@@ -30,18 +30,15 @@ jobs:
         run: |
           # 读取版本号
           VERSION=$(yq e .version pubspec.yaml)
-    
-          # 获取GitHub Actions的run_number
-          RUN_NUMBER=${{ github.run_number }}
-    
-          # 构建新版本号
-          NEW_VERSION=$(echo $VERSION | awk -F+ -v run_number="$RUN_NUMBER" '{print $1"+"run_number}')
-    
+
+          # 输出原版本号为新版本号
+          NEW_VERSION=$VERSION
+
           # 输出新版本号
           echo "New version: $NEW_VERSION"
-    
+
           # 设置新版本号为输出变量
-          echo "new_version=$NEW_VERSION" >>$GITHUB_OUTPUT
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
   android:
     name: Build CI (Android)
@@ -81,11 +78,6 @@ jobs:
         env:
             KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
-      - name: 更新版本号
-        id: version
-        run: |
-          # 更新pubspec.yaml文件中的版本号
-          sed -i "s/version: .*/version: ${{ needs.update_version.outputs.new_version }}/g" pubspec.yaml
 
       - name: flutter build apk (arm64 v8a only)
         run: flutter build apk --release --split-per-abi --target-platform android-arm64
