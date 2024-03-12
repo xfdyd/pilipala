@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/models/live/item.dart';
-import 'package:pilipala/utils/utils.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:PiliPalaX/common/constants.dart';
+import 'package:PiliPalaX/models/live/item.dart';
+import 'package:PiliPalaX/utils/utils.dart';
+import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 
 // 视频卡片 - 垂直布局
 class LiveCardV extends StatelessWidget {
@@ -159,18 +159,34 @@ class VideoStat extends StatelessWidget {
           tileMode: TileMode.mirror,
         ),
       ),
-      child: RichText(
-        maxLines: 1,
-        textAlign: TextAlign.justify,
-        softWrap: false,
-        text: TextSpan(
-          style: const TextStyle(fontSize: 11, color: Colors.white),
-          children: [
-            TextSpan(text: liveItem!.areaName!),
-            TextSpan(text: liveItem!.watchedShow!['text_small']),
-          ],
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            liveItem!.areaName!,
+            style: const TextStyle(fontSize: 11, color: Colors.white),
+            semanticsLabel: "${liveItem!.areaName!}直播",
+          ),
+          Text(
+            liveItem!.watchedShow!['text_small'],
+            style: const TextStyle(fontSize: 11, color: Colors.white),
+            semanticsLabel: "${liveItem!.watchedShow!['text_small']}围观",
+          ),
+        ],
       ),
+
+      // child: RichText(
+      //   maxLines: 1,
+      //   textAlign: TextAlign.justify,
+      //   softWrap: false,
+      //   text: TextSpan(
+      //     style: const TextStyle(fontSize: 11, color: Colors.white),
+      //     children: [
+      //       TextSpan(text: liveItem!.areaName!),
+      //       TextSpan(text: liveItem!.watchedShow!['text_small']),
+      //     ],
+      //   ),
+      // ),
     );
   }
 }
