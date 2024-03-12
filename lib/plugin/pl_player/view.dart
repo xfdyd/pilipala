@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -9,14 +9,16 @@ import 'package:hive/hive.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:nil/nil.dart';
-import 'package:pilipala/plugin/pl_player/controller.dart';
-import 'package:pilipala/plugin/pl_player/models/duration.dart';
-import 'package:pilipala/plugin/pl_player/models/fullscreen_mode.dart';
-import 'package:pilipala/plugin/pl_player/utils.dart';
-import 'package:pilipala/utils/feed_back.dart';
-import 'package:pilipala/utils/storage.dart';
+import 'package:PiliPalaX/plugin/pl_player/controller.dart';
+import 'package:PiliPalaX/plugin/pl_player/models/duration.dart';
+import 'package:PiliPalaX/plugin/pl_player/models/fullscreen_mode.dart';
+import 'package:PiliPalaX/plugin/pl_player/utils.dart';
+import 'package:PiliPalaX/utils/feed_back.dart';
+import 'package:PiliPalaX/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
+import '../../common/widgets/audio_video_progress_bar.dart';
+import '../../utils/utils.dart';
 import 'models/bottom_progress_behavior.dart';
 import 'widgets/app_bar_ani.dart';
 import 'widgets/backward_seek.dart';
@@ -79,6 +81,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   DateTime? lastFullScreenToggleTime;
   // 记录上一次音量调整值作平均，避免音量调整抖动
   double lastVolume = -1.0;
+  // 是否在调整固定进度条
+  RxBool draggingFixedProgressBar = false.obs;
+  // 阅读器限制
+  Timer? _accessibilityDebounce;
+  double _lastAnnouncedValue = -1;
 
   void onDoubleTapSeekBackward() {
     _ctr.onDoubleTapSeekBackward();
@@ -118,7 +125,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   void initState() {
     super.initState();
     animationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 300));
+        vsync: this, duration: const Duration(milliseconds: 100));
     videoController = widget.controller.videoController!;
     widget.controller.headerControl = widget.headerControl;
     widget.controller.bottomControl = widget.bottomControl;
@@ -127,8 +134,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         defaultValue: BtmProgresBehavior.values.first.code);
     enableQuickDouble =
         setting.get(SettingBoxKey.enableQuickDouble, defaultValue: true);
-    fullScreenGestureReverse = setting.get(SettingBoxKey.fullScreenGestureReverse,
-        defaultValue: false);
+    fullScreenGestureReverse = setting
+        .get(SettingBoxKey.fullScreenGestureReverse, defaultValue: false);
     enableBackgroundPlay =
         setting.get(SettingBoxKey.enableBackgroundPlay, defaultValue: false);
     Future.microtask(() async {
@@ -199,9 +206,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     final Color colorTheme = Theme.of(context).colorScheme.primary;
     const TextStyle subTitleStyle = TextStyle(
       height: 1.5,
-      fontSize: 40.0,
-      letterSpacing: 0.0,
-      wordSpacing: 0.0,
+      fontSize: 65.0,
+      letterSpacing: 0.1,
+      wordSpacing: 0.1,
       color: Color(0xffffffff),
       fontWeight: FontWeight.normal,
       backgroundColor: Color(0xaa000000),
@@ -216,6 +223,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       children: <Widget>[
         Obx(
           () => Video(
+            key: ValueKey(_.videoFit.value),
             controller: videoController,
             controls: NoVideoControls,
             pauseUponEnteringBackgroundMode: !enableBackgroundPlay,
@@ -246,11 +254,12 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     ),
                     height: 32.0,
                     width: 70.0,
-                    child: const Center(
-                      child: Text(
-                        '倍速中',
-                        style: TextStyle(color: Colors.white, fontSize: 13),
-                      ),
+                    child: Center(
+                      child: Obx(() => Text(
+                            '${_.enableAutoLongPressSpeed ? _.playbackSpeed * 2 : _.longPressSpeed}倍速中',
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 13),
+                          )),
                     )),
               ),
             ),
@@ -281,10 +290,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                       children: [
                         Obx(() {
                           return Text(
-                            _.sliderTempPosition.value.inMinutes >= 60
-                                ? printDurationWithHours(
-                                    _.sliderTempPosition.value)
-                                : printDuration(_.sliderTempPosition.value),
+                            Utils.timeFormat(
+                                _.sliderTempPosition.value.inSeconds),
                             style: textStyle,
                           );
                         }),
@@ -439,123 +446,131 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           top: 25,
           right: 15,
           bottom: 15,
-          child: GestureDetector(
-            onTap: () {
-              _.controls = !_.showControls.value;
-            },
-            onDoubleTapDown: (TapDownDetails details) {
-              // live模式下禁用 锁定时🔒禁用
-              if (_.videoType.value == 'live' || _.controlsLock.value) {
-                return;
-              }
-              RenderBox renderBox = _playerKey.currentContext!.findRenderObject() as RenderBox;
-              final double totalWidth = renderBox.size.width;
-              final double tapPosition = details.localPosition.dx;
-              final double sectionWidth = totalWidth / 3;
-              String type = 'left';
-              if (tapPosition < sectionWidth) {
-                type = 'left';
-              } else if (tapPosition < sectionWidth * 2) {
-                type = 'center';
-              } else {
-                type = 'right';
-              }
-              doubleTapFuc(type);
-            },
-            onLongPressStart: (LongPressStartDetails detail) {
-              feedBack();
-              _.setDoubleSpeedStatus(true);
-            },
-            onLongPressEnd: (LongPressEndDetails details) {
-              _.setDoubleSpeedStatus(false);
-            },
+          child: Semantics(
+            label: '双击开关播放控件，左右滑动调整进度',
+            child: GestureDetector(
+              onTap: () {
+                _.controls = !_.showControls.value;
+              },
+              onDoubleTapDown: (TapDownDetails details) {
+                // live模式下禁用 锁定时🔒禁用
+                if (_.videoType.value == 'live' || _.controlsLock.value) {
+                  return;
+                }
+                RenderBox renderBox =
+                    _playerKey.currentContext!.findRenderObject() as RenderBox;
+                final double totalWidth = renderBox.size.width;
+                final double tapPosition = details.localPosition.dx;
+                final double sectionWidth = totalWidth / 3;
+                String type = 'left';
+                if (tapPosition < sectionWidth) {
+                  type = 'left';
+                } else if (tapPosition < sectionWidth * 2) {
+                  type = 'center';
+                } else {
+                  type = 'right';
+                }
+                doubleTapFuc(type);
+              },
+              onLongPressStart: (LongPressStartDetails detail) {
+                feedBack();
+                _.setDoubleSpeedStatus(true);
+              },
+              onLongPressEnd: (LongPressEndDetails details) {
+                _.setDoubleSpeedStatus(false);
+              },
 
-            /// 水平位置 快进 live模式下禁用
-            onHorizontalDragUpdate: (DragUpdateDetails details) {
-              // live模式下禁用 锁定时🔒禁用
-              if (_.videoType.value == 'live' || _.controlsLock.value) {
-                return;
-              }
-              // final double tapPosition = details.localPosition.dx;
-              final int curSliderPosition =
-                  _.sliderPosition.value.inMilliseconds;
-              RenderBox renderBox = _playerKey.currentContext!.findRenderObject() as RenderBox;
-              final double scale = 90000 / renderBox.size.width;
-              final Duration pos = Duration(
-                  milliseconds:
-                      curSliderPosition + (details.delta.dx * scale).round());
-              final Duration result =
-                  pos.clamp(Duration.zero, _.duration.value);
-              _.onUpdatedSliderProgress(result);
-              _.onChangedSliderStart();
-              // _initTapPositoin = tapPosition;
-            },
-            onHorizontalDragEnd: (DragEndDetails details) {
-              if (_.videoType.value == 'live' || _.controlsLock.value) {
-                return;
-              }
-              _.onChangedSliderEnd();
-              _.seekTo(_.sliderPosition.value, type: 'slider');
-            },
-            // 垂直方向 音量/亮度调节
-            onVerticalDragUpdate: (DragUpdateDetails details) async {
-              RenderBox renderBox = _playerKey.currentContext!.findRenderObject() as RenderBox;
-              final double totalWidth = renderBox.size.width;
-              final double tapPosition = details.localPosition.dx;
-              final double sectionWidth = totalWidth / 3;
-              final double delta = details.delta.dy;
+              /// 水平位置 快进 live模式下禁用
+              onHorizontalDragUpdate: (DragUpdateDetails details) {
+                // live模式下禁用 锁定时🔒禁用
+                if (_.videoType.value == 'live' || _.controlsLock.value) {
+                  return;
+                }
+                // final double tapPosition = details.localPosition.dx;
+                final int curSliderPosition =
+                    _.sliderPosition.value.inMilliseconds;
+                RenderBox renderBox =
+                    _playerKey.currentContext!.findRenderObject() as RenderBox;
+                final double scale = 90000 / renderBox.size.width;
+                final Duration pos = Duration(
+                    milliseconds:
+                        curSliderPosition + (details.delta.dx * scale).round());
+                final Duration result =
+                    pos.clamp(Duration.zero, _.duration.value);
+                _.onUpdatedSliderProgress(result);
+                _.onChangedSliderStart();
+                // _initTapPositoin = tapPosition;
+              },
+              onHorizontalDragEnd: (DragEndDetails details) {
+                if (_.videoType.value == 'live' || _.controlsLock.value) {
+                  return;
+                }
+                _.onChangedSliderEnd();
+                _.seekTo(_.sliderPosition.value, type: 'slider');
+              },
+              // 垂直方向 音量/亮度调节
+              onVerticalDragUpdate: (DragUpdateDetails details) async {
+                RenderBox renderBox =
+                    _playerKey.currentContext!.findRenderObject() as RenderBox;
 
-              /// 锁定时禁用
-              if (_.controlsLock.value) {
-                return;
-              }
-              if (lastFullScreenToggleTime != null &&
-                  DateTime.now().difference(lastFullScreenToggleTime!) <
-                      const Duration(milliseconds: 500)) {
-                return;
-              }
-              if (tapPosition < sectionWidth) {
-                // 左边区域 👈
-                final double level = renderBox.size.height * 3;
-                final double brightness =
-                    _ctr.brightnessValue.value - delta / level;
-                final double result = brightness.clamp(0.0, 1.0);
-                setBrightness(result);
-              } else if (tapPosition < sectionWidth * 2) {
-                // 全屏
-                final double dy = details.delta.dy;
-                const double threshold = 7.0; // 滑动阈值
-                void fullScreenTrigger(bool status) async {
-                  lastFullScreenToggleTime = DateTime.now();
-                  await widget.controller.triggerFullScreen(status: status);
+                /// 锁定时禁用
+                if (_.controlsLock.value) {
+                  return;
                 }
-                if (dy > _distance && dy > threshold) {
-                  // 下滑退出全屏/进入全屏
-                  if (_.isFullScreen.value ^ fullScreenGestureReverse) {
-                    fullScreenTrigger(fullScreenGestureReverse);
+                final double totalWidth = renderBox.size.width;
+                final double tapPosition = details.localPosition.dx;
+                final double sectionWidth = totalWidth / 3;
+                final double delta = details.delta.dy;
+                if (lastFullScreenToggleTime != null &&
+                    DateTime.now().difference(lastFullScreenToggleTime!) <
+                        const Duration(milliseconds: 500)) {
+                  return;
+                }
+                if (tapPosition < sectionWidth) {
+                  // 左边区域 👈
+                  final double level = renderBox.size.height * 3;
+                  final double brightness =
+                      _ctr.brightnessValue.value - delta / level;
+                  final double result = brightness.clamp(0.0, 1.0);
+                  setBrightness(result);
+                } else if (tapPosition < sectionWidth * 2) {
+                  // 全屏
+                  final double dy = details.delta.dy;
+                  const double threshold = 7.0; // 滑动阈值
+                  void fullScreenTrigger(bool status) async {
+                    lastFullScreenToggleTime = DateTime.now();
+                    await widget.controller.triggerFullScreen(status: status);
                   }
-                  _distance = 0.0;
-                } else if (dy < _distance && dy < -threshold) {
-                  // 上划进入全屏/退出全屏
-                  if (!_.isFullScreen.value ^ fullScreenGestureReverse) {
-                    fullScreenTrigger(!fullScreenGestureReverse);
+
+                  if (dy > _distance && dy > threshold) {
+                    // 下滑退出全屏/进入全屏
+                    if (_.isFullScreen.value ^ fullScreenGestureReverse) {
+                      fullScreenTrigger(fullScreenGestureReverse);
+                    }
+                    _distance = 0.0;
+                  } else if (dy < _distance && dy < -threshold) {
+                    // 上划进入全屏/退出全屏
+                    if (!_.isFullScreen.value ^ fullScreenGestureReverse) {
+                      fullScreenTrigger(!fullScreenGestureReverse);
+                    }
+                    _distance = 0.0;
                   }
-                  _distance = 0.0;
+                  _distance = dy;
+                } else {
+                  // 右边区域 👈
+                  final double level = renderBox.size.height * 0.5;
+                  if (lastVolume < 0) {
+                    lastVolume = _ctr.volumeValue.value;
+                  }
+                  final double volume =
+                      (lastVolume + _ctr.volumeValue.value - delta / level) / 2;
+                  final double result = volume.clamp(0.0, 1.0);
+                  lastVolume = result;
+                  setVolume(result);
                 }
-                _distance = dy;
-              } else {
-                // 右边区域 👈
-                final double level = renderBox.size.height * 0.5;
-                if(lastVolume < 0) {
-                  lastVolume = _ctr.volumeValue.value;
-                }
-                final double volume = (lastVolume + _ctr.volumeValue.value - delta / level)/2;
-                final double result = volume.clamp(0.0, 1.0);
-                lastVolume = result;
-                setVolume(result);
-              }
-            },
-            onVerticalDragEnd: (DragEndDetails details) {},
+              },
+              onVerticalDragEnd: (DragEndDetails details) {},
+            ),
           ),
         ),
 
@@ -594,6 +609,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         ),
 
         /// 进度条 live模式下禁用
+
         Obx(
           () {
             final int value = _.sliderPositionSeconds.value;
@@ -604,65 +620,84 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             }
             if (defaultBtmProgressBehavior ==
                 BtmProgresBehavior.alwaysHide.code) {
-              return nil;
+              return Container();
             }
             if (defaultBtmProgressBehavior ==
                     BtmProgresBehavior.onlyShowFullScreen.code &&
                 !_.isFullScreen.value) {
-              return nil;
+              return Container();
             } else if (defaultBtmProgressBehavior ==
                     BtmProgresBehavior.onlyHideFullScreen.code &&
                 _.isFullScreen.value) {
-              return nil;
+              return Container();
             }
 
             if (_.videoType.value == 'live') {
-              return nil;
+              return Container();
             }
             if (value > max || max <= 0) {
-              return nil;
+              return Container();
             }
             return Positioned(
-              bottom: -1.5,
-              left: 0,
-              right: 0,
-              child: ProgressBar(
-                progress: Duration(seconds: value),
-                buffered: Duration(seconds: buffer),
-                total: Duration(seconds: max),
-                progressBarColor: colorTheme,
-                baseBarColor: Colors.white.withOpacity(0.2),
-                bufferedBarColor:
-                    Theme.of(context).colorScheme.primary.withOpacity(0.4),
-                timeLabelLocation: TimeLabelLocation.none,
-                thumbColor: colorTheme,
-                barHeight: 3,
-                thumbRadius: 0.0,
-                // onDragStart: (duration) {
-                //   _.onChangedSliderStart();
-                // },
-                // onDragEnd: () {
-                //   _.onChangedSliderEnd();
-                // },
-                // onDragUpdate: (details) {
-                //   print(details);
-                // },
-                // onSeek: (duration) {
-                //   feedBack();
-                //   _.onChangedSlider(duration.inSeconds.toDouble());
-                //   _.seekTo(duration);
-                // },
-              ),
-              // SlideTransition(
-              //     position: Tween<Offset>(
-              //       begin: Offset.zero,
-              //       end: const Offset(0, -1),
-              //     ).animate(CurvedAnimation(
-              //       parent: animationController,
-              //       curve: Curves.easeInOut,
-              //     )),
-              //     child: ),
-            );
+                bottom: -1,
+                left: 0,
+                right: 0,
+                child: Semantics(
+                  // label: '${(value / max * 100).round()}%',
+                  value: '${(value / max * 100).round()}%',
+                  // enabled: false,
+                  child: ProgressBar(
+                    progress: Duration(seconds: value),
+                    buffered: Duration(seconds: buffer),
+                    total: Duration(seconds: max),
+                    progressBarColor: colorTheme,
+                    baseBarColor: Colors.white.withOpacity(0.2),
+                    bufferedBarColor:
+                        Theme.of(context).colorScheme.primary.withOpacity(0.4),
+                    timeLabelLocation: TimeLabelLocation.none,
+                    thumbColor: colorTheme,
+                    barHeight: 3.5,
+                    thumbRadius: draggingFixedProgressBar.value ? 7 : 2.5,
+                    // onDragStart: (duration) {
+                    //   draggingFixedProgressBar.value = true;
+                    //   feedBack();
+                    //   _.onChangedSliderStart();
+                    // },
+                    // onDragUpdate: (duration) {
+                    //   double newProgress = duration.timeStamp.inSeconds / max;
+                    //   if ((newProgress - _lastAnnouncedValue).abs() > 0.02) {
+                    //     _accessibilityDebounce?.cancel();
+                    //     _accessibilityDebounce =
+                    //         Timer(const Duration(milliseconds: 200), () {
+                    //       SemanticsService.announce(
+                    //           "${(newProgress * 100).round()}%",
+                    //           TextDirection.ltr);
+                    //       _lastAnnouncedValue = newProgress;
+                    //     });
+                    //   }
+                    //   _.onUpdatedSliderProgress(duration.timeStamp);
+                    // },
+                    // onSeek: (duration) {
+                    //   draggingFixedProgressBar.value = false;
+                    //   _.onChangedSliderEnd();
+                    //   _.onChangedSlider(duration.inSeconds.toDouble());
+                    //   _.seekTo(Duration(seconds: duration.inSeconds),
+                    //       type: 'slider');
+                    //   SemanticsService.announce(
+                    //       "${(duration.inSeconds / max * 100).round()}%",
+                    //       TextDirection.ltr);
+                    // },
+                  ),
+                  // SlideTransition(
+                  //     position: Tween<Offset>(
+                  //       begin: Offset.zero,
+                  //       end: const Offset(0, -1),
+                  //     ).animate(CurvedAnimation(
+                  //       parent: animationController,
+                  //       curve: Curves.easeInOut,
+                  //     )),
+                  //     child: ),
+                ));
           },
         ),
 
@@ -677,6 +712,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 child: Visibility(
                   visible: _.showControls.value,
                   child: ComBtn(
+                    tooltip: _.controlsLock.value ? '解锁' : '锁定',
                     icon: Icon(
                       _.controlsLock.value
                           ? FontAwesomeIcons.lock
@@ -706,6 +742,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 child: Image.asset(
                   'assets/images/loading.gif',
                   height: 25,
+                  semanticLabel: "加载中",
                 ),
               ),
             );
@@ -749,6 +786,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                               },
                               onSubmitted: (Duration value) {
                                 _ctr.hideSeekBackwardButton.value = true;
+                                _ctr.mountSeekBackwardButton.value = false;
                                 final Player player =
                                     widget.controller.videoPlayerController!;
                                 Duration result = player.state.position - value;
@@ -795,6 +833,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                               },
                               onSubmitted: (Duration value) {
                                 _ctr.hideSeekForwardButton.value = true;
+                                _ctr.mountSeekForwardButton.value = false;
                                 final Player player =
                                     widget.controller.videoPlayerController!;
                                 Duration result = player.state.position + value;
