@@ -1,11 +1,10 @@
-// import 'package:hive/hive.dart';
 import 'dart:io';
-
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pilipala/models/model_owner.dart';
-import 'package:pilipala/models/search/hot.dart';
-import 'package:pilipala/models/user/info.dart';
+import 'package:PiliPalaX/models/model_owner.dart';
+import 'package:PiliPalaX/models/search/hot.dart';
+import 'package:PiliPalaX/models/user/info.dart';
+import 'global_data.dart';
 
 class GStrorage {
   static late final Box<dynamic> userInfo;
@@ -42,6 +41,10 @@ class GStrorage {
         return deletedEntries > 10;
       },
     );
+    // 视频设置
+    video = await Hive.openBox('video');
+    GlobalData().imgQuality =
+        setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10); // 设置全局变量
   }
 
   static void regAdapter() {
@@ -50,11 +53,6 @@ class GStrorage {
     Hive.registerAdapter(LevelInfoAdapter());
     Hive.registerAdapter(HotSearchModelAdapter());
     Hive.registerAdapter(HotSearchItemAdapter());
-  }
-
-  static Future<void> lazyInit() async {
-    // 视频设置
-    video = await Hive.openBox('video');
   }
 
   static Future<void> close() async {
@@ -84,6 +82,7 @@ class SettingBoxKey {
       autoPlayEnable = 'autoPlayEnable',
       fullScreenMode = 'fullScreenMode',
       defaultDecode = 'defaultDecode',
+      secondDecode = 'secondDecode',
       danmakuEnable = 'danmakuEnable',
       defaultToastOp = 'defaultToastOp',
       defaultPicQa = 'defaultPicQa',
@@ -97,6 +96,7 @@ class SettingBoxKey {
       enableCDN = 'enableCDN',
       autoPiP = 'autoPiP',
       enableAutoLongPressSpeed = 'enableAutoLongPressSpeed',
+      subtitlePreference = 'subtitlePreference',
 
       // youtube 双击快进快退
       enableQuickDouble = 'enableQuickDouble',
@@ -127,7 +127,8 @@ class SettingBoxKey {
       enableWordRe = 'enableWordRe',
       enableSearchWord = 'enableSearchWord',
       enableSystemProxy = 'enableSystemProxy',
-      enableAi = 'enableAi';
+      enableAi = 'enableAi',
+      defaultHomePage = 'defaultHomePage';
 
   /// 外观
   static const String themeMode = 'themeMode',
@@ -141,7 +142,9 @@ class SettingBoxKey {
       hideSearchBar = 'hideSearchBar', // 收起顶栏
       hideTabBar = 'hideTabBar', // 收起底栏
       tabbarSort = 'tabbarSort', // 首页tabbar
-      dynamicBadgeMode = 'dynamicBadgeMode';
+      dynamicBadgeMode = 'dynamicBadgeMode',
+      hiddenSettingUnlocked = 'hiddenSettingUnlocked',
+      enableGradientBg = 'enableGradientBg';
 }
 
 class LocalCacheKey {

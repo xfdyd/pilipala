@@ -13,6 +13,10 @@ class Api {
   // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/videostream_url.md
   static const String videoUrl = '/x/player/wbi/playurl';
 
+  // 字幕
+  // aid, cid
+  static const String subtitleUrl = '/x/player/wbi/v2';
+
   // 视频详情
   // 竖屏 https://api.bilibili.com/x/web-interface/view?aid=527403921
   // https://api.bilibili.com/x/web-interface/view/detail  获取视频超详细信息(web端)
@@ -119,6 +123,11 @@ class Api {
   // 用户(被)关注数、投稿数
   // https://api.bilibili.com/x/relation/stat?vmid=697166795
   static const String userStat = '/x/relation/stat';
+
+  // 获取我的表情列表
+  // business:reply（回复）dynamic（动态）
+  //https://api.bilibili.com/x/emote/user/panel/web?business=reply
+  static const String myEmote = '/x/emote/user/panel/web';
 
   // 获取用户信息
   static const String userInfo = '/x/web-interface/nav';
@@ -233,6 +242,10 @@ class Api {
   static const String liveRoomInfo =
       '${HttpString.liveBaseUrl}/xlive/web-room/v2/index/getRoomPlayInfo';
 
+  // 直播间详情 H5
+  static const String liveRoomInfoH5 =
+      '${HttpString.liveBaseUrl}/xlive/web-room/v1/index/getH5InfoByRoom';
+
   // 用户信息 需要Wbi签名
   // https://api.bilibili.com/x/space/wbi/acc/info?mid=503427686&token=&platform=web&web_location=1550101&w_rid=d709892496ce93e3d94d6d37c95bde91&wts=1689301482
   static const String memberInfo = '/x/space/wbi/acc/info';
@@ -309,7 +322,7 @@ class Api {
 
   // github 获取最新版
   static const String latestApp =
-      'https://api.github.com/repos/guozhigq/pilipala/releases/latest';
+      'https://api.github.com/repos/orz12/pilipala/releases';
 
   // 多少人在看
   // https://api.bilibili.com/x/player/online/total?aid=913663681&cid=1203559746&bvid=BV1MM4y1s7NZ&ts=56427838
@@ -339,13 +352,13 @@ class Api {
   static const String msgFeedAt = '/x/msgfeed/at';
   //https://api.bilibili.com/x/msgfeed/like?platform=web&build=0&mobi_app=web
   static const String msgFeedLike = '/x/msgfeed/like';
-  //https://message.bilibili.com/x/sys-msg/query_user_notify?csrf=31b0caa533cea4d1a1bd2e921f045ec6&csrf=31b0caa533cea4d1a1bd2e921f045ec6&page_size=20&build=0&mobi_app=web
+  //https://message.bilibili.com/x/sys-msg/query_user_notify?csrf=xxxx&csrf=xxxx&page_size=20&build=0&mobi_app=web
   static const String msgSysUserNotify = '${HttpString.messageBaseUrl}/x/sys-msg/query_user_notify';
-  //https://message.bilibili.com/x/sys-msg/query_unified_notify?csrf=31b0caa533cea4d1a1bd2e921f045ec6&csrf=31b0caa533cea4d1a1bd2e921f045ec6&page_size=10&build=0&mobi_app=web
+  //https://message.bilibili.com/x/sys-msg/query_unified_notify?csrf=xxxx&csrf=xxxx&page_size=10&build=0&mobi_app=web
   static const String msgSysUnifiedNotify = '${HttpString.messageBaseUrl}/x/sys-msg/query_unified_notify';
 
   // 系统信息光标更新（已读标记）
-  //https://message.bilibili.com/x/sys-msg/update_cursor?csrf=31b0caa533cea4d1a1bd2e921f045ec6&csrf=31b0caa533cea4d1a1bd2e921f045ec6&cursor=1705288500000000000&has_up=0&build=0&mobi_app=web
+  //https://message.bilibili.com/x/sys-msg/update_cursor?csrf=xxxx&csrf=xxxx&cursor=1705288500000000000&has_up=0&build=0&mobi_app=web
   static const String msgSysUpdateCursor = '${HttpString.messageBaseUrl}/x/sys-msg/update_cursor';
 
   /// 私聊
@@ -490,4 +503,19 @@ class Api {
 
   /// 获取未读动态数
   static const getUnreadDynamic = '/x/web-interface/dynamic/entrance';
+
+  /// 用户动态主页
+  static const dynamicSpmPrefix = 'https://space.bilibili.com/1/dynamic';
+
+  /// 激活buvid3
+  static const activateBuvidApi = '/x/internal/gaia-gateway/ExClimbWuzhi';
+
+  /// 我的订阅
+  static const userSubFolder = '/x/v3/fav/folder/collected/list';
+
+  /// 我的订阅详情
+  static const userSubFolderDetail = '/x/space/fav/season/list';
+
+  /// 发送私信
+  static const String sendMsg = '${HttpString.tUrl}/web_im/v1/web_im/send_msg';
 }
