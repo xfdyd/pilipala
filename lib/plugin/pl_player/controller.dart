@@ -434,7 +434,7 @@ class PlPlayerController {
           configuration: PlayerConfiguration(
             // 默认缓存 5M 大小
             bufferSize:
-                videoType.value == 'live' ? 5 * 1024 * 1024 : 5 * 1024 * 1024,
+                videoType.value == 'live' ? 2 * 1024 * 1024 : 5 * 1024 * 1024,
           ),
         );
 
