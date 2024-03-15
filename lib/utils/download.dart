@@ -22,8 +22,9 @@ class DownloadUtils {
       SmartDialog.showLoading(msg: '保存中');
       var response = await Dio()
           .get(imgUrl, options: Options(responseType: ResponseType.bytes));
+      String imgExt = ".jpg"; // 确保图片扩展名与实际内容相符
       String picName =
-          "plpl_${imgType}_${DateTime.now().toString().split('-').join()}";
+          "plpl_${imgType}_${DateTime.now().toString().split('-').join()}_${imgExt}";
       final SaveResult result = await SaverGallery.saveImage(
         Uint8List.fromList(response.data),
         quality: 100,
