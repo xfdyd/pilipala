@@ -431,7 +431,7 @@ class PlPlayerController {
     int bufferSize =
         setting.get(SettingBoxKey.expandBuffer, defaultValue: false)
             ? (videoType.value == 'live' ? 64 * 1024 * 1024 : 32 * 1024 * 1024)
-            : (videoType.value == 'live' ? 5 * 1024 * 1024 : 2 * 1024 * 1024);
+            : (videoType.value == 'live' ? 5 * 1024 * 1024 : 5 * 1024 * 1024);
     Player player = _videoPlayerController ??
         Player(
           configuration: PlayerConfiguration(
