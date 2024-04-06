@@ -1,22 +1,25 @@
 import 'dart:math';
 
+import 'package:PiliPalaX/common/widgets/list_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/models/video_detail_res.dart';
 import 'package:PiliPalaX/pages/video/detail/index.dart';
 
-import '../../../../../utils/utils.dart';
+import '../../../../../utils/id_utils.dart';
 
 class PagesPanel extends StatefulWidget {
   const PagesPanel({
     super.key,
     required this.pages,
     this.cid,
-    this.changeFuc,
+    required this.bvid,
+    required this.changeFuc,
   });
   final List<Part> pages;
   final int? cid;
-  final Function? changeFuc;
+  final String bvid;
+  final Function changeFuc;
 
   @override
   State<PagesPanel> createState() => _PagesPanelState();
@@ -28,7 +31,6 @@ class _PagesPanelState extends State<PagesPanel> {
   late int currentIndex;
   final String heroTag = Get.arguments['heroTag'];
   late VideoDetailController _videoDetailController;
-  final ScrollController _scrollController = ScrollController();
   final ScrollController _scrollController2 = ScrollController();
 
   @override
@@ -40,64 +42,25 @@ class _PagesPanelState extends State<PagesPanel> {
     currentIndex = episodes.indexWhere((Part e) => e.cid == cid);
     _videoDetailController.cid.listen((int p0) {
       cid = p0;
-      setState(() {});
       currentIndex = episodes.indexWhere((Part e) => e.cid == cid);
+      if (!mounted) return;
+      const double itemWidth = 150; // 每个列表项的宽度
+      final double targetOffset = min(
+          (currentIndex * itemWidth) - (itemWidth / 2),
+          _scrollController2.position.maxScrollExtent);
+      // 滑动至目标位置
+      _scrollController2.animateTo(
+        targetOffset,
+        duration: const Duration(milliseconds: 300), // 滑动动画持续时间
+        curve: Curves.easeInOut, // 滑动动画曲线
+      );
     });
-  }
-
-  void changeFucCall(item, i) async {
-    await widget.changeFuc!(item.cid);
-
-    const double itemWidth = 150; // 每个列表项的宽度
-    final double targetOffset = min((i * itemWidth) - (itemWidth / 2),
-        _scrollController2.position.maxScrollExtent);
-
-    // 滑动至目标位置
-    _scrollController2.animateTo(
-      targetOffset,
-      duration: const Duration(milliseconds: 300), // 滑动动画持续时间
-      curve: Curves.easeInOut, // 滑动动画曲线
-    );
-    currentIndex = i;
-    setState(() {});
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _scrollController2.dispose();
     super.dispose();
-  }
-
-  Widget buildEpisodeListItem(
-    Part episode,
-    int index,
-    bool isCurrentIndex,
-  ) {
-    Color primary = Theme.of(context).colorScheme.primary;
-    return ListTile(
-      onTap: () {
-        changeFucCall(episode, index);
-        Get.back();
-      },
-      dense: false,
-      leading: isCurrentIndex
-          ? Image.asset(
-              'assets/images/live.png',
-              color: primary,
-              height: 12,
-              semanticLabel: "正在播放：",
-            )
-          : null,
-      title: Text(
-        episode.pagePart!,
-        style: TextStyle(
-          fontSize: 14,
-          color: isCurrentIndex
-              ? primary
-              : Theme.of(context).colorScheme.onSurface,
-        ),
-      ),
-    );
   }
 
   @override
@@ -128,83 +91,14 @@ class _PagesPanelState extends State<PagesPanel> {
                     padding: MaterialStateProperty.all(EdgeInsets.zero),
                   ),
                   onPressed: () {
-                    showBottomSheet(
+                    ListSheet(
+                      episodes: episodes,
+                      bvid: widget.bvid,
+                      aid: IdUtils.bv2av(widget.bvid),
+                      currentCid: cid,
+                      changeFucCall: widget.changeFuc,
                       context: context,
-                      builder: (BuildContext context) {
-                        return StatefulBuilder(builder:
-                            (BuildContext context, StateSetter setState) {
-                          WidgetsBinding.instance
-                              .addPostFrameCallback((_) async {
-                            await Future.delayed(
-                                const Duration(milliseconds: 200));
-                            _scrollController.jumpTo(currentIndex * 56);
-                          });
-                          return Container(
-                            height: Utils.getSheetHeight(context),
-                            color: Theme.of(context).colorScheme.background,
-                            child: Column(
-                              children: [
-                                Container(
-                                  height: 45,
-                                  padding: const EdgeInsets.only(
-                                      left: 14, right: 14),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        '合集（${episodes.length}）',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium,
-                                      ),
-                                      IconButton(
-                                        tooltip: '关闭',
-                                        icon: const Icon(Icons.close),
-                                        onPressed: () => Navigator.pop(context),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Divider(
-                                  height: 1,
-                                  color: Theme.of(context)
-                                      .dividerColor
-                                      .withOpacity(0.1),
-                                ),
-                                Expanded(
-                                  child: Material(
-                                    child: ListView.builder(
-                                      controller: _scrollController,
-                                      itemCount: episodes.length + 1,
-                                      itemBuilder:
-                                          (BuildContext context, int index) {
-                                        bool isLastItem =
-                                            index == episodes.length;
-                                        bool isCurrentIndex =
-                                            currentIndex == index;
-                                        return isLastItem
-                                            ? SizedBox(
-                                                height: MediaQuery.of(context)
-                                                        .padding
-                                                        .bottom +
-                                                    20,
-                                              )
-                                            : buildEpisodeListItem(
-                                                episodes[index],
-                                                index,
-                                                isCurrentIndex,
-                                              );
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        });
-                      },
-                    );
+                    ).buildShowBottomSheet();
                   },
                   child: Text(
                     '共${widget.pages.length}集',
@@ -233,7 +127,10 @@ class _PagesPanelState extends State<PagesPanel> {
                   borderRadius: BorderRadius.circular(6),
                   clipBehavior: Clip.hardEdge,
                   child: InkWell(
-                    onTap: () => changeFucCall(widget.pages[i], i),
+                    onTap: () => {
+                      widget.changeFuc(widget.bvid, widget.pages[i].cid,
+                          IdUtils.bv2av(widget.bvid))
+                    },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 8, horizontal: 8),

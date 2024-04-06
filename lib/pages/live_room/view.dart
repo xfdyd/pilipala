@@ -179,7 +179,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
                             IconButton(
                               tooltip: '内置浏览器打开',
                                 onPressed: () {
-                                  Get.toNamed(
+                                  Get.offNamed(
                                     '/webview',
                                     parameters: {
                                       'url':

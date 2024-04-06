@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:PiliPalaX/pages/setting/widgets/select_dialog.dart';
@@ -137,12 +138,18 @@ class _PlaySettingState extends State<PlaySetting> {
             defaultVal: false,
           ),
           if (Platform.isAndroid)
-            const SetSwitchItem(
-              title: '后台画中画',
-              subTitle: '进入后台时以小窗形式（PiP）播放',
-              setKey: SettingBoxKey.autoPiP,
-              defaultVal: false,
-            ),
+            SetSwitchItem(
+                title: '后台画中画',
+                subTitle: '进入后台时以小窗形式（PiP）播放，建议同时开启【后台播放】，避免没有暂停按钮',
+                setKey: SettingBoxKey.autoPiP,
+                defaultVal: false,
+                callFn: (val) {
+                  if (val &&
+                      !setting.get(SettingBoxKey.enableBackgroundPlay,
+                          defaultValue: false)) {
+                    SmartDialog.showToast('建议开启后台播放');
+                  }
+                }),
           if (Platform.isAndroid)
             const SetSwitchItem(
               title: '画中画不加载弹幕',

@@ -85,14 +85,14 @@ class _StyleSettingState extends State<StyleSetting> {
             title: '首页顶栏收起',
             subTitle: '首页列表滑动时，收起顶栏',
             setKey: SettingBoxKey.hideSearchBar,
-            defaultVal: true,
+            defaultVal: false,
             needReboot: true,
           ),
           const SetSwitchItem(
             title: '首页底栏收起',
             subTitle: '首页列表滑动时，收起底栏',
             setKey: SettingBoxKey.hideTabBar,
-            defaultVal: true,
+            defaultVal: false,
             needReboot: true,
           ),
           const SetSwitchItem(
@@ -262,6 +262,12 @@ class _StyleSettingState extends State<StyleSetting> {
             subtitle: Obx(() => Text(
                 '当前主题：${colorSelectController.type.value == 0 ? '动态取色' : '指定颜色'}',
                 style: subTitleStyle)),
+          ),
+          const SetSwitchItem(
+            title: '默认展示评论区',
+            subTitle: '在视频详情页默认切换至评论区页',
+            setKey: SettingBoxKey.defaultShowComment,
+            defaultVal: false,
           ),
           ListTile(
             dense: false,

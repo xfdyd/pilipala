@@ -378,6 +378,7 @@ class Part {
   String? weblink;
   Dimension? dimension;
   String? firstFrame;
+  String? badge;
 
   Part({
     this.cid,
@@ -389,6 +390,7 @@ class Part {
     this.weblink,
     this.dimension,
     this.firstFrame,
+    this.badge,
   });
 
   fromRawJson(String str) => Part.fromJson(json.decode(str));
@@ -407,6 +409,7 @@ class Part {
         ? null
         : Dimension.fromJson(json["dimension"]);
     firstFrame = json["first_frame"];
+    badge = json["badge"];
   }
 
   Map<String, dynamic> toJson() {
@@ -420,6 +423,7 @@ class Part {
     data["weblink"] = weblink;
     data["dimension"] = dimension?.toJson();
     data["first_frame"] = firstFrame;
+    data["badge"] = badge;
     return data;
   }
 }
@@ -627,9 +631,11 @@ class EpisodeItem {
     this.aid,
     this.cid,
     this.title,
+    this.longTitle,
     this.attribute,
     this.page,
     this.bvid,
+    this.badge,
   });
   int? seasonId;
   int? sectionId;
@@ -637,9 +643,11 @@ class EpisodeItem {
   int? aid;
   int? cid;
   String? title;
+  String? longTitle;
   int? attribute;
   Part? page;
   String? bvid;
+  String? badge;
 
   EpisodeItem.fromJson(Map<String, dynamic> json) {
     seasonId = json['season_id'];
@@ -648,8 +656,10 @@ class EpisodeItem {
     aid = json['aid'];
     cid = json['cid'];
     title = json['title'];
+    longTitle = json['long_title'];
     attribute = json['attribute'];
     page = Part.fromJson(json['page']);
     bvid = json['bvid'];
+    badge = json['badge'];
   }
 }

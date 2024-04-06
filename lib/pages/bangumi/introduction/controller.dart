@@ -295,7 +295,7 @@ class BangumiIntroController extends GetxController {
   }
 
   /// 列表循环或者顺序播放时，自动播放下一个
-  void nextPlay() {
+  bool nextPlay() {
     late List episodes;
     if (bangumiDetail.value.episodes != null) {
       episodes = bangumiDetail.value.episodes!;
@@ -312,12 +312,15 @@ class BangumiIntroController extends GetxController {
         nextIndex = 0;
       }
     }
-    if (nextIndex <= episodes.length - 1 &&
-        platRepeat == PlayRepeat.listOrder) {}
+    if (nextIndex == episodes.length - 1 &&
+        platRepeat == PlayRepeat.listOrder) {
+      return false;
+    }
 
     int cid = episodes[nextIndex].cid!;
     String bvid = episodes[nextIndex].bvid!;
     int aid = episodes[nextIndex].aid!;
     changeSeasonOrbangu(bvid, cid, aid);
+    return true;
   }
 }

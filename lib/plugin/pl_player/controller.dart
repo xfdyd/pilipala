@@ -86,6 +86,9 @@ class PlPlayerController {
   late StreamSubscription<DataStatus> _dataListenerForVideoFit;
   late StreamSubscription<DataStatus> _dataListenerForEnterFullscreen;
 
+  /// 后台播放
+  final Rx<bool> _backgroundPlay = false.obs;
+
   ///
   // ignore: prefer_final_fields
   Rx<bool> _isSliderMoving = false.obs;
@@ -124,6 +127,9 @@ class PlPlayerController {
   PreferredSizeWidget? bottomControl;
   Widget? danmuWidget;
 
+  String get bvid => _bvid;
+  int get cid => _cid;
+
   /// 数据加载监听
   Stream<DataStatus> get onDataStatusChanged => dataStatus.status.stream;
 
@@ -153,7 +159,7 @@ class PlPlayerController {
   Stream<bool> get onMuteChanged => _mute.stream;
 
   // 视频字幕
-  RxList<Map<String,String>> get vttSubtitles => _vttSubtitles;
+  RxList<Map<String, String>> get vttSubtitles => _vttSubtitles;
   RxInt get vttSubtitlesIndex => _vttSubtitlesIndex;
 
   /// [videoPlayerController] instance of Player
@@ -202,6 +208,9 @@ class PlPlayerController {
   Rx<BoxFit> get videoFit => _videoFit;
   Rx<String> get videoFitDEsc => _videoFitDesc;
 
+  /// 后台播放
+  Rx<bool> get backgroundPlay => _backgroundPlay;
+
   /// 是否长按倍速
   Rx<bool> get doubleSpeedStatus => _doubleSpeedStatus;
 
@@ -223,6 +232,9 @@ class PlPlayerController {
 
   /// 弹幕开关
   Rx<bool> isOpenDanmu = false.obs;
+
+  /// 弹幕权重
+  ValueNotifier<int> danmakuWeight = ValueNotifier(0);
   // 关联弹幕控制器
   DanmakuController? danmakuController;
   // 弹幕相关配置
@@ -272,6 +284,8 @@ class PlPlayerController {
     _videoType = videoType;
     isOpenDanmu.value =
         setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: false);
+    danmakuWeight.value =
+        localCache.get(LocalCacheKey.danmakuWeight, defaultValue: 0);
     blockTypes =
         localCache.get(LocalCacheKey.danmakuBlockType, defaultValue: []);
     showArea = localCache.get(LocalCacheKey.danmakuShowArea, defaultValue: 0.5);
@@ -296,6 +310,9 @@ class PlPlayerController {
         videoStorage.get(VideoBoxKey.playSpeedDefault, defaultValue: 1.0);
     enableAutoLongPressSpeed = setting
         .get(SettingBoxKey.enableAutoLongPressSpeed, defaultValue: false);
+    // 后台播放
+    _backgroundPlay.value =
+        setting.get(SettingBoxKey.enableBackgroundPlay, defaultValue: false);
     if (!enableAutoLongPressSpeed) {
       _longPressSpeed.value = videoStorage
           .get(VideoBoxKey.longPressSpeedDefault, defaultValue: 3.0);
@@ -387,7 +404,7 @@ class PlPlayerController {
       await _initializePlayer(seekTo: seekTo, duration: _duration.value);
       if (videoType.value != 'live' && _cid != 0) {
         refreshSubtitles().then((value) {
-          if (_vttSubtitles.isNotEmpty){
+          if (_vttSubtitles.isNotEmpty) {
             String preference = setting.get(SettingBoxKey.subtitlePreference,
                 defaultValue: SubtitlePreference.values.first.code);
             if (preference == 'on') {
@@ -551,8 +568,8 @@ class PlPlayerController {
   }
 
   Future<void> autoEnterFullscreen() async {
-    bool autoEnterFullscreen =
-      GStrorage.setting.get(SettingBoxKey.enableAutoEnter, defaultValue: false);
+    bool autoEnterFullscreen = GStrorage.setting
+        .get(SettingBoxKey.enableAutoEnter, defaultValue: false);
     if (autoEnterFullscreen) {
       Future.delayed(const Duration(milliseconds: 500), () {
         if (dataStatus.status.value != DataStatus.loaded) {
@@ -607,7 +624,7 @@ class PlPlayerController {
           } else {
             // playerStatus.status.value = PlayerStatus.playing;
           }
-          makeHeartBeat(positionSeconds.value, type: 'status');
+          makeHeartBeat(positionSeconds.value, type: 'completed');
         }),
         videoPlayerController!.stream.position.listen((event) {
           _position.value = event;
@@ -961,6 +978,13 @@ class PlPlayerController {
     _videoFitDesc.value = videoFitType[fitValue]['desc'];
   }
 
+  /// 设置后台播放
+  Future<void> setBackgroundPlay(bool val) async {
+    _backgroundPlay.value = val;
+    setting.put(SettingBoxKey.enableBackgroundPlay, val);
+    videoPlayerServiceHandler.revalidateSetting();
+  }
+
   /// 读取亮度
   // Future<void> getVideoBrightness() async {
   //   double brightnessValue =
@@ -1080,15 +1104,17 @@ class PlPlayerController {
     if (videoType.value == 'live') {
       return;
     }
+    bool isComplete = playerStatus.status.value == PlayerStatus.completed ||
+        type == 'completed';
     // 播放状态变化时，更新
-    if (type == 'status') {
+    if (type == 'status' || type == 'completed') {
       await VideoHttp.heartBeat(
         bvid: _bvid,
         cid: _cid,
-        progress:
-            playerStatus.status.value == PlayerStatus.completed ? -1 : progress,
+        progress: isComplete ? -1 : progress,
       );
-    } else
+      return;
+    }
     // 正常播放时，间隔5秒更新一次
     if (progress - _heartDuration >= 5) {
       _heartDuration = progress;
@@ -1106,6 +1132,7 @@ class PlPlayerController {
   }
 
   void putDanmakuSettings() {
+    localCache.put(LocalCacheKey.danmakuWeight, danmakuWeight.value);
     localCache.put(LocalCacheKey.danmakuBlockType, blockTypes);
     localCache.put(LocalCacheKey.danmakuShowArea, showArea);
     localCache.put(LocalCacheKey.danmakuOpacity, opacityVal);

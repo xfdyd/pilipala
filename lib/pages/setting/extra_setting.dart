@@ -136,7 +136,7 @@ class _ExtraSettingState extends State<ExtraSetting> {
         centerTitle: false,
         titleSpacing: 0,
         title: Text(
-          '其他设置',
+          '其它设置',
           style: Theme.of(context).textTheme.titleMedium,
         ),
       ),
@@ -283,6 +283,12 @@ class _ExtraSettingState extends State<ExtraSetting> {
                 },
               ),
             ),
+          ),
+          const SetSwitchItem(
+            title: '自动清除缓存',
+            subTitle: '每次启动时清除缓存',
+            setKey: SettingBoxKey.autoClearCache,
+            defaultVal: false,
           ),
           const SetSwitchItem(
             title: '检查更新',

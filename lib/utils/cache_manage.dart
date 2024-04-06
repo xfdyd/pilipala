@@ -134,7 +134,7 @@ class CacheManage {
   }
 
   // 清除 Library/Caches 目录及文件缓存
-  Future clearLibraryCache() async {
+  static Future clearLibraryCache() async {
     var appDocDir = await getTemporaryDirectory();
     if (appDocDir.existsSync()) {
       await appDocDir.delete(recursive: true);

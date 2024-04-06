@@ -108,9 +108,9 @@ class SettingController extends GetxController {
       dynamicBadgeType.value = result;
       setting.put(SettingBoxKey.dynamicBadgeMode, result.code);
       MainController mainController = Get.put(MainController());
-      mainController.dynamicBadgeType.value =
+      mainController.dynamicBadgeType =
           DynamicBadgeMode.values[result.code];
-      if (mainController.dynamicBadgeType.value != DynamicBadgeMode.hidden) {
+      if (mainController.dynamicBadgeType != DynamicBadgeMode.hidden) {
         mainController.getUnreadDynamic();
       }
       SmartDialog.showToast('设置成功');

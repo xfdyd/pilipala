@@ -56,6 +56,7 @@ class _BangumiIntroPanelState extends State<BangumiIntroPanel>
     _futureBuilderFuture = bangumiIntroController.queryBangumiIntro();
     videoDetailCtr.cid.listen((int p0) {
       cid = p0;
+      if (!mounted) return;
       setState(() {});
     });
   }
@@ -138,7 +139,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
     print('cid:  $cid');
     videoDetailCtr.cid.listen((p0) {
       cid = p0;
-      print('cid:  $cid');
+      if (!mounted) return;
       setState(() {});
     });
   }
@@ -371,8 +372,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
                           (bangumiItem != null
                               ? bangumiItem!.episodes!.first.cid
                               : widget.bangumiDetail!.episodes!.first.cid),
-                      changeFuc: (bvid, cid, aid) => bangumiIntroController
-                          .changeSeasonOrbangu(bvid, cid, aid),
+                      changeFuc: bangumiIntroController.changeSeasonOrbangu,
                     )
                   ],
                 ],

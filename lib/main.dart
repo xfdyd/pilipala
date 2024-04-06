@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:PiliPalaX/utils/cache_manage.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -29,6 +30,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
   await GStrorage.init();
+  if (GStrorage.setting.get(SettingBoxKey.autoClearCache, defaultValue: false)) {
+    await CacheManage.clearLibraryCache();
+  }
   if (GStrorage.setting.get(SettingBoxKey.horizontalScreen, defaultValue: false)) {
     await SystemChrome.setPreferredOrientations(
       //支持竖屏与横屏

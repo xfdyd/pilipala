@@ -62,7 +62,7 @@ class SettingPage extends StatelessWidget {
             onTap: () => Get.toNamed('/extraSetting'),
             leading: const Icon(Icons.extension_outlined),
             dense: false,
-            title: const Text('其他设置'),
+            title: const Text('其它设置'),
             subtitle: Text('震动、搜索、收藏、ai、评论、动态、代理、更新检查等', style: subTitleStyle),
           ),
           Obx(

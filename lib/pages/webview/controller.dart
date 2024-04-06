@@ -44,6 +44,7 @@ class WebviewController extends GetxController {
     controller
       ..setUserAgent(Request().headerUa(type: uaType))
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..enableZoom(true)
       ..setNavigationDelegate(
         NavigationDelegate(
           // 页面加载
@@ -52,7 +53,9 @@ class WebviewController extends GetxController {
             loadProgress.value = progress;
           },
           onPageStarted: (String url) {
-            final String str = Uri.parse(url).pathSegments[0];
+            final parseUrl = Uri.parse(url);
+            if (parseUrl.pathSegments.isEmpty) return;
+            final String str = parseUrl.pathSegments[0];
             final Map matchRes = IdUtils.matchAvorBv(input: str);
             final List matchKeys = matchRes.keys.toList();
             if (matchKeys.isNotEmpty) {
@@ -70,7 +73,13 @@ class WebviewController extends GetxController {
               //注入js
               controller.runJavaScriptReturningResult('''
                 document.styleSheets[0].insertRule('div.open-app-btn.bili-btn-warp {display:none;}', 0);
+                document.styleSheets[0].insertRule('#app__display-area > div.control-panel {display:none;}', 0);
                 ''').then((value) => print(value));
+            } else if (type.value == 'whisper') {
+              controller.runJavaScriptReturningResult('''
+                document.querySelector('#internationalHeader').remove();
+                document.querySelector('#message-navbar').remove();
+              ''').then((value) => print(value));
             }
           },
           // 加载完成

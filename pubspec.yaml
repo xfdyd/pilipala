@@ -122,10 +122,7 @@ dependencies:
   # 代理
   system_proxy: ^0.1.0
   # pip
-  floating:
-    git:
-      url: https://github.com/wrbl606/floating.git
-      ref: main
+  floating: ^2.0.2
   # html解析
   html: ^0.15.4
   # html渲染
@@ -143,7 +140,7 @@ dependencies:
   marquee: ^2.2.3
 dependency_overrides:
   mime:
-    git: https://github.com/orz12/mime/
+    git: https://github.com/orz12/mime.git
 
 dev_dependencies:
   flutter_test:

@@ -123,7 +123,7 @@ class Routes {
     CustomGetPage(name: '/styleSetting', page: () => const StyleSetting()),
     // 隐私设置
     CustomGetPage(name: '/privacySetting', page: () => const PrivacySetting()),
-    // 其他设置
+    // 其它设置
     CustomGetPage(name: '/extraSetting', page: () => const ExtraSetting()),
     //
     CustomGetPage(name: '/blackListPage', page: () => const BlackListPage()),

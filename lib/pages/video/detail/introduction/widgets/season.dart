@@ -1,23 +1,20 @@
-
+import 'package:PiliPalaX/common/widgets/list_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/models/video_detail_res.dart';
 import 'package:PiliPalaX/pages/video/detail/index.dart';
 import 'package:PiliPalaX/utils/id_utils.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-
-import '../../../../../utils/utils.dart';
 
 class SeasonPanel extends StatefulWidget {
   const SeasonPanel({
     super.key,
     required this.ugcSeason,
     this.cid,
-    this.changeFuc,
+    required this.changeFuc,
   });
   final UgcSeason ugcSeason;
   final int? cid;
-  final Function? changeFuc;
+  final Function changeFuc;
 
   @override
   State<SeasonPanel> createState() => _SeasonPanelState();
@@ -30,7 +27,6 @@ class _SeasonPanelState extends State<SeasonPanel> {
   final String heroTag = Get.arguments['heroTag'];
   late VideoDetailController _videoDetailController;
   final ScrollController _scrollController = ScrollController();
-  final ItemScrollController itemScrollController = ItemScrollController();
 
   @override
   void initState() {
@@ -62,55 +58,27 @@ class _SeasonPanelState extends State<SeasonPanel> {
     currentIndex = episodes!.indexWhere((EpisodeItem e) => e.cid == cid);
     _videoDetailController.cid.listen((int p0) {
       cid = p0;
-      setState(() {});
       currentIndex = episodes!.indexWhere((EpisodeItem e) => e.cid == cid);
+      if (!mounted) return;
+      setState(() {});
     });
   }
 
-  void changeFucCall(item, int i) async {
-    await widget.changeFuc!(
-      IdUtils.av2bv(item.aid),
-      item.cid,
-      item.aid,
-    );
-    currentIndex = i;
-    Get.back();
-    setState(() {});
-  }
+  // void changeFucCall(item, int i) async {
+  //   await widget.changeFuc!(
+  //     IdUtils.av2bv(item.aid),
+  //     item.cid,
+  //     item.aid,
+  //   );
+  //   currentIndex = i;
+  //   Get.back();
+  //   setState(() {});
+  // }
 
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
-  }
-
-  Widget buildEpisodeListItem(
-    EpisodeItem episode,
-    int index,
-    bool isCurrentIndex,
-  ) {
-    Color primary = Theme.of(context).colorScheme.primary;
-    return ListTile(
-      onTap: () => changeFucCall(episode, index),
-      dense: false,
-      leading: isCurrentIndex
-          ? Image.asset(
-              'assets/images/live.png',
-              color: primary,
-              height: 12,
-              semanticLabel: "正在播放：",
-            )
-          : null,
-      title: Text(
-        episode.title!,
-        style: TextStyle(
-          fontSize: 14,
-          color: isCurrentIndex
-              ? primary
-              : Theme.of(context).colorScheme.onSurface,
-        ),
-      ),
-    );
   }
 
   @override
@@ -131,75 +99,16 @@ class _SeasonPanelState extends State<SeasonPanel> {
           borderRadius: BorderRadius.circular(6),
           clipBehavior: Clip.hardEdge,
           child: InkWell(
-            onTap: () => showBottomSheet(
-              context: context,
-              builder: (BuildContext context) {
-                return StatefulBuilder(
-                    builder: (BuildContext context, StateSetter setState) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) async {
-                    itemScrollController.jumpTo(index: currentIndex);
-                  });
-                  return Container(
-                    height: Utils.getSheetHeight(context),
-                    color: Theme.of(context).colorScheme.background,
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 45,
-                          padding: const EdgeInsets.only(left: 14, right: 14),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '合集（${episodes!.length}）',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              IconButton(
-                                tooltip: '关闭',
-                                icon: const Icon(Icons.close),
-                                onPressed: () => Navigator.pop(context),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Divider(
-                          height: 1,
-                          color:
-                              Theme.of(context).dividerColor.withOpacity(0.1),
-                        ),
-                        Expanded(
-                            child: Padding(
-                          padding: EdgeInsets.only(
-                              bottom: MediaQuery.of(context).padding.bottom),
-                          child: Material(
-                            child: ScrollablePositionedList.builder(
-                              itemCount: episodes!.length + 1,
-                              itemBuilder: (BuildContext context, int index) {
-                                bool isLastItem = index == episodes!.length;
-                                bool isCurrentIndex = currentIndex == index;
-                                return isLastItem
-                                    ? SizedBox(
-                                        height: MediaQuery.of(context)
-                                                .padding
-                                                .bottom +
-                                            20,
-                                      )
-                                    : buildEpisodeListItem(
-                                        episodes![index],
-                                        index,
-                                        isCurrentIndex,
-                                      );
-                              },
-                              itemScrollController: itemScrollController,
-                            ),
-                          ),
-                        )),
-                      ],
-                    ),
-                  );
-                });
-              },
-            ),
+            onTap: () {
+              ListSheet(
+                      episodes: episodes,
+                      // bvid: IdUtils.av2bv(episodes!.first.aid!),
+                      // aid: episodes!.first.aid!,
+                      currentCid: cid,
+                      changeFucCall: widget.changeFuc,
+                      context: context)
+                  .buildShowBottomSheet();
+            },
             child: Padding(
               padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
               child: Row(

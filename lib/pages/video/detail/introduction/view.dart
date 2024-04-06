@@ -374,8 +374,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                         cid: videoIntroController.lastPlayCid.value != 0
                             ? videoIntroController.lastPlayCid.value
                             : widget.videoDetail!.pages!.first.cid,
-                        changeFuc: (bvid, cid, aid) => videoIntroController
-                            .changeSeasonOrbangu(bvid, cid, aid),
+                        changeFuc: videoIntroController.changeSeasonOrbangu,
                       ),
                     )
                   ],
@@ -385,11 +384,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     Obx(() => PagesPanel(
                           pages: widget.videoDetail!.pages!,
                           cid: videoIntroController.lastPlayCid.value,
-                          changeFuc: (cid) =>
-                              videoIntroController.changeSeasonOrbangu(
-                                  videoIntroController.bvid,
-                                  cid,
-                                  IdUtils.bv2av(videoIntroController.bvid)),
+                          bvid: videoIntroController.bvid,
+                          changeFuc: videoIntroController.changeSeasonOrbangu,
                         ))
                   ],
                   GestureDetector(

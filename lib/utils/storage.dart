@@ -124,6 +124,7 @@ class SettingBoxKey {
 
       /// 其他
       autoUpdate = 'autoUpdate',
+      autoClearCache = 'autoClearCache',
       replySortType = 'replySortType',
       defaultDynamicType = 'defaultDynamicType',
       enableHotKey = 'enableHotKey',
@@ -149,7 +150,8 @@ class SettingBoxKey {
       tabbarSort = 'tabbarSort', // 首页tabbar
       dynamicBadgeMode = 'dynamicBadgeMode',
       hiddenSettingUnlocked = 'hiddenSettingUnlocked',
-      enableGradientBg = 'enableGradientBg';
+      enableGradientBg = 'enableGradientBg',
+      defaultShowComment = 'defaultShowComment';
 }
 
 class LocalCacheKey {
@@ -162,7 +164,8 @@ class LocalCacheKey {
       wbiKeys = 'wbiKeys',
       timeStamp = 'timeStamp',
 
-      // 弹幕相关设置 屏蔽类型 显示区域 透明度 字体大小 弹幕时间 描边粗细
+      // 弹幕相关设置 权重（云屏蔽） 屏蔽类型 显示区域 透明度 字体大小 弹幕时间 描边粗细
+      danmakuWeight = 'danmakuWeight',
       danmakuBlockType = 'danmakuBlockType',
       danmakuShowArea = 'danmakuShowArea',
       danmakuOpacity = 'danmakuOpacity',

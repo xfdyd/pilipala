@@ -146,27 +146,29 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   void playerListener(PlayerStatus? status) async {
     playerStatus = status!;
     if (status == PlayerStatus.completed) {
-      // 结束播放退出全屏
-      if (autoExitFullcreen) {
-        plPlayerController!.triggerFullScreen(status: false);
-      }
       shutdownTimerService.handleWaitingFinished();
-
+      bool notExitFlag = false;
       /// 顺序播放 列表循环
       if (plPlayerController!.playRepeat != PlayRepeat.pause &&
           plPlayerController!.playRepeat != PlayRepeat.singleCycle) {
         if (videoDetailController.videoType == SearchType.video) {
-          videoIntroController.nextPlay();
+          notExitFlag = videoIntroController.nextPlay();
         }
         if (videoDetailController.videoType == SearchType.media_bangumi) {
-          bangumiIntroController.nextPlay();
+          notExitFlag = bangumiIntroController.nextPlay();
         }
       }
 
       /// 单个循环
       if (plPlayerController!.playRepeat == PlayRepeat.singleCycle) {
+        notExitFlag = true;
         plPlayerController!.seekTo(Duration.zero);
         plPlayerController!.play();
+      }
+
+      // 结束播放退出全屏
+      if (!notExitFlag && autoExitFullcreen) {
+        plPlayerController!.triggerFullScreen(status: false);
       }
       // 播放完展示控制栏
       if (videoDetailController.floating != null) {
@@ -263,6 +265,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // 离开当前页面时
   void didPushNext() async {
     _bufferedListener?.cancel();
+
     /// 开启
     if (setting.get(SettingBoxKey.enableAutoBrightness, defaultValue: false)
         as bool) {
@@ -449,6 +452,19 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                                 : PLVideoPlayer(
                                                     controller:
                                                         plPlayerController!,
+                                                    videoIntroController:
+                                                        videoDetailController
+                                                                    .videoType ==
+                                                                SearchType.video
+                                                            ? videoIntroController
+                                                            : null,
+                                                    bangumiIntroController:
+                                                        videoDetailController
+                                                                    .videoType ==
+                                                                SearchType
+                                                                    .media_bangumi
+                                                            ? bangumiIntroController
+                                                            : null,
                                                     headerControl:
                                                         videoDetailController
                                                             .headerControl,
@@ -585,6 +601,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                           ),
                           Expanded(
                             child: TabBarView(
+                              physics: const BouncingScrollPhysics(),
                               controller: videoDetailController.tabCtr,
                               children: <Widget>[
                                 CustomScrollView(
@@ -701,6 +718,20 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                                     : PLVideoPlayer(
                                                         controller:
                                                             plPlayerController!,
+                                                        videoIntroController:
+                                                            videoDetailController
+                                                                        .videoType ==
+                                                                    SearchType
+                                                                        .video
+                                                                ? videoIntroController
+                                                                : null,
+                                                        bangumiIntroController:
+                                                            videoDetailController
+                                                                        .videoType ==
+                                                                    SearchType
+                                                                        .media_bangumi
+                                                                ? bangumiIntroController
+                                                                : null,
                                                         headerControl:
                                                             videoDetailController
                                                                 .headerControl,
@@ -846,6 +877,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                           MediaQuery.of(context).padding.top -
                           MediaQuery.of(context).padding.bottom,
                       child: TabBarView(
+                        physics: const BouncingScrollPhysics(),
                         controller: videoDetailController.tabCtr,
                         children: <Widget>[
                           if (videoDetailController.videoType ==
@@ -873,6 +905,14 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           ? const SizedBox()
           : PLVideoPlayer(
               controller: plPlayerController!,
+              videoIntroController:
+                  videoDetailController.videoType == SearchType.video
+                      ? videoIntroController
+                      : null,
+              bangumiIntroController:
+                  videoDetailController.videoType == SearchType.media_bangumi
+                      ? bangumiIntroController
+                      : null,
               headerControl: HeaderControl(
                 controller: plPlayerController,
                 videoDetailCtr: videoDetailController,

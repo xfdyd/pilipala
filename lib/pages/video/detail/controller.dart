@@ -110,7 +110,10 @@ class VideoDetailController extends GetxController
         videoItem['pic'] = argMap['pic'];
       }
     }
-    tabCtr = TabController(length: 2, vsync: this);
+    bool defaultShowComment =
+        setting.get(SettingBoxKey.defaultShowComment, defaultValue: false);
+    tabCtr = TabController(
+        length: 2, vsync: this, initialIndex: defaultShowComment ? 1 : 0);
     autoPlay.value =
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
     enableHA.value = setting.get(SettingBoxKey.enableHA, defaultValue: true);

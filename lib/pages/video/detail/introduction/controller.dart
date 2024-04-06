@@ -532,7 +532,7 @@ class VideoIntroController extends GetxController {
   }
 
   /// 列表循环或者顺序播放时，自动播放下一个
-  void nextPlay() {
+  bool nextPlay() {
     final List episodes = [];
     bool isPages = false;
     if (videoDetail.value.ugcSeason != null) {
@@ -561,13 +561,14 @@ class VideoIntroController extends GetxController {
         nextIndex = 0;
       }
       if (platRepeat == PlayRepeat.listOrder) {
-        return;
+        return false;
       }
     }
     final int cid = episodes[nextIndex].cid!;
     final String rBvid = isPages ? bvid : episodes[nextIndex].bvid;
     final int rAid = isPages ? IdUtils.bv2av(bvid) : episodes[nextIndex].aid!;
     changeSeasonOrbangu(rBvid, cid, rAid);
+    return true;
   }
 
   // 设置关注分组

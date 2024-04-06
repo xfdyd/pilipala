@@ -73,6 +73,10 @@ class MemberController extends GetxController {
       SmartDialog.showToast('账号未登录');
       return;
     }
+    if (memberInfo.value == null) {
+      SmartDialog.showToast('尚未获取到用户信息');
+      return;
+    }
     if (attribute.value == 128) {
       blockUser();
       return;

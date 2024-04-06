@@ -32,7 +32,7 @@ class MainController extends GetxController {
   int selectedIndex = 0;
   Box userInfoCache = GStrorage.userInfo;
   RxBool userLogin = false.obs;
-  late Rx<DynamicBadgeMode> dynamicBadgeType = DynamicBadgeMode.number.obs;
+  late DynamicBadgeMode dynamicBadgeType;
 
   @override
   void onInit() {
@@ -40,17 +40,17 @@ class MainController extends GetxController {
     if (setting.get(SettingBoxKey.autoUpdate, defaultValue: false)) {
       Utils.checkUpdate();
     }
-    hideTabBar = setting.get(SettingBoxKey.hideTabBar, defaultValue: true);
+    hideTabBar = setting.get(SettingBoxKey.hideTabBar, defaultValue: false);
     int defaultHomePage =
         setting.get(SettingBoxKey.defaultHomePage, defaultValue: 0) as int;
     selectedIndex = defaultNavigationBars
         .indexWhere((item) => item['id'] == defaultHomePage);
     var userInfo = userInfoCache.get('userInfoCache');
     userLogin.value = userInfo != null;
-    dynamicBadgeType.value = DynamicBadgeMode.values[setting.get(
+    dynamicBadgeType = DynamicBadgeMode.values[setting.get(
         SettingBoxKey.dynamicBadgeMode,
         defaultValue: DynamicBadgeMode.number.code)];
-    if (dynamicBadgeType.value != DynamicBadgeMode.hidden) {
+    if (dynamicBadgeType != DynamicBadgeMode.hidden) {
       getUnreadDynamic();
     }
   }

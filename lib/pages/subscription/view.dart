@@ -75,7 +75,8 @@ class _SubPageState extends State<SubPage> {
                             (BuildContext context, int index) {
                               return SubItem(
                                   subFolderItem: _subController
-                                      .subFolderData.value.list![index]);
+                                      .subFolderData.value.list![index],
+                                  cancelSub: _subController.cancelSub);
                             },
                           ),
                         )

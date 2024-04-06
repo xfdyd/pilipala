@@ -13,9 +13,12 @@ import '../../../utils/utils.dart';
 
 class BottomControl extends StatelessWidget implements PreferredSizeWidget {
   final PlPlayerController? controller;
-  final Function? triggerFullScreen;
-  const BottomControl({this.controller, this.triggerFullScreen, Key? key})
-      : super(key: key);
+  final List<Widget>? buildBottomControl;
+  const BottomControl({
+    this.controller,
+    this.buildBottomControl,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);
@@ -95,147 +98,7 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
             },
           ),
           Row(
-            children: [
-              controller != null
-                  ? PlayOrPauseButton(
-                      controller: _,
-                    )
-                  : nil,
-              // 播放时间
-              Obx(() {
-                return Text(
-                  Utils.timeFormat(_.positionSeconds.value),
-                  style: textStyle,
-                  semanticsLabel:
-                      '已播放${Utils.durationReadFormat(Utils.timeFormat(_.positionSeconds.value))}',
-                );
-              }),
-              const SizedBox(width: 2),
-              const ExcludeSemantics(
-                child: Text(
-                  '/',
-                  style: textStyle,
-                ),
-              ),
-              const SizedBox(width: 2),
-              Obx(
-                () => Text(
-                  Utils.timeFormat(_.durationSeconds.value),
-                  style: textStyle,
-                  semanticsLabel:
-                      '共${Utils.durationReadFormat(Utils.timeFormat(_.durationSeconds.value))}',
-                ),
-              ),
-              const Spacer(),
-              SizedBox(
-                width: 42,
-                height: 30,
-                child: TextButton(
-                  onPressed: () => _.toggleVideoFit(),
-                  style: ButtonStyle(
-                    padding: MaterialStateProperty.all(EdgeInsets.zero),
-                  ),
-                  child: Obx(
-                    () => Text(
-                      _.videoFitDEsc.value,
-                      style: const TextStyle(color: Colors.white, fontSize: 13),
-                    ),
-                  ),
-                ),
-              ),
-              Obx(
-                () => _.vttSubtitles.isEmpty
-                    ? const SizedBox(
-                        width: 0,
-                      )
-                    : SizedBox(
-                        width: 42,
-                        height: 30,
-                        child: PopupMenuButton<Map<String, String>>(
-                          onSelected: (Map<String, String> value) {
-                            controller!.setSubtitle(value);
-                          },
-                          initialValue:
-                              _.vttSubtitles[_.vttSubtitlesIndex.value],
-                          color: Colors.black.withOpacity(0.8),
-                          itemBuilder: (BuildContext context) {
-                            return _.vttSubtitles
-                                .map((Map<String, String> subtitle) {
-                              return PopupMenuItem<Map<String, String>>(
-                                value: subtitle,
-                                child: Text(
-                                  "${subtitle['title']}",
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              );
-                            }).toList();
-                          },
-                          child: Container(
-                            width: 42,
-                            height: 30,
-                            alignment: Alignment.center,
-                            child: const Icon(
-                              Icons.closed_caption_off_outlined,
-                              size: 22,
-                              color: Colors.white,
-                              semanticLabel: '字幕',
-                            ),
-                          ),
-                        ),
-                      ),
-              ),
-              SizedBox(
-                width: 42,
-                height: 30,
-                child: PopupMenuButton<double>(
-                  onSelected: (double value) {
-                    controller!.setPlaybackSpeed(value);
-                  },
-                  initialValue: _.playbackSpeed,
-                  color: Colors.black.withOpacity(0.8),
-                  itemBuilder: (BuildContext context) {
-                    return _.speedsList.map((double speed) {
-                      return PopupMenuItem<double>(
-                        height: 35,
-                        padding: const EdgeInsets.only(left: 30),
-                        value: speed,
-                        child: Text(
-                          "${speed}X",
-                          style: const TextStyle(color: Colors.white, fontSize: 13),
-                          semanticsLabel: "$speed倍速",
-                        ),
-                      );
-                    }).toList();
-                  },
-                  child: Container(
-                    width: 42,
-                    height: 30,
-                    alignment: Alignment.center,
-                    child: Obx(() => Text("${_.playbackSpeed}X",
-                        style:
-                            const TextStyle(color: Colors.white, fontSize: 13),
-                        semanticsLabel: "${_.playbackSpeed}倍速")),
-                  ),
-                ),
-              ),
-              // 全屏
-              SizedBox(
-                width: 42,
-                height: 30,
-                child: Obx(() => ComBtn(
-                      tooltip: _.isFullScreen.value ? '退出全屏' : '全屏',
-                      icon: Icon(
-                        _.isFullScreen.value
-                            ? Icons.fullscreen_exit
-                            : Icons.fullscreen,
-                        size: 24,
-                        color: Colors.white,
-                      ),
-                      fuc: () =>
-                          triggerFullScreen!(status: !_.isFullScreen.value),
-                    )),
-              ),
-            ],
+            children: [...buildBottomControl!],
           ),
           const SizedBox(height: 12),
         ],

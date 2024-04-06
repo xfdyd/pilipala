@@ -101,8 +101,8 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (!enableBackgroundPlay) return;
 
     if (data == null) return;
-    Map argMap = Get.arguments;
-    final heroTag = argMap['heroTag'];
+    if (Get.arguments == null) return;
+    final heroTag = Get.arguments['heroTag'];
 
     late MediaItem? mediaItem;
     if (data is VideoDetailData) {

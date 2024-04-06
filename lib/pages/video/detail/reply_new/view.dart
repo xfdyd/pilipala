@@ -110,23 +110,22 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   void didChangeMetrics() {
     super.didChangeMetrics();
     final String routePath = Get.currentRoute;
-    if (mounted){
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        // 键盘高度
-        final viewInsets = EdgeInsets.fromViewPadding(
-            View.of(context).viewInsets, View.of(context).devicePixelRatio);
-        _debouncer.run(() {
-          if (mounted) {
-            if (keyboardHeight == 0 && emoteHeight == 0) {
-              setState(() {
-                emoteHeight = keyboardHeight =
-                    keyboardHeight == 0.0 ? viewInsets.bottom : keyboardHeight;
-              });
-            }
-          }
-        });
+    if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      // 键盘高度
+      final viewInsets = EdgeInsets.fromViewPadding(
+          View.of(context).viewInsets, View.of(context).devicePixelRatio);
+      _debouncer.run(() {
+        if (!mounted) return;
+        if (keyboardHeight == 0 && emoteHeight == 0) {
+          setState(() {
+            emoteHeight = keyboardHeight =
+                keyboardHeight == 0.0 ? viewInsets.bottom : keyboardHeight;
+          });
+        }
       });
-    }
+    });
   }
 
   @override

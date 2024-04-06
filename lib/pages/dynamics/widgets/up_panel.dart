@@ -80,6 +80,7 @@ class _UpPanelState extends State<UpPanel> {
                   children: [
                     Expanded(
                       child: ListView(
+                        physics: const BouncingScrollPhysics(),
                         scrollDirection: Axis.horizontal,
                         controller: scrollController,
                         children: [

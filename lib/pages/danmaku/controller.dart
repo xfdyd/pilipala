@@ -1,9 +1,12 @@
 import 'package:PiliPalaX/http/danmaku.dart';
 import 'package:PiliPalaX/models/danmaku/dm.pb.dart';
+import 'package:flutter/cupertino.dart';
 
 class PlDanmakuController {
-  PlDanmakuController(this.cid);
+  PlDanmakuController(this.cid, this.danmakuWeightNotifier);
   final int cid;
+  final ValueNotifier<int> danmakuWeightNotifier;
+  int danmakuWeight = 0;
   Map<int, List<DanmakuElem>> dmSegMap = {};
   // 已请求的段落标记
   List<bool> requestedSeg = [];
@@ -16,6 +19,11 @@ class PlDanmakuController {
     if (videoDuration <= 0) {
       return;
     }
+    danmakuWeightNotifier.addListener(() {
+      print(
+          "danmakuWeight changed from $danmakuWeight to ${danmakuWeightNotifier.value}");
+      danmakuWeight = danmakuWeightNotifier.value;
+    });
     if (requestedSeg.isEmpty) {
       int segCount = (videoDuration / segmentLength).ceil();
       requestedSeg = List<bool>.generate(segCount, (index) => false);
@@ -59,6 +67,13 @@ class PlDanmakuController {
     if (!requestedSeg[segmentIndex]) {
       queryDanmaku(segmentIndex);
     }
-    return dmSegMap[progress ~/ 100];
+    if (danmakuWeight == 0) {
+      return dmSegMap[progress ~/ 100];
+    } else {
+      //using filter
+      return dmSegMap[progress ~/ 100]
+          ?.where((element) => element.weight >= danmakuWeight)
+          .toList();
+    }
   }
 }

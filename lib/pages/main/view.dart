@@ -130,83 +130,73 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
               curve: Curves.easeInOutCubicEmphasized,
               duration: const Duration(milliseconds: 500),
               offset: Offset(0, snapshot.data ? 0 : 1),
-              child: Obx(
-                () => enableMYBar
-                    ? NavigationBar(
-                        onDestinationSelected: (value) => setIndex(value),
-                        selectedIndex: _mainController.selectedIndex,
-                        destinations: <Widget>[
-                          ..._mainController.navigationBars.map((e) {
-                            return NavigationDestination(
-                              icon: Obx(
-                                () => Badge(
-                                  label:
-                                      _mainController.dynamicBadgeType.value ==
-                                              DynamicBadgeMode.number
-                                          ? Text(e['count'].toString())
-                                          : null,
-                                  padding:
-                                      const EdgeInsets.fromLTRB(6, 0, 6, 0),
-                                  isLabelVisible:
-                                      _mainController.dynamicBadgeType.value !=
-                                              DynamicBadgeMode.hidden &&
-                                          e['count'] > 0,
-                                  child: e['icon'],
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.primary,
-                                  textColor: Theme.of(context)
-                                      .colorScheme
-                                      .onInverseSurface,
-                                ),
-                              ),
-                              selectedIcon: e['selectIcon'],
-                              label: e['label'],
-                            );
-                          }).toList(),
-                        ],
-                      )
-                    : BottomNavigationBar(
-                        currentIndex: _mainController.selectedIndex,
-                        onTap: (value) => setIndex(value),
-                        iconSize: 16,
-                        selectedFontSize: 12,
-                        unselectedFontSize: 12,
-                        type: BottomNavigationBarType.fixed,
-                        // selectedItemColor:
-                        //     Theme.of(context).colorScheme.primary, // 选中项的颜色
-                        // unselectedItemColor:
-                        //     Theme.of(context).colorScheme.onSurface,
-                        items: [
-                          ..._mainController.navigationBars.map((e) {
-                            return BottomNavigationBarItem(
-                              icon: Obx(
-                                () => Badge(
-                                  label:
-                                      _mainController.dynamicBadgeType.value ==
-                                              DynamicBadgeMode.number
-                                          ? Text(e['count'].toString())
-                                          : null,
-                                  padding:
-                                      const EdgeInsets.fromLTRB(6, 0, 6, 0),
-                                  isLabelVisible:
-                                      _mainController.dynamicBadgeType.value !=
-                                              DynamicBadgeMode.hidden &&
-                                          e['count'] > 0,
-                                  child: e['icon'],
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.primary,
-                                  textColor: Theme.of(context)
-                                      .colorScheme
-                                      .onInverseSurface,
-                                ),
-                              ),
-                              activeIcon: e['selectIcon'],
-                              label: e['label'],
-                            );
-                          }).toList(),
-                        ],
-                      ),
-              ),
+              child: enableMYBar
+                  ? NavigationBar(
+                      onDestinationSelected: (value) => setIndex(value),
+                      selectedIndex: _mainController.selectedIndex,
+                      destinations: <Widget>[
+                        ..._mainController.navigationBars.map((e) {
+                          return NavigationDestination(
+                            icon: Badge(
+                              label: _mainController.dynamicBadgeType ==
+                                      DynamicBadgeMode.number
+                                  ? Text(e['count'].toString())
+                                  : null,
+                              padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
+                              isLabelVisible:
+                                  _mainController.dynamicBadgeType !=
+                                          DynamicBadgeMode.hidden &&
+                                      e['count'] > 0,
+                              child: e['icon'],
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                              textColor: Theme.of(context)
+                                  .colorScheme
+                                  .onInverseSurface,
+                            ),
+                            selectedIcon: e['selectIcon'],
+                            label: e['label'],
+                          );
+                        }).toList(),
+                      ],
+                    )
+                  : BottomNavigationBar(
+                      currentIndex: _mainController.selectedIndex,
+                      onTap: (value) => setIndex(value),
+                      iconSize: 16,
+                      selectedFontSize: 12,
+                      unselectedFontSize: 12,
+                      type: BottomNavigationBarType.fixed,
+                      // selectedItemColor:
+                      //     Theme.of(context).colorScheme.primary, // 选中项的颜色
+                      // unselectedItemColor:
+                      //     Theme.of(context).colorScheme.onSurface,
+                      items: [
+                        ..._mainController.navigationBars.map((e) {
+                          return BottomNavigationBarItem(
+                            icon: Badge(
+                              label: _mainController.dynamicBadgeType ==
+                                      DynamicBadgeMode.number
+                                  ? Text(e['count'].toString())
+                                  : null,
+                              padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
+                              isLabelVisible:
+                                  _mainController.dynamicBadgeType !=
+                                          DynamicBadgeMode.hidden &&
+                                      e['count'] > 0,
+                              child: e['icon'],
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                              textColor: Theme.of(context)
+                                  .colorScheme
+                                  .onInverseSurface,
+                            ),
+                            activeIcon: e['selectIcon'],
+                            label: e['label'],
+                          );
+                        }).toList(),
+                      ],
+                    ),
             );
           },
         ),

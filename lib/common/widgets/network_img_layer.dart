@@ -22,6 +22,7 @@ class NetworkImgLayer extends StatelessWidget {
     this.quality,
     this.origAspectRatio,
     this.semanticsLabel,
+    this.ignoreHeight,
   });
 
   final String? src;
@@ -33,6 +34,7 @@ class NetworkImgLayer extends StatelessWidget {
   final int? quality;
   final double? origAspectRatio;
   final String? semanticsLabel;
+  final bool? ignoreHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +67,7 @@ class NetworkImgLayer extends StatelessWidget {
             child: CachedNetworkImage(
               imageUrl: imageUrl,
               width: width,
-              height: height,
+              height: ignoreHeight == null || ignoreHeight == false? height:null,
               memCacheWidth: memCacheWidth,
               memCacheHeight: memCacheHeight,
               fit: BoxFit.cover,

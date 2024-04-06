@@ -43,7 +43,8 @@ class _PlDanmakuState extends State<PlDanmaku> {
     super.initState();
     enableShowDanmaku =
         setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: false);
-    _plDanmakuController = PlDanmakuController(widget.cid);
+    _plDanmakuController = PlDanmakuController(
+        widget.cid, widget.playerController.danmakuWeight);
     if (mounted) {
       playerController = widget.playerController;
       if (enableShowDanmaku || playerController.isOpenDanmu.value) {
@@ -136,8 +137,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
               hideTop: blockTypes.contains(5),
               hideScroll: blockTypes.contains(2),
               hideBottom: blockTypes.contains(4),
-              duration:
-                  danmakuDurationVal / playerController.playbackSpeed,
+              duration: danmakuDurationVal / playerController.playbackSpeed,
               strokeWidth: strokeWidth,
               // initDuration /
               //     (danmakuSpeedVal * widget.playerController.playbackSpeed),

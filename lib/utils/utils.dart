@@ -4,6 +4,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 import 'dart:math';
 import 'package:PiliPalaX/utils/storage.dart';
 import 'package:crypto/crypto.dart';
@@ -34,7 +35,7 @@ class Utils {
 
   static String numFormat(dynamic number) {
     if (number == null) {
-      return '0';
+      return '00:00';
     }
     if (number is String) {
       return number;
@@ -125,27 +126,20 @@ class Utils {
   }
 
   static String timeFormat(dynamic time) {
-    // 1小时内
     if (time is String && time.contains(':')) {
       return time;
     }
-    if (time < 3600) {
-      if (time == 0) {
-        return time.toString();
-      }
-      final int minute = time ~/ 60;
-      final double res = time / 60;
-      if (minute != res) {
-        return '${minute < 10 ? '0$minute' : minute}:${(time - minute * 60) < 10 ? '0${(time - minute * 60)}' : (time - minute * 60)}';
-      } else {
-        return '$minute:00';
-      }
-    } else {
-      final int hour = time ~/ 3600;
-      final String hourStr = hour < 10 ? '0$hour' : hour.toString();
-      var a = timeFormat(time - hour * 3600);
-      return '$hourStr:$a';
+    if (time == null || time == 0) {
+      return '00:00';
     }
+    int hour = time ~/ 3600;
+    int minute = (time % 3600) ~/ 60;
+    int second = time % 60;
+    String paddingStr(int number) {
+      return number.toString().padLeft(2, '0');
+    }
+
+    return '${hour > 0 ? "${paddingStr(hour)}:" : ""}${paddingStr(minute)}:${paddingStr(second)}';
   }
 
   // 完全相对时间显示
@@ -374,7 +368,7 @@ class Utils {
                 child: Text(
                   '不再提醒',
                   style:
-                  TextStyle(color: Theme.of(context).colorScheme.outline),
+                      TextStyle(color: Theme.of(context).colorScheme.outline),
                 ),
               ),
               TextButton(
@@ -437,7 +431,15 @@ class Utils {
     double height = context.height.abs();
     double width = context.width.abs();
     if (height > width) {
-      return height * 0.7;
+      //return height * 0.7;
+      double paddingTop = MediaQueryData.fromView(
+              WidgetsBinding.instance.platformDispatcher.views.single)
+          .padding
+          .top;
+      print("paddingTop");
+      print(paddingTop);
+      paddingTop += width * 9 / 16;
+      return height - paddingTop;
     }
     //横屏状态
     return height;
