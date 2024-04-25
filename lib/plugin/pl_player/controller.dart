@@ -472,7 +472,10 @@ class PlPlayerController {
     // await pp.setProperty("vo", "gpu-next");
     // await pp.setProperty("gpu-context", "android");
     // await pp.setProperty("gpu-api", "opengl");
-    await pp.setProperty("drop-late-frames", "yes");
+    if (Get.height / Get.width < 1.25) {
+} else {
+currentVideoQa = 32
+}
     
     await player.setAudioTrack(
       AudioTrack.auto(),
