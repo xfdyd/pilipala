@@ -469,8 +469,8 @@ class PlPlayerController {
       await pp.setProperty("ao", ao ) 
     }
     // // vo=gpu-next & gpu-context=android & gpu-api=opengl
-     await pp.setProperty("vo", "gpu-next");
-    // await pp.setProperty("gpu-context", "android");
+    // await pp.setProperty("vo", "gpu-next");
+     await pp.setProperty("gpu-context", "android");
     // await pp.setProperty("gpu-api", "opengl");
     // await pp.setProperty("vf", "framedrop")
     await player.setAudioTrack(
