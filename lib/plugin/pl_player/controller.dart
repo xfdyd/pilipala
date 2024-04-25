@@ -472,7 +472,12 @@ class PlPlayerController {
     // await pp.setProperty("vo", "gpu-next");
     // await pp.setProperty("gpu-context", "android");
     // await pp.setProperty("gpu-api", "opengl");
-    await pp.setProperty("framedrop", "yes");
+if (Get.height / Get.width < 1.25) {
+await pp.setProperty("vf scale", "1280:-1:format=yuv420p");
+} else {
+await pp.setProperty("vf scale", "-1:1280:format=yuv420p");
+}
+
     
     await player.setAudioTrack(
       AudioTrack.auto(),
