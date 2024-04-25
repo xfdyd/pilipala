@@ -474,7 +474,7 @@ class PlPlayerController {
     // await pp.setProperty("gpu-api", "opengl");
     if (Get.height / Get.width < 1.25) {
 } else {
-currentVideoQa = 32
+currentVideoQa = "32"
 }
     
     await player.setAudioTrack(
