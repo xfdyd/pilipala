@@ -466,7 +466,7 @@ class PlPlayerController {
       String ao = setting.get(SettingBoxKey.useOpenSLES, defaultValue: true)
           ? "opensles,audiotrack"
           : "audiotrack,opensles";
-      await pp.setProperty("ao", ao ) 
+      await pp.setProperty("ao", ao);
     }
     // // vo=gpu-next & gpu-context=android & gpu-api=opengl
     // await pp.setProperty("vo", "gpu-next");
