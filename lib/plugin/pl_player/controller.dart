@@ -472,7 +472,6 @@ class PlPlayerController {
     // await pp.setProperty("vo", "gpu-next");
     // await pp.setProperty("gpu-context", "android");
     // await pp.setProperty("gpu-api", "opengl");
-    await pp.setProperty("vf", "\"format=yuv420p\"");
     await player.setAudioTrack(
       AudioTrack.auto(),
     );
