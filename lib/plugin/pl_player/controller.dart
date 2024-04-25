@@ -466,12 +466,13 @@ class PlPlayerController {
       String ao = setting.get(SettingBoxKey.useOpenSLES, defaultValue: true)
           ? "opensles,audiotrack"
           : "audiotrack,opensles";
-      await pp.setProperty("ao", ao + " --framedrop");
+      await pp.setProperty("ao", ao);
     }
     // // vo=gpu-next & gpu-context=android & gpu-api=opengl
     // await pp.setProperty("vo", "gpu-next");
     // await pp.setProperty("gpu-context", "android");
     // await pp.setProperty("gpu-api", "opengl");
+    await pp.setProperty("framedrop", true ) 
     await player.setAudioTrack(
       AudioTrack.auto(),
     );
