@@ -472,6 +472,12 @@ class PlPlayerController {
     // await pp.setProperty("vo", "gpu-next");
     // await pp.setProperty("gpu-context", "android");
     // await pp.setProperty("gpu-api", "opengl");
+    if (Get.height / Get.width < 1.25) {
+        enableHA = true;
+    } else {
+        enableHA = false;
+    }
+
     await player.setAudioTrack(
       AudioTrack.auto(),
     );
