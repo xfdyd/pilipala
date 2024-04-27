@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.orz12.PiliPalaX">
+    package="com.orz12.PiliPalaX2">
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -45,7 +45,7 @@
         android:fullBackupContent="false"
         tools:replace="android:allowBackup">
         <activity
-            android:name="com.orz12.PiliPalaX.MainActivity"
+            android:name="com.orz12.PiliPalaX2.MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/LaunchTheme"
