@@ -66,7 +66,8 @@ class SubController extends GetxController {
           ),
           TextButton(
             onPressed: () async {
-              var res = await UserHttp.cancelSub(seasonId: subFolderItem.id!);
+              var res = await UserHttp.cancelSub(
+                  id: subFolderItem.id!, type: subFolderItem.type!);
               if (res['status']) {
                 subFolderData.value.list!.remove(subFolderItem);
                 subFolderData.update((val) {});

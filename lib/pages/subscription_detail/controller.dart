@@ -7,7 +7,7 @@ import '../../models/user/sub_folder.dart';
 class SubDetailController extends GetxController {
   late SubFolderItemData item;
 
-  late int seasonId;
+  late int id;
   late String heroTag;
   int currentPage = 1;
   bool isLoadingMore = false;
@@ -15,12 +15,14 @@ class SubDetailController extends GetxController {
   RxList<SubDetailMediaItem> subList = <SubDetailMediaItem>[].obs;
   RxString loadingText = '加载中...'.obs;
   int mediaCount = 0;
+  RxInt playCount = 0.obs;
 
   @override
   void onInit() {
     item = Get.arguments;
+    if (playCount.value == 0) playCount.value = item.viewCount!;
     if (Get.parameters.keys.isNotEmpty) {
-      seasonId = int.parse(Get.parameters['seasonId']!);
+      id = int.parse(Get.parameters['id']!);
       heroTag = Get.parameters['heroTag']!;
     }
     super.onInit();
@@ -32,16 +34,28 @@ class SubDetailController extends GetxController {
       return;
     }
     isLoadingMore = true;
-    var res = await UserHttp.userSubFolderDetail(
-      seasonId: seasonId,
-      ps: 20,
-      pn: currentPage,
-    );
+    late Map<String,dynamic> res;
+    if (item.type! == 11) {
+      res = await UserHttp.favResourceList(
+        id: id,
+        ps: 20,
+        pn: currentPage,
+      );
+    } else {
+      res = await UserHttp.favSeasonList(// item.type! == 21
+        id: id,
+        ps: 20,
+        pn: currentPage,
+      );
+    }
     if (res['status']) {
       subInfo.value = res['data'].info;
       if (currentPage == 1 && type == 'init') {
         subList.value = res['data'].medias;
         mediaCount = res['data'].info.mediaCount;
+        if (item.type == 11) {
+          playCount.value = res['data'].info.cntInfo!['play'];
+        }
       } else if (type == 'onLoad') {
         subList.addAll(res['data'].medias);
       }

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/models/video_detail_res.dart';
 import 'package:PiliPalaX/pages/video/detail/index.dart';
-import 'package:PiliPalaX/utils/id_utils.dart';
 
 class SeasonPanel extends StatefulWidget {
   const SeasonPanel({

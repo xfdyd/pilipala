@@ -28,7 +28,6 @@ class DynamicsHttp {
           'data': DynamicsDataModel.fromJson(res.data['data']),
         };
       } catch (err) {
-        print(err);
         return {
           'status': false,
           'data': [],

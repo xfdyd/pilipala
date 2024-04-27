@@ -184,12 +184,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             duration: const Duration(milliseconds: 500),
             height: snapshot.data ? top + 52 : top,
             padding: EdgeInsets.fromLTRB(14, top + 6, 14, 0),
-            child: UserInfoWidget(
-              top: top,
-              ctr: ctr,
-              userLogin: isUserLoggedIn,
-              userFace: ctr?.userFace.value,
-              callback: () => callback!(),
+            child: Obx(
+              () => UserInfoWidget(
+                top: top,
+                ctr: ctr,
+                userLogin: isUserLoggedIn,
+                userFace: ctr?.userFace.value,
+                callback: () => callback!(),
+              ),
             ),
           ),
         );
@@ -219,18 +221,18 @@ class UserInfoWidget extends StatelessWidget {
     return Row(
       children: [
         SearchBar(ctr: ctr),
-        if (userLogin.value) ...[
-          const SizedBox(width: 4),
-          ClipRect(
-            child: IconButton(
-              tooltip: '消息',
-              onPressed: () => Get.toNamed('/whisper'),
-              icon: const Icon(
-                Icons.notifications_none,
-              ),
-            ),
-          )
-        ],
+        const SizedBox(width: 4),
+        Obx(() => userLogin.value
+            ? ClipRect(
+                child: IconButton(
+                  tooltip: '消息',
+                  onPressed: () => Get.toNamed('/whisper'),
+                  icon: const Icon(
+                    Icons.notifications_none,
+                  ),
+                ),
+              )
+            : const SizedBox.shrink()),
         const SizedBox(width: 8),
         Semantics(
             label: "我的",

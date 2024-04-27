@@ -57,7 +57,7 @@ class _RecommendSettingState extends State<RecommendSetting> {
         centerTitle: false,
         titleSpacing: 0,
         title: Text(
-          '推荐设置',
+          '推荐流设置',
           style: Theme.of(context).textTheme.titleMedium,
         ),
       ),
@@ -66,6 +66,7 @@ class _RecommendSettingState extends State<RecommendSetting> {
           ListTile(
             dense: false,
             title: Text('首页推荐类型', style: titleStyle),
+            leading: const Icon(Icons.model_training_outlined),
             subtitle: Text(
               '当前使用「$defaultRcmdType端」推荐¹',
               style: subTitleStyle,
@@ -131,12 +132,14 @@ class _RecommendSettingState extends State<RecommendSetting> {
           const SetSwitchItem(
             title: '推荐动态',
             subTitle: '是否在推荐内容中展示动态(仅app端)',
+            leading: Icon(Icons.motion_photos_on_outlined),
             setKey: SettingBoxKey.enableRcmdDynamic,
             defaultVal: true,
           ),
           const SetSwitchItem(
             title: '首页推荐刷新',
             subTitle: '下拉刷新时保留上次内容',
+            leading: Icon(Icons.refresh),
             setKey: SettingBoxKey.enableSaveLastData,
             defaultVal: false,
           ),
@@ -144,6 +147,7 @@ class _RecommendSettingState extends State<RecommendSetting> {
           const Divider(height: 1),
           ListTile(
             dense: false,
+            leading: const Icon(Icons.thumb_up_outlined),
             title: Text('点赞率过滤', style: titleStyle),
             subtitle: Text(
               '过滤掉点赞数/播放量「小于$minLikeRatioForRecommend%」的推荐视频(仅web端)',
@@ -172,6 +176,7 @@ class _RecommendSettingState extends State<RecommendSetting> {
           ListTile(
             dense: false,
             title: Text('视频时长过滤', style: titleStyle),
+            leading: const Icon(Icons.timelapse_outlined),
             subtitle: Text(
               '过滤掉时长「小于$minDurationForRcmd秒」的推荐视频',
               style: subTitleStyle,
@@ -199,6 +204,7 @@ class _RecommendSettingState extends State<RecommendSetting> {
           SetSwitchItem(
             title: '已关注Up豁免推荐过滤',
             subTitle: '推荐中已关注用户发布的内容不会被过滤',
+            leading: const Icon(Icons.favorite_border_outlined),
             setKey: SettingBoxKey.exemptFilterForFollowed,
             defaultVal: true,
             callFn: (_) => {RecommendFilter.update},
@@ -234,6 +240,7 @@ class _RecommendSettingState extends State<RecommendSetting> {
           SetSwitchItem(
             title: '过滤器也应用于相关视频',
             subTitle: '视频详情页的相关视频也进行过滤²',
+            leading: const Icon(Icons.explore_outlined),
             setKey: SettingBoxKey.applyFilterToRelatedVideos,
             defaultVal: true,
             callFn: (_) => {RecommendFilter.update},

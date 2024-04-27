@@ -69,7 +69,7 @@ class SettingPage extends StatelessWidget {
             () => Visibility(
               visible: settingController.hiddenSettingUnlocked.value,
               child: ListTile(
-                leading: const Icon(Icons.developer_mode_outlined),
+                leading: const Icon(Icons.developer_board_outlined),
                 onTap: () => Get.toNamed('/hiddenSetting'),
                 dense: false,
                 title: const Text('开发人员选项'),

@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:PiliPalaX/common/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -28,8 +27,6 @@ class _RankPageState extends State<RankPage>
         TabController(vsync: this, length: _rankController.tabs.length);
     _selectedTabIndex = _rankController.initialIndex.value;
     _rankController.tabController.addListener(() {
-      print("_rankController.tabController.index");
-      print(_rankController.tabController.index);
       if (!_rankController.tabController.indexIsChanging) {
         // _rankController.onRefresh();
         setState(() {

@@ -79,6 +79,16 @@ class _MediaPageState extends State<MediaPage>
                   ),
                 ),
               ),
+              trailing: IconButton(
+                tooltip: '设置',
+                onPressed: () {
+                  Get.toNamed('/setting');
+                },
+                icon: const Icon(
+                  Icons.settings_outlined,
+                  size: 20,
+                ),
+              )
             ),
             for (var i in mediaController.list) ...[
               ListTile(
