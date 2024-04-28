@@ -569,6 +569,7 @@ class PlPlayerController {
 
 
     //尝试锁定竖屏软解
+     if (dataStatus.status.value != DataStatus.loaded) {
         _dataListenerForVideoDirection = dataStatus.status.listen((status) {
           if (status == DataStatus.loaded) {
             _dataListenerForVideoDirection.cancel();
@@ -578,7 +579,8 @@ class PlPlayerController {
             }
           }
         });
-
+     }
+    
 
     // 跳转播放
     if (seekTo != Duration.zero) {
