@@ -119,8 +119,17 @@ class VideoDetailController extends GetxController
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
     enableHA.value = setting.get(SettingBoxKey.enableHA, defaultValue: true);
 
-    //尝试
-    enableHA.value
+
+
+            //尝试真正实现竖屏软解
+        if (firstVideo.width != null && firstVideo.height != null) {
+            if ((firstVideo.width! - firstVideo.height!) > 0) {
+            } else {
+                enableHA.value = false;
+            }
+        }
+
+
       
     hwdec.value = setting.get(SettingBoxKey.hardwareDecoding,
         defaultValue: Platform.isAndroid ? 'auto-safe' : 'auto');
