@@ -573,8 +573,7 @@ class PlPlayerController {
         _dataListenerForVideoDirection = dataStatus.status.listen((status) {
           if (status == DataStatus.loaded) {
             _dataListenerForVideoDirection.cancel();
-            if (Get.height / Get.width < 1.25) {
-            } else {
+            if (Get.width / Get.height > 1.25) {
                 enableHA = false;
             }
           }
