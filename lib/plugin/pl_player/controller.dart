@@ -983,7 +983,7 @@ class PlPlayerController {
             }
 
             //尝试真正实现竖屏软解
-            if ( direction.value == 'vertical') {
+            if (direction.value == 'vertical') {
                 enableHA = false;
             }
 
