@@ -271,10 +271,10 @@ class VideoDetailController extends GetxController
         },
       ),
       // 硬解
-      enableHA: enableHA.value,
-      hwdec: hwdec.value,
+      enableHA: enableHA.value, 
+      hwdec: enableHA.value ? hwdec.value : null, 
       seekTo: seekToTime ?? defaultST,
-      duration: duration ?? data.timeLength == null
+        duration: duration ?? data.timeLength == null
           ? null
           : Duration(milliseconds: data.timeLength!),
       // 宽>高 水平 否则 垂直
