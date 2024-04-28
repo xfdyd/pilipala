@@ -566,6 +566,13 @@ class PlPlayerController {
     //   await setLooping(_looping);
     // }
 
+    
+            //尝试真正实现竖屏软解
+            if (direction.value == 'vertical') {
+                enableHA = false;
+            }
+
+
     // 跳转播放
     if (seekTo != Duration.zero) {
       await this.seekTo(seekTo);
@@ -994,11 +1001,6 @@ class PlPlayerController {
     } else if (attr == BoxFit.fill && direction.value == 'vertical') {
       attr = BoxFit.contain;
     }
-    
-    //尝试真正实现竖屏软解
-            if (direction.value == 'vertical') {
-                enableHA = false;
-            }
     
     _videoFit.value = attr;
     _videoFitDesc.value = videoFitType[fitValue]['desc'];
