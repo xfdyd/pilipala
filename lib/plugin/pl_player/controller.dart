@@ -981,12 +981,12 @@ class PlPlayerController {
             if (attr == BoxFit.none || attr == BoxFit.scaleDown) {
               _videoFit.value = attr;
             }
-
+/*
             //尝试真正实现竖屏软解
             if (direction.value == 'vertical') {
                 enableHA = false;
             }
-            
+*/
           }
         });
       }
