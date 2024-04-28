@@ -566,12 +566,12 @@ class PlPlayerController {
     //   await setLooping(_looping);
     // }
 
-    
+    /*
             //尝试真正实现竖屏软解
             if (direction.value == 'vertical') {
                 enableHA = false;
             }
-
+*/
 
     // 跳转播放
     if (seekTo != Duration.zero) {
@@ -988,12 +988,14 @@ class PlPlayerController {
             if (attr == BoxFit.none || attr == BoxFit.scaleDown) {
               _videoFit.value = attr;
             }
-/*
+
+            
             //尝试真正实现竖屏软解
             if (direction.value == 'vertical') {
-                enableHA = false;
+                bool enableHA = false;
             }
-*/
+
+            
           }
         });
       }
