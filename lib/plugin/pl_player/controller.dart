@@ -569,7 +569,7 @@ class PlPlayerController {
 
 
     //尝试锁定竖屏软解
-            _dataListenerForVideoDirection = dataStatus.status.listen((status) {
+        _dataListenerForVideoDirection = dataStatus.status.listen((status) {
           if (status == DataStatus.loaded) {
             _dataListenerForVideoDirection.cancel();
             if (Get.height / Get.width < 1.25) {
