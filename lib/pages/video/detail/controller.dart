@@ -284,7 +284,7 @@ class VideoDetailController extends GetxController
         },
       ),
       // 硬解
-      // enableHA: enableHA.value, 
+      enableHA: enableHA.value, 
       // hwdec: hwdec.value, 
       seekTo: seekToTime ?? defaultST,
         duration: duration ?? data.timeLength == null
@@ -297,14 +297,12 @@ class VideoDetailController extends GetxController
               : 'vertical')
           : null,
 
-
       //尝试真正实现竖屏软解
       enableHA: firstVideo.width != null && firstVideo.height != null
           ? ((firstVideo.width! - firstVideo.height!) > 0
               ? 1
               : 0)
           : null,
-
         
       bvid: bvid,
       cid: cid.value,
