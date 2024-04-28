@@ -307,7 +307,6 @@ class VideoDetailController extends GetxController
         if ((firstVideo.width - firstVideo.height) > 0) {
             } else {
                 enableHA.value = false;
-            }
         }
         enableHA: enableHA.value;
 
