@@ -259,8 +259,7 @@ class VideoDetailController extends GetxController
     } else {
       ScreenBrightness().resetScreenBrightness();
     }
-    await plPlayerController.setDataSource(
-
+      
         
             //尝试真正实现竖屏软解
         if (firstVideo.width != null && firstVideo.height != null) {
@@ -271,6 +270,7 @@ class VideoDetailController extends GetxController
         }
         
 
+    await plPlayerController.setDataSource(
       DataSource(
         videoSource: video ?? videoUrl,
         audioSource: audio ?? audioUrl,
