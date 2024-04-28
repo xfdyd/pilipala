@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 
+bool enableHA
+
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
