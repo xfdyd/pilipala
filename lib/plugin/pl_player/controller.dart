@@ -986,7 +986,7 @@ class PlPlayerController {
             if (direction.value == 'vertical') {
                 enableHA = false;
             }
-
+            
           }
         });
       }
