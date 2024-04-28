@@ -282,14 +282,14 @@ class VideoDetailController extends GetxController
           ? ((firstVideo.width! - firstVideo.height!) > 0
               ? 'horizontal'
               : 'vertical')
-          : null,
+          : null;
 
 
             //尝试真正实现竖屏软解
             if (direction.value == 'vertical') {
                 enableHA.value = false;
                 enableHA: enableHA.value;
-            }
+            };
 
         
       bvid: bvid,
