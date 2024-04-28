@@ -282,23 +282,22 @@ class VideoDetailController extends GetxController
           ? ((firstVideo.width! - firstVideo.height!) > 0
               ? 'horizontal'
               : 'vertical')
-          : null,      
+          : null,
+
+
+      //尝试真正实现竖屏软解
+      enableHA: firstVideo.width != null && firstVideo.height != null
+          ? ((firstVideo.width! - firstVideo.height!) > 0
+              : false)
+          : null,
+
+        
       bvid: bvid,
       cid: cid.value,
       enableHeart: enableHeart,
       autoplay: autoplay,
     );
       
-        
-            //尝试真正实现竖屏软解
-        if (firstVideo.width != null && firstVideo.height != null) {
-            if ((firstVideo.width - firstVideo.height) > 0) {
-            } else {
-                enableHA.value = false;
-            }
-        }
-
-
     /// 开启自动全屏时，在player初始化完成后立即传入headerControl
     plPlayerController.headerControl = headerControl;
   }
