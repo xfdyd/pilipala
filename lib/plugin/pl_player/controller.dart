@@ -85,6 +85,7 @@ class PlPlayerController {
   final Rx<String> _videoFitDesc = Rx(videoFitType.first['desc']);
   late StreamSubscription<DataStatus> _dataListenerForVideoFit;
   late StreamSubscription<DataStatus> _dataListenerForEnterFullscreen;
+  late StreamSubscription<DataStatus> _dataListenerForVideoDirection;
 
   /// 后台播放
   final Rx<bool> _continuePlayInBackground = false.obs;
@@ -567,7 +568,7 @@ class PlPlayerController {
     // }
 
 
-    //
+    //尝试锁定竖屏软解
             _dataListenerForVideoDirection = dataStatus.status.listen((status) {
           if (status == DataStatus.loaded) {
             _dataListenerForVideoDirection.cancel();
