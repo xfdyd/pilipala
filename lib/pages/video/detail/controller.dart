@@ -260,6 +260,15 @@ class VideoDetailController extends GetxController
       ScreenBrightness().resetScreenBrightness();
     }
     await plPlayerController.setDataSource(
+
+        
+            //尝试真正实现竖屏软解
+            if ((firstVideo.width - firstVideo.height) > 0) {
+            } else {
+                enableHA.value = false;
+            }
+        
+
       DataSource(
         videoSource: video ?? videoUrl,
         audioSource: audio ?? audioUrl,
@@ -288,15 +297,6 @@ class VideoDetailController extends GetxController
       enableHeart: enableHeart,
       autoplay: autoplay,
     );
-
-
-            //尝试真正实现竖屏软解
-            if ((firstVideo.width - firstVideo.height) > 0) {
-            } else {
-                enableHA.value = false;
-                enableHA: enableHA.value;
-            }
-        
 
     /// 开启自动全屏时，在player初始化完成后立即传入headerControl
     plPlayerController.headerControl = headerControl;
