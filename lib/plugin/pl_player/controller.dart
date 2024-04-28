@@ -482,7 +482,6 @@ class PlPlayerController {
           if (status == DataStatus.loaded) {
             _dataListenerForVideoDirection.cancel();
             if (Get.height / Get.width < 1.25) {
-                enableHA = true;
             } else {
                 enableHA = false;
             }
