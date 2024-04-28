@@ -289,7 +289,7 @@ class VideoDetailController extends GetxController
             if (direction.value == 'vertical') {
                 enableHA.value = false;
                 enableHA: enableHA.value;
-            };
+            }
 
         
       bvid: bvid,
