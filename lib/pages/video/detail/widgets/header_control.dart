@@ -20,10 +20,8 @@ import 'package:PiliPalaX/utils/storage.dart';
 import 'package:PiliPalaX/http/danmaku.dart';
 import 'package:PiliPalaX/services/shutdown_timer_service.dart';
 import '../../../../models/video_detail_res.dart';
-import '../../../../services/service_locator.dart';
 import '../introduction/index.dart';
 import 'package:marquee/marquee.dart';
-import '../../../danmaku/controller.dart';
 
 class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
   const HeaderControl({
@@ -440,6 +438,10 @@ class _HeaderControlState extends State<HeaderControl> {
 
   /// 选择画质
   void showSetVideoQa() {
+    if (videoInfo.dash == null) {
+      SmartDialog.showToast('当前视频不支持选择画质');
+      return;
+    }
     final List<FormatItem> videoFormat = videoInfo.supportFormats!;
     final VideoQuality currentVideoQa = widget.videoDetailCtr!.currentVideoQa;
 
@@ -634,9 +636,13 @@ class _HeaderControlState extends State<HeaderControl> {
     final VideoItem firstVideo = widget.videoDetailCtr!.firstVideo;
     // 当前视频可用的解码格式
     final List<FormatItem> videoFormat = videoInfo.supportFormats!;
-    final List list = videoFormat
+    final List? list = videoFormat
         .firstWhere((FormatItem e) => e.quality == firstVideo.quality!.code)
-        .codecs!;
+        .codecs;
+    if (list == null) {
+      SmartDialog.showToast('当前视频不支持选择解码格式');
+      return;
+    }
 
     showModalBottomSheet(
       context: context,

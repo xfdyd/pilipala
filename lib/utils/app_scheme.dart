@@ -2,7 +2,6 @@ import 'package:appscheme/appscheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import '../http/dynamics.dart';
 import '../http/search.dart';
 import '../models/common/search_type.dart';
 import 'id_utils.dart';

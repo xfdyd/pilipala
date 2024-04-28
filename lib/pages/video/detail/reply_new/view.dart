@@ -109,7 +109,6 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   @override
   void didChangeMetrics() {
     super.didChangeMetrics();
-    final String routePath = Get.currentRoute;
     if (!mounted) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;

@@ -66,8 +66,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   RxBool isFullScreen = false.obs;
   late StreamSubscription<bool> fullScreenStatusListener;
   late final MethodChannel onUserLeaveHintListener;
-  late AnimationController _animationController;
-  late Animation<double> _animation;
   StreamSubscription<Duration>? _bufferedListener;
 
   @override
@@ -292,29 +290,33 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     if (mounted) {
       setState(() => {});
     }
+    super.didPopNext();
     videoDetailController.isFirstTime = false;
     final bool autoplay = autoPlayEnable;
-    videoDetailController.playerInit(autoplay: autoplay);
+    await videoDetailController.playerInit(autoplay: autoplay);
 
     /// 未开启自动播放时，未播放跳转下一页返回/播放后跳转下一页返回
     videoDetailController.autoPlay.value =
         !videoDetailController.isShowCover.value;
     videoIntroController.isPaused = false;
-    if (autoplay) {
-      // await Future.delayed(const Duration(milliseconds: 300));
-      if (plPlayerController?.buffered.value == Duration.zero) {
-        _bufferedListener = plPlayerController?.buffered.listen((p0) {
-          if (p0 > Duration.zero) {
-            _bufferedListener!.cancel();
-            plPlayerController?.seekTo(videoDetailController.defaultST);
-            plPlayerController?.play();
-          }
-        });
-      } else {
-        plPlayerController?.seekTo(videoDetailController.defaultST);
-        plPlayerController?.play();
-      }
-    }
+    // if (autoplay) {
+    //   // await Future.delayed(const Duration(milliseconds: 300));
+    //   print(plPlayerController);
+    //   if (plPlayerController?.buffered.value == Duration.zero) {
+    //     _bufferedListener = plPlayerController?.buffered.listen((p0) {
+    //       print("p0");
+    //       print(p0);
+    //       if (p0 > Duration.zero) {
+    //         _bufferedListener!.cancel();
+    //         plPlayerController?.seekTo(videoDetailController.defaultST);
+    //         plPlayerController?.play();
+    //       }
+    //     });
+    //   } else {
+    //     plPlayerController?.seekTo(videoDetailController.defaultST);
+    //     plPlayerController?.play();
+    //   }
+    // }
     Future.delayed(const Duration(milliseconds: 600), () {
       AutoOrientation.fullAutoMode();
     });
@@ -322,7 +324,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     if (plPlayerController != null) {
       listenFullScreenStatus();
     }
-    super.didPopNext();
   }
 
   @override
@@ -409,6 +410,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 child: AppBar(
                   backgroundColor: Colors.transparent,
                   elevation: 0,
+                  // systemOverlayStyle: const SystemUiOverlayStyle(
+                  //     statusBarColor: Colors.transparent,
+                  //     statusBarIconBrightness: Brightness.light),
                 ),
               ),
               body: Column(
@@ -417,10 +421,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     () {
                       double videoheight = context.width * 9 / 16;
                       final double videowidth = context.width;
-                      print(videoDetailController.tabCtr.index);
+                      // print(videoDetailController.tabCtr.index);
                       if (enableVerticalExpand &&
-                          plPlayerController?.direction.value == 'vertical' &&
-                          videoDetailController.tabCtr.index != 1) {
+                          plPlayerController?.direction.value == 'vertical') {
                         videoheight = context.width * 5 / 4;
                       }
                       if (MediaQuery.of(context).orientation ==
@@ -812,6 +815,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     child: AppBar(
                       backgroundColor: Colors.transparent,
                       elevation: 0,
+                      // systemOverlayStyle: const SystemUiOverlayStyle(
+                      //     statusBarColor: Colors.transparent,
+                      //     statusBarIconBrightness: Brightness.dark),
                     ),
                   ),
                   body: childWhenDisabledLandscapeInner)

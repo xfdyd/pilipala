@@ -57,11 +57,7 @@ class ListSheet {
         }
         SmartDialog.showToast('切换到：$title');
         bottomSheetController.close();
-        print(episode.runtimeType.toString());
         if (episode.runtimeType.toString() == "EpisodeItem") {
-          print(episode.bvid);
-          print(episode.cid);
-          print(episode.aid);
           changeFucCall(episode.bvid, episode.cid, episode.aid);
         } else {
           changeFucCall(bvid!, episode.cid, aid!);

@@ -334,13 +334,33 @@ class UserHttp {
     }
   }
 
-  static Future userSubFolderDetail({
-    required int seasonId,
+  static Future favSeasonList({
+    required int id,
     required int pn,
     required int ps,
   }) async {
-    var res = await Request().get(Api.userSubFolderDetail, data: {
-      'season_id': seasonId,
+    var res = await Request().get(Api.favSeasonList, data: {
+      'season_id': id,
+      'ps': ps,
+      'pn': pn,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': SubDetailModelData.fromJson(res.data['data'])
+      };
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  static Future favResourceList({
+    required int id,
+    required int pn,
+    required int ps,
+  }) async {
+    var res = await Request().get(Api.favResourceList, data: {
+      'media_id': id,
       'ps': ps,
       'pn': pn,
     });
@@ -355,15 +375,26 @@ class UserHttp {
   }
 
   // 取消订阅
-  static Future cancelSub({required int seasonId}) async {
-    var res = await Request().post(
-      Api.cancelSub,
-      queryParameters: {
-        'platform': 'web',
-        'season_id': seasonId,
-        'csrf': await Request.getCsrf(),
-      },
-    );
+  static Future cancelSub({required int id, required int type}) async {
+    late dynamic res;
+    if (type == 11) {
+      res = await Request().post(
+        Api.unfavFolder,
+        queryParameters: {
+          'media_id': id,
+          'csrf': await Request.getCsrf(),
+        },
+      );
+    } else {
+      res = await Request().post(
+        Api.unfavSeason,
+        queryParameters: {
+          'platform': 'web',
+          'season_id': id,
+          'csrf': await Request.getCsrf(),
+        },
+      );
+    }
     if (res.data['code'] == 0) {
       return {'status': true};
     } else {

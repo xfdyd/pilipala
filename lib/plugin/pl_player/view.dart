@@ -17,7 +17,6 @@ import 'package:PiliPalaX/plugin/pl_player/models/fullscreen_mode.dart';
 import 'package:PiliPalaX/plugin/pl_player/utils.dart';
 import 'package:PiliPalaX/utils/feed_back.dart';
 import 'package:PiliPalaX/utils/storage.dart';
-import 'package:media_kit_video/media_kit_video_controls/src/controls/methods/video_state.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
 import '../../common/widgets/audio_video_progress_bar.dart';
@@ -496,7 +495,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       children: <Widget>[
         Obx(
           () => Video(
-            key: ValueKey('${_.videoFit.value}${_.continuePlayInBackground.value}'),
+            key: ValueKey('${_.videoFit.value}'),
             controller: videoController,
             controls: NoVideoControls,
             pauseUponEnteringBackgroundMode: !_.continuePlayInBackground.value,

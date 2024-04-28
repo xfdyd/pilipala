@@ -4,7 +4,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:ui';
 import 'dart:math';
 import 'package:PiliPalaX/utils/storage.dart';
 import 'package:crypto/crypto.dart';
@@ -193,7 +192,6 @@ class Utils {
         toInt: true,
       );
     }
-    print('distance: $distance');
     if (distance <= 60) {
       return '刚刚';
     } else if (distance <= 3600) {

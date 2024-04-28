@@ -41,7 +41,6 @@ class NetworkImgLayer extends StatelessWidget {
     final int defaultImgQuality = GlobalData().imgQuality;
     final String imageUrl =
         '${src!.startsWith('//') ? 'https:${src!}' : src!}@${quality ?? defaultImgQuality}q.webp';
-    print(imageUrl);
     int? memCacheWidth, memCacheHeight;
 
     if (width > height || (origAspectRatio != null && origAspectRatio! > 1)) {

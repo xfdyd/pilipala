@@ -26,12 +26,12 @@ class _SubDetailPageState extends State<SubDetailPage> {
       Get.put(SubDetailController());
   late StreamController<bool> titleStreamC; // a
   late Future _futureBuilderFuture;
-  late String seasonId;
+  late String id;
 
   @override
   void initState() {
     super.initState();
-    seasonId = Get.parameters['seasonId']!;
+    id = Get.parameters['id']!;
     _futureBuilderFuture = _subDetailController.queryUserSubFolderDetail();
     titleStreamC = StreamController<bool>();
     _controller.addListener(
@@ -162,14 +162,17 @@ class _SubDetailPageState extends State<SubDetailPage> {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              '${Utils.numFormat(_subDetailController.item.viewCount)}次播放',
-                              style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .labelSmall!
-                                      .fontSize,
-                                  color: Theme.of(context).colorScheme.outline),
+                            Obx(
+                              () => Text(
+                                '${Utils.numFormat(_subDetailController.playCount.value)}次播放',
+                                style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall!
+                                        .fontSize,
+                                    color:
+                                        Theme.of(context).colorScheme.outline),
+                              ),
                             ),
                           ],
                         ),
