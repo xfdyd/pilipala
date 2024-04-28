@@ -994,6 +994,12 @@ class PlPlayerController {
     } else if (attr == BoxFit.fill && direction.value == 'vertical') {
       attr = BoxFit.contain;
     }
+    
+    //尝试真正实现竖屏软解
+            if (direction.value == 'vertical') {
+                enableHA = false;
+            }
+    
     _videoFit.value = attr;
     _videoFitDesc.value = videoFitType[fitValue]['desc'];
   }
