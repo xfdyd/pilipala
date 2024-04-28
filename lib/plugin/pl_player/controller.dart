@@ -989,12 +989,12 @@ class PlPlayerController {
               _videoFit.value = attr;
             }
 
-
+/*
             //尝试真正实现竖屏软解
             if (direction.value == 'vertical') {
                 enableHA.value = false;
             }
-
+*/
             
           }
         });
