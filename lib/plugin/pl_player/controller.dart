@@ -1,7 +1,5 @@
 // ignore_for_file: avoid_print
 
-bool enableHA
-
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
@@ -991,10 +989,10 @@ class PlPlayerController {
               _videoFit.value = attr;
             }
 
-            
+
             //尝试真正实现竖屏软解
             if (direction.value == 'vertical') {
-                bool enableHA = false;
+                enableHA.value = false;
             }
 
             
