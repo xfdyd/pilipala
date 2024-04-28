@@ -85,8 +85,7 @@ class PlPlayerController {
   final Rx<String> _videoFitDesc = Rx(videoFitType.first['desc']);
   late StreamSubscription<DataStatus> _dataListenerForVideoFit;
   late StreamSubscription<DataStatus> _dataListenerForEnterFullscreen;
-  late StreamSubscription<DataStatus> _dataListenerForVideoDirection;
-
+  
   /// 后台播放
   final Rx<bool> _continuePlayInBackground = false.obs;
 
@@ -567,20 +566,6 @@ class PlPlayerController {
     //   await setLooping(_looping);
     // }
 
-
-    //尝试锁定竖屏软解
-     if (dataStatus.status.value != DataStatus.loaded) {
-        _dataListenerForVideoDirection = dataStatus.status.listen((status) {
-          if (status == DataStatus.loaded) {
-            _dataListenerForVideoDirection.cancel();
-            if (Get.width / Get.height > 1.25) {
-                enableHA = false;
-            }
-          }
-        });
-     }
-    
-
     // 跳转播放
     if (seekTo != Duration.zero) {
       await this.seekTo(seekTo);
@@ -996,6 +981,12 @@ class PlPlayerController {
             if (attr == BoxFit.none || attr == BoxFit.scaleDown) {
               _videoFit.value = attr;
             }
+
+            //尝试真正实现竖屏软解
+            if (Get.width / Get.height > 1.25) {
+                enableHA = false;
+            }
+
           }
         });
       }
