@@ -120,7 +120,7 @@ class VideoDetailController extends GetxController
     enableHA.value = setting.get(SettingBoxKey.enableHA, defaultValue: true);
 
 
-
+/*
             //尝试真正实现竖屏软解
         if (firstVideo.width != null && firstVideo.height != null) {
             if ((firstVideo.width! - firstVideo.height!) > 0) {
@@ -128,7 +128,7 @@ class VideoDetailController extends GetxController
                 enableHA.value = false;
             }
         }
-
+*/
 
       
     hwdec.value = setting.get(SettingBoxKey.hardwareDecoding,
@@ -284,7 +284,7 @@ class VideoDetailController extends GetxController
         },
       ),
       // 硬解
-      enableHA: enableHA.value, 
+      // enableHA: enableHA.value, 
       // hwdec: hwdec.value, 
       seekTo: seekToTime ?? defaultST,
         duration: duration ?? data.timeLength == null
@@ -296,14 +296,14 @@ class VideoDetailController extends GetxController
               ? 'horizontal'
               : 'vertical')
           : null,
-/*
+
       //尝试真正实现竖屏软解
       enableHA: firstVideo.width != null && firstVideo.height != null
           ? ((firstVideo.width! - firstVideo.height!) > 0
               ? 1
               : 0)
           : null,
-*/
+
       bvid: bvid,
       cid: cid.value,
       enableHeart: enableHeart,
