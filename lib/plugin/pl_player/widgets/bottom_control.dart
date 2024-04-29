@@ -5,11 +5,9 @@ import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:nil/nil.dart';
 import 'package:PiliPalaX/plugin/pl_player/index.dart';
-import 'package:PiliPalaX/plugin/pl_player/widgets/play_pause_btn.dart';
 import 'package:PiliPalaX/utils/feed_back.dart';
 
 import '../../../common/widgets/audio_video_progress_bar.dart';
-import '../../../utils/utils.dart';
 
 class BottomControl extends StatelessWidget implements PreferredSizeWidget {
   final PlPlayerController? controller;
@@ -27,10 +25,6 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     Color colorTheme = Theme.of(context).colorScheme.primary;
     final _ = controller!;
-    const textStyle = TextStyle(
-      color: Colors.white,
-      fontSize: 11,
-    );
     //阅读器限制
     Timer? _accessibilityDebounce;
     double _lastAnnouncedValue = -1;

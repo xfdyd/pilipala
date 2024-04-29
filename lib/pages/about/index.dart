@@ -84,6 +84,7 @@ class _AboutPageState extends State<AboutPage> {
             () => ListTile(
               onTap: () => _aboutController.tapOnVersion(),
               title: const Text('当前版本'),
+              leading: const Icon(Icons.commit_outlined),
               trailing: Text(_aboutController.currentVersion.value,
                   style: subTitleStyle),
             ),
@@ -92,6 +93,7 @@ class _AboutPageState extends State<AboutPage> {
             () => ListTile(
               onTap: () => _aboutController.onUpdate(),
               title: const Text('最新版本'),
+              leading: const Icon(Icons.flag_outlined),
               trailing: Text(
                 _aboutController.isLoading.value
                     ? '正在获取'
@@ -117,6 +119,7 @@ class _AboutPageState extends State<AboutPage> {
           ),
           ListTile(
             onTap: () => _aboutController.githubUrl(),
+            leading: const Icon(Icons.star_outline_outlined),
             title: const Text('Github开源仓库'),
             trailing: Text(
               'github.com/orz12/pilipala',
@@ -125,6 +128,7 @@ class _AboutPageState extends State<AboutPage> {
           ),
           ListTile(
             onTap: () => _aboutController.feedback(),
+            leading: const Icon(Icons.feedback_outlined),
             title: const Text('问题反馈'),
             trailing: Icon(
               Icons.arrow_forward_ios,
@@ -134,33 +138,37 @@ class _AboutPageState extends State<AboutPage> {
           ),
           ListTile(
             onTap: () => _aboutController.qqGroup(),
-            title: const Text('QQ群：392176105'),
-            trailing: Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: outline,
+            leading: const Icon(Icons.group_add_outlined),
+            title: const Text('QQ群'),
+            trailing: Text(
+              '392176105',
+              style: subTitleStyle,
             ),
           ),
           ListTile(
-            onTap: () => _aboutController.tgChanel(),
+            onTap: () => _aboutController.tgChannel(),
+            leading: const Icon(Icons.group_add_outlined),
             title: const Text('TG频道'),
             trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
           ),
           ListTile(
             onTap: () => _aboutController.webSiteUrl(),
-            title: const Text('访问官网'),
+            leading: const Icon(Icons.language),
+            title: const Text('官网'),
             trailing: Text(
-              'https://pilipalanet.mysxl.cn/pilipala-x',
+              'pilipalanet.mysxl.cn/pilipala-x',
               style: subTitleStyle,
             ),
           ),
           ListTile(
             onTap: () => _aboutController.aPay(),
+            leading: const Icon(Icons.wallet_giftcard_outlined),
             title: const Text('赞赏'),
             trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
           ),
           ListTile(
             onTap: () => _aboutController.logs(),
+            leading: const Icon(Icons.bug_report_outlined),
             title: const Text('错误日志'),
             trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
           ),
@@ -169,11 +177,78 @@ class _AboutPageState extends State<AboutPage> {
               await CacheManage().clearCacheAll();
               getCacheSize();
             },
+            leading: const Icon(Icons.delete_outline),
             title: const Text('清除缓存'),
             subtitle: Text('图片及网络缓存 $cacheSize', style: subTitleStyle),
           ),
           ListTile(
+              title: const Text('导入/导出设置'),
+              dense: false,
+              leading: const Icon(Icons.import_export_outlined),
+              onTap: () {
+                SmartDialog.show(
+                  useSystem: true,
+                  builder: (BuildContext context) {
+                    return SimpleDialog(
+                      title: const Text('导入/导出设置'),
+                      children: [
+                        ListTile(
+                          title: const Text('导出设置至剪贴板'),
+                          onTap: () async {
+                            SmartDialog.dismiss();
+                            String data = await GStrorage.exportAllSettings();
+                            Clipboard.setData(ClipboardData(text: data));
+                            SmartDialog.showToast('已复制到剪贴板');
+                          },
+                        ),
+                        ListTile(
+                          title: const Text('从剪贴板导入设置'),
+                          onTap: () async {
+                            SmartDialog.dismiss();
+                            ClipboardData? data = await Clipboard.getData('text/plain');
+                            if (data == null || data.text == null || data.text!.isEmpty) {
+                              SmartDialog.showToast('剪贴板无数据');
+                              return;
+                            }
+                            SmartDialog.show(
+                              useSystem: true,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('是否导入如下设置？'),
+                                  content: Text(data.text!),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        SmartDialog.dismiss();
+                                      },
+                                      child: const Text('取消'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        SmartDialog.dismiss();
+                                        try{
+                                          await GStrorage.importAllSettings(data.text!);
+                                          SmartDialog.showToast('导入成功');
+                                        } catch (e) {
+                                          SmartDialog.showToast('导入失败：$e');
+                                        }
+                                      },
+                                      child: const Text('确定'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              }),
+          ListTile(
             title: const Text('重置所有设置'),
+            leading: const Icon(Icons.settings_backup_restore_outlined),
             onTap: () {
               SmartDialog.show(
                 useSystem: true,
@@ -191,6 +266,8 @@ class _AboutPageState extends State<AboutPage> {
                       TextButton(
                         onPressed: () {
                           GStrorage.setting.clear();
+                          GStrorage.localCache.clear();
+                          GStrorage.video.clear();
                           SmartDialog.showToast('重置成功');
                           SmartDialog.dismiss();
                         },
@@ -312,24 +389,24 @@ class AboutController extends GetxController {
       useSystem: true,
       animationType: SmartAnimationType.centerFade_otherSlide,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return SimpleDialog(
           title: const Text('问题反馈'),
-          actions: [
-            ElevatedButton(
-              onPressed: () => launchUrl(
+          children: [
+            ListTile(
+              title: const Text('GitHub Issue'),
+              onTap: () => launchUrl(
                 Uri.parse('https://github.com/orz12/pilipala/issues'),
                 // 系统自带浏览器打开
                 mode: LaunchMode.externalApplication,
               ),
-              child: const Text('GitHub Issue'),
             ),
-            ElevatedButton(
-              onPressed: () => launchUrl(
+            ListTile(
+              title: const Text('腾讯兔小巢'),
+              onTap: () => launchUrl(
                 Uri.parse('https://support.qq.com/embed/phone/637735'),
                 // 系统自带浏览器打开
                 mode: LaunchMode.externalApplication,
               ),
-              child: const Text('腾讯兔小巢'),
             ),
           ],
         );
@@ -355,7 +432,7 @@ class AboutController extends GetxController {
   }
 
   // tg频道
-  tgChanel() {
+  tgChannel() {
     Clipboard.setData(
       const ClipboardData(text: 'https://t.me/+162zlPtZlT9hNWVl'),
     );

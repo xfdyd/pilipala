@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
@@ -47,6 +48,21 @@ class GStrorage {
         setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10); // 设置全局变量
   }
 
+  static Future<String> exportAllSettings() async {
+    return jsonEncode({
+      setting.name: setting.toMap(),
+      video.name: video.toMap(),
+    });
+  }
+
+  static Future<void> importAllSettings(String data) async {
+    final Map<String, dynamic> map = jsonDecode(data);
+    await setting.clear();
+    await video.clear();
+    await setting.putAll(map[setting.name]);
+    await video.putAll(map[video.name]);
+  }
+
   static void regAdapter() {
     Hive.registerAdapter(OwnerAdapter());
     Hive.registerAdapter(UserInfoDataAdapter());
@@ -89,6 +105,8 @@ class SettingBoxKey {
       enableHA = 'enableHA',
       useOpenSLES = 'useOpenSLES',
       expandBuffer = 'expandBuffer',
+      hardwareDecoding = 'hardwareDecoding',
+      videoSync = 'videoSync',
       enableVerticalExpand = 'enableVerticalExpand',
       enableOnlineTotal = 'enableOnlineTotal',
       enableAutoBrightness = 'enableAutoBrightness',
@@ -136,7 +154,20 @@ class SettingBoxKey {
       enableSystemProxy = 'enableSystemProxy',
       enableAi = 'enableAi',
       disableLikeMsg = 'disableLikeMsg',
-      defaultHomePage = 'defaultHomePage';
+      defaultHomePage = 'defaultHomePage',
+
+      // 弹幕相关设置 权重（云屏蔽） 屏蔽类型 显示区域 透明度 字体大小 弹幕时间 描边粗细
+      danmakuWeight = 'danmakuWeight',
+      danmakuBlockType = 'danmakuBlockType',
+      danmakuShowArea = 'danmakuShowArea',
+      danmakuOpacity = 'danmakuOpacity',
+      danmakuFontScale = 'danmakuFontScale',
+      danmakuDuration = 'danmakuDuration',
+      strokeWidth = 'strokeWidth',
+
+      // 代理host port
+      systemProxyHost = 'systemProxyHost',
+      systemProxyPort = 'systemProxyPort';
 
   /// 外观
   static const String themeMode = 'themeMode',
@@ -146,6 +177,7 @@ class SettingBoxKey {
       enableSingleRow = 'enableSingleRow', // 首页单列
       displayMode = 'displayMode',
       maxRowWidth = 'maxRowWidth', // 首页列最大宽度（dp）
+      adaptiveNavBar = 'adaptiveNavBar',
       enableMYBar = 'enableMYBar',
       hideSearchBar = 'hideSearchBar', // 收起顶栏
       hideTabBar = 'hideTabBar', // 收起底栏
@@ -164,20 +196,7 @@ class LocalCacheKey {
 
       //
       wbiKeys = 'wbiKeys',
-      timeStamp = 'timeStamp',
-
-      // 弹幕相关设置 权重（云屏蔽） 屏蔽类型 显示区域 透明度 字体大小 弹幕时间 描边粗细
-      danmakuWeight = 'danmakuWeight',
-      danmakuBlockType = 'danmakuBlockType',
-      danmakuShowArea = 'danmakuShowArea',
-      danmakuOpacity = 'danmakuOpacity',
-      danmakuFontScale = 'danmakuFontScale',
-      danmakuDuration = 'danmakuDuration',
-      strokeWidth = 'strokeWidth',
-
-      // 代理host port
-      systemProxyHost = 'systemProxyHost',
-      systemProxyPort = 'systemProxyPort';
+      timeStamp = 'timeStamp';
 }
 
 class VideoBoxKey {

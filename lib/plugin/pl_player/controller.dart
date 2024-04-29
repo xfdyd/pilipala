@@ -116,7 +116,7 @@ class PlPlayerController {
   static List<Map<String, dynamic>> videoFitType = [
     {'attr': BoxFit.contain, 'desc': '自动', 'toast': '缩放至播放器尺寸，保留黑边'},
     {'attr': BoxFit.cover, 'desc': '裁剪', 'toast': '缩放至填满播放器，裁剪超出部分'},
-    {'attr': BoxFit.fill, 'desc': '拉伸', 'toast': '拉伸至播放器尺寸，将产生变形'},
+    {'attr': BoxFit.fill, 'desc': '拉伸', 'toast': '拉伸至播放器尺寸，将产生变形（竖屏改为自动）'},
     {'attr': BoxFit.none, 'desc': '原始', 'toast': '不缩放，以视频原始尺寸显示'},
     {'attr': BoxFit.fitHeight, 'desc': '等高', 'toast': '缩放至撑满播放器高度'},
     {'attr': BoxFit.fitWidth, 'desc': '等宽', 'toast': '缩放至撑满播放器宽度'},
@@ -285,21 +285,21 @@ class PlPlayerController {
     isOpenDanmu.value =
         setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: false);
     danmakuWeight.value =
-        localCache.get(LocalCacheKey.danmakuWeight, defaultValue: 0);
+        setting.get(SettingBoxKey.danmakuWeight, defaultValue: 0);
     blockTypes =
-        localCache.get(LocalCacheKey.danmakuBlockType, defaultValue: []);
-    showArea = localCache.get(LocalCacheKey.danmakuShowArea, defaultValue: 0.5);
+        setting.get(SettingBoxKey.danmakuBlockType, defaultValue: []);
+    showArea = setting.get(SettingBoxKey.danmakuShowArea, defaultValue: 0.5);
     // 不透明度
     opacityVal =
-        localCache.get(LocalCacheKey.danmakuOpacity, defaultValue: 1.0);
+        setting.get(SettingBoxKey.danmakuOpacity, defaultValue: 1.0);
     // 字体大小
     fontSizeVal =
-        localCache.get(LocalCacheKey.danmakuFontScale, defaultValue: 1.0);
+        setting.get(SettingBoxKey.danmakuFontScale, defaultValue: 1.0);
     // 弹幕时间
     danmakuDurationVal =
-        localCache.get(LocalCacheKey.danmakuDuration, defaultValue: 4.0);
+        setting.get(SettingBoxKey.danmakuDuration, defaultValue: 4.0);
     // 描边粗细
-    strokeWidth = localCache.get(LocalCacheKey.strokeWidth, defaultValue: 1.5);
+    strokeWidth = setting.get(SettingBoxKey.strokeWidth, defaultValue: 1.5);
     playRepeat = PlayRepeat.values.toList().firstWhere(
           (e) =>
               e.value ==
@@ -356,6 +356,7 @@ class PlPlayerController {
     double speed = 1.0,
     // 硬件加速
     bool enableHA = true,
+        String? hwdec,
     double? width,
     double? height,
     Duration? duration,
@@ -390,7 +391,7 @@ class PlPlayerController {
       }
       // 配置Player 音轨、字幕等等
       _videoPlayerController = await _createVideoController(
-          dataSource, _looping, enableHA, width, height);
+          dataSource, _looping, enableHA, hwdec, width, height);
       // 获取视频时长 00:00
       _duration.value = duration ?? _videoPlayerController!.state.duration;
       updateDurationSecond();
@@ -401,7 +402,7 @@ class PlPlayerController {
       if (!_listenersInitialized) {
         startListeners();
       }
-      await _initializePlayer(seekTo: seekTo, duration: _duration.value);
+      await _initializePlayer(seekTo: seekTo);
       if (videoType.value != 'live' && _cid != 0) {
         refreshSubtitles().then((value) {
           if (_vttSubtitles.isNotEmpty) {
@@ -432,6 +433,7 @@ class PlPlayerController {
     DataSource dataSource,
     PlaylistMode looping,
     bool enableHA,
+    String? hwdec,
     double? width,
     double? height,
   ) async {
@@ -468,6 +470,9 @@ class PlPlayerController {
           : "audiotrack,opensles";
       await pp.setProperty("ao", ao);
     }
+    // video-sync=display-resample
+    await pp.setProperty("video-sync",
+        setting.get(SettingBoxKey.videoSync, defaultValue: 'display-resample'));
     // // vo=gpu-next & gpu-context=android & gpu-api=opengl
     // await pp.setProperty("vo", "gpu-next");
     // await pp.setProperty("gpu-context", "android");
@@ -510,6 +515,7 @@ class PlPlayerController {
           configuration: VideoControllerConfiguration(
             enableHardwareAcceleration: enableHA,
             androidAttachSurfaceAfterVideoParameters: false,
+            hwdec: hwdec,
           ),
         );
 
@@ -519,15 +525,16 @@ class PlPlayerController {
       final assetUrl = dataSource.videoSource!.startsWith("asset://")
           ? dataSource.videoSource!
           : "asset://${dataSource.videoSource!}";
-      player.open(
+      await player.open(
         Media(assetUrl, httpHeaders: dataSource.httpHeaders),
         play: false,
       );
+    } else {
+      await player.open(
+        Media(dataSource.videoSource!, httpHeaders: dataSource.httpHeaders),
+        play: false,
+      );
     }
-    player.open(
-      Media(dataSource.videoSource!, httpHeaders: dataSource.httpHeaders),
-      play: false,
-    );
     // 音轨
     // player.setAudioTrack(
     //   AudioTrack.uri(dataSource.audioSource!),
@@ -764,6 +771,12 @@ class PlPlayerController {
     if (repeat) {
       await seekTo(Duration.zero);
     }
+
+    /// 临时fix _duration.value丢失
+    if (duration != null) {
+      _duration.value = duration;
+      updateDurationSecond();
+    }
     await _videoPlayerController?.play();
 
     await getCurrentVolume();
@@ -772,11 +785,6 @@ class PlPlayerController {
     playerStatus.status.value = PlayerStatus.playing;
     // screenManager.setOverlays(false);
 
-    /// 临时fix _duration.value丢失
-    if (duration != null) {
-      _duration.value = duration;
-      updateDurationSecond();
-    }
     audioSessionHandler.setActive(true);
   }
 
@@ -957,7 +965,7 @@ class PlPlayerController {
   Future<void> getVideoFit() async {
     int fitValue = videoStorage.get(VideoBoxKey.cacheVideoFit, defaultValue: 0);
     var attr = videoFitType[fitValue]['attr'];
-    // 由于none与scaleDown涉及视频原始尺寸，需要等待视频加载后再设置，否则尺寸会变为0，出现错误
+    // 由于none与scaleDown涉及视频原始尺寸，需要等待视频加载后再设置，否则尺寸会变为0，出现错误;
     if (attr == BoxFit.none || attr == BoxFit.scaleDown) {
       if (buffered.value == Duration.zero) {
         attr = BoxFit.contain;
@@ -973,6 +981,9 @@ class PlPlayerController {
           }
         });
       }
+      // fill不应该在竖屏视频生效
+    } else if (attr == BoxFit.fill && direction.value == 'vertical') {
+      attr = BoxFit.contain;
     }
     _videoFit.value = attr;
     _videoFitDesc.value = videoFitType[fitValue]['desc'];
@@ -1132,13 +1143,13 @@ class PlPlayerController {
   }
 
   void putDanmakuSettings() {
-    localCache.put(LocalCacheKey.danmakuWeight, danmakuWeight.value);
-    localCache.put(LocalCacheKey.danmakuBlockType, blockTypes);
-    localCache.put(LocalCacheKey.danmakuShowArea, showArea);
-    localCache.put(LocalCacheKey.danmakuOpacity, opacityVal);
-    localCache.put(LocalCacheKey.danmakuFontScale, fontSizeVal);
-    localCache.put(LocalCacheKey.danmakuDuration, danmakuDurationVal);
-    localCache.put(LocalCacheKey.strokeWidth, strokeWidth);
+    setting.put(SettingBoxKey.danmakuWeight, danmakuWeight.value);
+    setting.put(SettingBoxKey.danmakuBlockType, blockTypes);
+    setting.put(SettingBoxKey.danmakuShowArea, showArea);
+    setting.put(SettingBoxKey.danmakuOpacity, opacityVal);
+    setting.put(SettingBoxKey.danmakuFontScale, fontSizeVal);
+    setting.put(SettingBoxKey.danmakuDuration, danmakuDurationVal);
+    setting.put(SettingBoxKey.strokeWidth, strokeWidth);
   }
 
   Future<void> dispose({String type = 'single'}) async {

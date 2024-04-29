@@ -517,8 +517,11 @@ class Api {
   /// 我的订阅
   static const userSubFolder = '/x/v3/fav/folder/collected/list';
 
-  /// 我的订阅详情
-  static const userSubFolderDetail = '/x/space/fav/season/list';
+  /// 我的订阅-合集详情
+  static const favSeasonList = '/x/space/fav/season/list';
+
+  /// 我的订阅-播单详情
+  static const favResourceList = '/x/v3/fav/resource/list';
 
   /// 发送私信
   static const String sendMsg = '${HttpString.tUrl}/web_im/v1/web_im/send_msg';
@@ -526,6 +529,9 @@ class Api {
   /// 排行榜
   static const String getRankApi = "/x/web-interface/ranking/v2";
 
-  /// 取消订阅
-  static const String cancelSub = '/x/v3/fav/season/unfav';
+  /// 取消订阅-合集
+  static const String unfavSeason = '/x/v3/fav/season/unfav';
+
+  /// 取消订阅-播单
+  static const String unfavFolder = '/x/v3/fav/folder/unfav';
 }

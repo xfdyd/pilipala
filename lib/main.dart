@@ -30,15 +30,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
   await GStrorage.init();
-  if (GStrorage.setting.get(SettingBoxKey.autoClearCache, defaultValue: false)) {
+  if (GStrorage.setting.get(SettingBoxKey.autoClearCache, defaultValue: true)) {
     await CacheManage.clearLibraryCache();
   }
-  if (GStrorage.setting.get(SettingBoxKey.horizontalScreen, defaultValue: false)) {
+  if (GStrorage.setting
+      .get(SettingBoxKey.horizontalScreen, defaultValue: false)) {
     await SystemChrome.setPreferredOrientations(
       //支持竖屏与横屏
       [
         DeviceOrientation.portraitUp,
-        DeviceOrientation.portraitDown,
+        // DeviceOrientation.portraitDown,
         DeviceOrientation.landscapeLeft,
         DeviceOrientation.landscapeRight,
       ],
@@ -115,21 +116,18 @@ class MyApp extends StatelessWidget {
 
     // 强制设置高帧率
     if (Platform.isAndroid) {
-      try {
-        late List modes;
-        FlutterDisplayMode.supported.then((value) {
-          modes = value;
-          var storageDisplay = setting.get(SettingBoxKey.displayMode);
-          DisplayMode f = DisplayMode.auto;
-          if (storageDisplay != null) {
-            f = modes.firstWhere((e) => e.toString() == storageDisplay);
-          }
-          DisplayMode preferred = modes.toList().firstWhere((el) => el == f);
-          FlutterDisplayMode.setPreferredMode(preferred);
-        });
-      } catch (e) {
-        SmartDialog.showToast('设置帧率失败:$e', displayTime: const Duration(milliseconds: 500));
-      }
+      late List modes;
+      FlutterDisplayMode.supported.then((value) {
+        modes = value;
+        var storageDisplay = setting.get(SettingBoxKey.displayMode);
+        DisplayMode f = DisplayMode.auto;
+        if (storageDisplay != null) {
+          f = modes.firstWhere((e) => e.toString() == storageDisplay,
+              orElse: () => f);
+        }
+        DisplayMode preferred = modes.toList().firstWhere((el) => el == f);
+        FlutterDisplayMode.setPreferredMode(preferred);
+      });
     }
 
     return DynamicColorBuilder(

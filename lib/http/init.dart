@@ -105,7 +105,7 @@ class Request {
 
     String jsonData = json.encode({
       '3064': 1,
-      '39c8': '${spmPrefix}.fp.risk',
+      '39c8': '$spmPrefix.fp.risk',
       '3c43': {
         'adca': 'Linux',
         'bfe9': rand_png_end.substring(rand_png_end.length - 50),
@@ -138,9 +138,9 @@ class Request {
     enableSystemProxy = setting.get(SettingBoxKey.enableSystemProxy,
         defaultValue: false) as bool;
     systemProxyHost =
-        localCache.get(LocalCacheKey.systemProxyHost, defaultValue: '');
+        setting.get(SettingBoxKey.systemProxyHost, defaultValue: '');
     systemProxyPort =
-        localCache.get(LocalCacheKey.systemProxyPort, defaultValue: '');
+        setting.get(SettingBoxKey.systemProxyPort, defaultValue: '');
 
     dio = Dio(options);
 

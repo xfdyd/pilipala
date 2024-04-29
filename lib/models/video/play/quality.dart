@@ -94,18 +94,18 @@ extension AudioQualityDesc on AudioQuality {
 
 enum VideoDecodeFormats {
   DVH1,
-  AVC,
-  HEVC,
   AV1,
+  HEVC,
+  AVC,
 }
 
 extension VideoDecodeFormatsDesc on VideoDecodeFormats {
-  static final List<String> _descList = ['DVH1', 'AVC', 'HEVC', 'AV1'];
+  static final List<String> _descList = ['DVH1', 'AV1', 'HEVC', 'AVC'];
   get description => _descList[index];
 }
 
 extension VideoDecodeFormatsCode on VideoDecodeFormats {
-  static final List<String> _codeList = ['dvh1', 'avc1', 'hev1', 'av01'];
+  static final List<String> _codeList = ['dvh1', 'av01', 'hev1', 'avc1'];
   get code => _codeList[index];
 
   static VideoDecodeFormats? fromCode(String code) {

@@ -118,7 +118,7 @@ class WebviewController extends GetxController {
       content = '${content + url}; \n';
     }
     try {
-      await SetCookie.onSet();
+      await CookieTool.onSet();
       final result = await UserHttp.userInfo();
       if (result['status'] && result['data'].isLogin) {
         SmartDialog.showToast('登录成功，当前采用「'

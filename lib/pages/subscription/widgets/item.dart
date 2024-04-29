@@ -24,7 +24,7 @@ class SubItem extends StatelessWidget {
         arguments: subFolderItem,
         parameters: {
           'heroTag': heroTag,
-          'seasonId': subFolderItem.id.toString(),
+          'id': subFolderItem.id.toString(),
         },
       ),
       child: Padding(
@@ -77,6 +77,14 @@ class VideoContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // subFolderItem.type == 11：播单
+    // subFolderItem.type == 21：合集
+    // 其它：其它
+    String typeString = subFolderItem.type == 11
+        ? '播单'
+        : subFolderItem.type == 21
+            ? '合集'
+            : '其它:${subFolderItem.type}';
     return Expanded(
       child: Stack(
         children: [
@@ -95,7 +103,7 @@ class VideoContent extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '合集 UP主：${subFolderItem.upper!.name!}',
+                  '[$typeString] UP主：${subFolderItem.upper!.name!}',
                   textAlign: TextAlign.start,
                   style: TextStyle(
                     fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,

@@ -45,8 +45,10 @@ class VideoHttp {
       );
       if (res.data['code'] == 0) {
         List<RecVideoItemModel> list = [];
-        List<int> blackMidsList =
-            setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
+        List<int> blackMidsList = setting
+            .get(SettingBoxKey.blackMidsList, defaultValue: [-1])
+            .map<int>((e) => e as int)
+            .toList();
         for (var i in res.data['data']['item']) {
           //过滤掉live与ad，以及拉黑用户
           if (i['goto'] == 'av' &&
@@ -91,8 +93,10 @@ class VideoHttp {
       );
       if (res.data['code'] == 0) {
         List<RecVideoItemAppModel> list = [];
-        List<int> blackMidsList =
-            setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
+        List<int> blackMidsList = setting
+            .get(SettingBoxKey.blackMidsList, defaultValue: [-1])
+            .map<int>((e) => e as int)
+            .toList();
         for (var i in res.data['data']['items']) {
           // 屏蔽推广和拉黑用户
           if (i['card_goto'] != 'ad_av' &&
@@ -123,8 +127,10 @@ class VideoHttp {
       );
       if (res.data['code'] == 0) {
         List<HotVideoItemModel> list = [];
-        List<int> blackMidsList =
-            setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
+        List<int> blackMidsList = setting
+            .get(SettingBoxKey.blackMidsList, defaultValue: [-1])
+            .map<int>((e) => e as int)
+            .toList();
         for (var i in res.data['data']['list']) {
           if (!blackMidsList.contains(i['owner']['mid'])) {
             list.add(HotVideoItemModel.fromJson(i));
@@ -377,12 +383,12 @@ class VideoHttp {
   }
 
   static Future replyDel({
-    required int type,//replyType
+    required int type, //replyType
     required int oid,
     required int rpid,
   }) async {
     var res = await Request().post(Api.replyDel, queryParameters: {
-      'type': type,//type.index
+      'type': type, //type.index
       'oid': oid,
       'rpid': rpid,
       'csrf': await Request.getCsrf(),
@@ -615,8 +621,10 @@ class VideoHttp {
       var res = await Request().get(rankApi);
       if (res.data['code'] == 0) {
         List<HotVideoItemModel> list = [];
-        List<int> blackMidsList =
-            setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
+        List<int> blackMidsList = setting
+            .get(SettingBoxKey.blackMidsList, defaultValue: [-1])
+            .map<int>((e) => e as int)
+            .toList();
         for (var i in res.data['data']['list']) {
           if (!blackMidsList.contains(i['owner']['mid'])) {
             list.add(HotVideoItemModel.fromJson(i));

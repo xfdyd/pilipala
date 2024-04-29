@@ -63,7 +63,8 @@ class _StyleSettingState extends State<StyleSetting> {
         children: [
           SetSwitchItem(
               title: '横屏适配',
-              subTitle: '开启该项启用横屏布局与逻辑（测试）',
+              subTitle: '启用横屏布局与逻辑，适用于平板等设备',
+              leading: const Icon(Icons.phonelink_outlined),
               setKey: SettingBoxKey.horizontalScreen,
               defaultVal: false,
               callFn: (value) {
@@ -76,14 +77,23 @@ class _StyleSettingState extends State<StyleSetting> {
                 }
               }),
           const SetSwitchItem(
+            title: '自适应底栏/侧边栏',
+            subTitle: '横竖屏自动切换（其它底栏设置失效）',
+            leading: Icon(Icons.chrome_reader_mode_outlined),
+            setKey: SettingBoxKey.adaptiveNavBar,
+            defaultVal: false,
+          ),
+          const SetSwitchItem(
             title: 'MD3样式底栏',
-            subTitle: '符合Material You设计规范的底栏，关闭可使底栏变窄',
+            subTitle: 'Material You设计规范底栏，关闭可变窄',
+            leading: Icon(Icons.design_services_outlined),
             setKey: SettingBoxKey.enableMYBar,
             defaultVal: true,
           ),
           const SetSwitchItem(
             title: '首页顶栏收起',
             subTitle: '首页列表滑动时，收起顶栏',
+            leading: Icon(Icons.vertical_align_top_outlined),
             setKey: SettingBoxKey.hideSearchBar,
             defaultVal: false,
             needReboot: true,
@@ -91,6 +101,7 @@ class _StyleSettingState extends State<StyleSetting> {
           const SetSwitchItem(
             title: '首页底栏收起',
             subTitle: '首页列表滑动时，收起底栏',
+            leading: Icon(Icons.vertical_align_bottom_outlined),
             setKey: SettingBoxKey.hideTabBar,
             defaultVal: false,
             needReboot: true,
@@ -98,6 +109,7 @@ class _StyleSettingState extends State<StyleSetting> {
           const SetSwitchItem(
             title: '首页背景渐变',
             setKey: SettingBoxKey.enableGradientBg,
+            leading: Icon(Icons.gradient_outlined),
             defaultVal: true,
             needReboot: true,
           ),
@@ -123,11 +135,12 @@ class _StyleSettingState extends State<StyleSetting> {
                 setState(() {});
               }
             },
+            leading: const Icon(Icons.calendar_view_week_outlined),
             dense: false,
-            title: Text('最大列宽（dp）基准', style: titleStyle),
+            title: Text('列表宽度（dp）上限', style: titleStyle),
             subtitle: Text(
-              '当前：${maxRowWidth.toInt()}dp，屏幕宽度：${MediaQuery.of(context).size.width.toPrecision(2)}dp。'
-                  '该值决定列表在不同屏宽下的列数，部分列表会根据系数折算宽度',
+              '当前:${maxRowWidth.toInt()}dp，屏幕宽度:${MediaQuery.of(context).size.width.toPrecision(2)}dp。'
+                  '宽度越小列数越多，横条、大卡会2倍折算',
               style: subTitleStyle,
             ),
           ),
@@ -187,6 +200,7 @@ class _StyleSettingState extends State<StyleSetting> {
             },
             title: Text('图片质量', style: titleStyle),
             subtitle: Text('选择合适的图片清晰度，上限100%', style: subTitleStyle),
+            leading: const Icon(Icons.image_outlined),
             trailing: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Obx(
@@ -218,8 +232,9 @@ class _StyleSettingState extends State<StyleSetting> {
                 setting.put(SettingBoxKey.defaultToastOp, result);
               }
             },
-            title: Text('Toast不透明度', style: titleStyle),
-            subtitle: Text('自定义Toast不透明度', style: subTitleStyle),
+            leading: const Icon(Icons.opacity_outlined),
+            title: Text('气泡提示不透明度', style: titleStyle),
+            subtitle: Text('自定义气泡提示(Toast)不透明度', style: subTitleStyle),
           ),
           ListTile(
             dense: false,
@@ -242,6 +257,7 @@ class _StyleSettingState extends State<StyleSetting> {
                 Get.forceAppUpdate();
               }
             },
+            leading: const Icon(Icons.flashlight_on_outlined),
             title: Text('主题模式', style: titleStyle),
             subtitle: Obx(() => Text(
                 '当前模式：${settingController.themeType.value.description}',
@@ -251,6 +267,7 @@ class _StyleSettingState extends State<StyleSetting> {
             dense: false,
             onTap: () => settingController.setDynamicBadgeMode(context),
             title: Text('动态未读标记', style: titleStyle),
+            leading: const Icon(Icons.motion_photos_on_outlined),
             subtitle: Obx(() => Text(
                 '当前标记样式：${settingController.dynamicBadgeType.value.description}',
                 style: subTitleStyle)),
@@ -258,6 +275,7 @@ class _StyleSettingState extends State<StyleSetting> {
           ListTile(
             dense: false,
             onTap: () => Get.toNamed('/colorSetting'),
+            leading: const Icon(Icons.color_lens_outlined),
             title: Text('应用主题', style: titleStyle),
             subtitle: Obx(() => Text(
                 '当前主题：${colorSelectController.type.value == 0 ? '动态取色' : '指定颜色'}',
@@ -266,12 +284,14 @@ class _StyleSettingState extends State<StyleSetting> {
           const SetSwitchItem(
             title: '默认展示评论区',
             subTitle: '在视频详情页默认切换至评论区页',
+            leading: Icon(Icons.mode_comment_outlined),
             setKey: SettingBoxKey.defaultShowComment,
             defaultVal: false,
           ),
           ListTile(
             dense: false,
             onTap: () => settingController.seteDefaultHomePage(context),
+            leading: const Icon(Icons.home_outlined),
             title: Text('默认启动页', style: titleStyle),
             subtitle: Obx(() => Text(
                 '当前启动页：${defaultNavigationBars.firstWhere((e) => e['id'] == settingController.defaultHomePage.value)['label']}',
@@ -281,18 +301,21 @@ class _StyleSettingState extends State<StyleSetting> {
             dense: false,
             onTap: () => Get.toNamed('/fontSizeSetting'),
             title: Text('字体大小', style: titleStyle),
+            leading: const Icon(Icons.format_size_outlined),
           ),
           ListTile(
             dense: false,
             onTap: () => Get.toNamed('/tabbarSetting'),
             title: Text('首页标签页', style: titleStyle),
             subtitle: Text('删除或调换首页标签页', style: subTitleStyle),
+            leading: const Icon(Icons.toc_outlined),
           ),
           if (Platform.isAndroid)
             ListTile(
               dense: false,
               onTap: () => Get.toNamed('/displayModeSetting'),
               title: Text('屏幕帧率', style: titleStyle),
+              leading: const Icon(Icons.autofps_select_outlined),
             )
         ],
       ),
