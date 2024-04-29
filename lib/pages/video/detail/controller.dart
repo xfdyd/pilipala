@@ -312,16 +312,6 @@ class VideoDetailController extends GetxController
       enableHeart: enableHeart,
       autoplay: autoplay,
     );
-
-
-                      // 销毁播放器实例
-                      // await widget.controller!.dispose(type: 'all');
-                      if (mounted) {
-                        Navigator.popUntil(
-                            context, (Route<dynamic> route) => route.isFirst);
-                      }
-
-
       
     /// 开启自动全屏时，在player初始化完成后立即传入headerControl
     plPlayerController.headerControl = headerControl;
