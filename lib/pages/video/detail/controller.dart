@@ -276,7 +276,7 @@ class VideoDetailController extends GetxController
       
         //尝试真正实现竖屏软解
       if (firstVideo.width != null && firstVideo.height != null) {
-        if ((firstVideo.width - firstVideo.height) > 0) {
+        if ((firstVideo.width! - firstVideo.height!) > 0) {
         } else {
           enableHA.value = false;
         }
