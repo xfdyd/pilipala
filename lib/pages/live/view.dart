@@ -141,15 +141,12 @@ class _LivePageState extends State<LivePage>
 
   Widget contentGrid(ctr, liveList) {
     return SliverGrid(
-      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-        // 行间距
+      gridDelegate: SliverGridDelegateWithExtentAndRatio(
         mainAxisSpacing: StyleString.cardSpace,
-        // 列间距
         crossAxisSpacing: StyleString.cardSpace,
-        // 最大宽度
         maxCrossAxisExtent: Grid.maxRowWidth,
-        mainAxisExtent: Grid.calculateActualWidth(context, Grid.maxRowWidth, StyleString.safeSpace) / StyleString.aspectRatio+
-                MediaQuery.textScalerOf(context).scale(80),
+        childAspectRatio: StyleString.aspectRatio,
+        mainAxisExtent: MediaQuery.textScalerOf(context).scale(80),
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {

@@ -35,72 +35,94 @@ class _RankPageState extends State<RankPage>
       }
     });
   }
+
   @override
   void dispose() {
     _rankController.tabController.removeListener(() {});
     _rankController.tabController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 0,
-        elevation: 0,
-        systemOverlayStyle: SystemUiOverlayStyle(
-          // Customize the status bar here
-          statusBarIconBrightness:
-              MediaQuery.of(context).platformBrightness == Brightness.dark
-                  ? Brightness.light
-                  : Brightness.dark,
+    return Row(
+      children: [
+        const SizedBox(
+          width: StyleString.cardSpace,
         ),
-      ),
-      body: Row(
-        children: [
-          const SizedBox(
-            width: StyleString.cardSpace,
+        // SizedBox(
+        //     width: 55,
+        //     child: NavigationRail(
+        //
+        //       backgroundColor: Colors.transparent,
+        //       minWidth: 50.0,
+        //       // elevation: 0,
+        //       selectedIndex: _selectedTabIndex,
+        //       onDestinationSelected: (int index) {
+        //         feedBack();
+        //         if (_selectedTabIndex == index) {
+        //           _rankController.tabsCtrList[index]().animateToTop();
+        //         } else {
+        //           setState(() {
+        //             _rankController.tabController.index = index;
+        //             _selectedTabIndex = index;
+        //           });
+        //         }
+        //       },
+        //       labelType: NavigationRailLabelType.none,
+        //       destinations: [
+        //         for (var tab in _rankController.tabs)
+        //           NavigationRailDestination(
+        //             padding: EdgeInsets.zero,
+        //             icon: Text(tab['label']),
+        //             // selectedIcon: Text(tab['label']),
+        //             label: const SizedBox.shrink(),
+        //           ),
+        //       ],
+        //       trailing: const SizedBox(height: 100),
+        //     )),
+        LayoutBuilder(builder: (context, constraint) {
+          return SingleChildScrollView(
+              child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraint.maxHeight),
+                  child: IntrinsicHeight(
+                      child: NavigationRail(
+                    backgroundColor: Colors.transparent,
+                    minWidth: 50.0,
+                    // elevation: 0,
+                    selectedIndex: _selectedTabIndex,
+                    onDestinationSelected: (int index) {
+                      feedBack();
+                      if (_selectedTabIndex == index) {
+                        _rankController.tabsCtrList[index]().animateToTop();
+                      } else {
+                        setState(() {
+                          _rankController.tabController.index = index;
+                          _selectedTabIndex = index;
+                        });
+                      }
+                    },
+                    labelType: NavigationRailLabelType.none,
+                    destinations: [
+                      for (var tab in _rankController.tabs)
+                        NavigationRailDestination(
+                          icon: Text(tab['label']),
+                          // selectedIcon: Text(tab['label']),
+                          label: const SizedBox.shrink(),
+                        ),
+                    ],
+                    trailing: const SizedBox(height: 100),
+                  ))));
+        }),
+        Expanded(
+          child: TabBarView(
+            controller: _rankController.tabController,
+            children: _rankController.tabsPageList,
           ),
-          LayoutBuilder(builder: (context, constraint) {
-            return SingleChildScrollView(
-                child: ConstrainedBox(
-                    constraints:
-                        BoxConstraints(minHeight: constraint.maxHeight + 100),
-                    child: IntrinsicHeight(
-                        child: NavigationRail(
-                      minWidth: 55.0,
-                      selectedIndex: _selectedTabIndex,
-                      onDestinationSelected: (int index) {
-                        feedBack();
-                        if (_selectedTabIndex == index) {
-                          _rankController.tabsCtrList[index]().animateToTop();
-                        } else {
-                          setState(() {
-                            _rankController.tabController.index = index;
-                            _selectedTabIndex = index;
-                          });
-                        }
-                      },
-                      labelType: NavigationRailLabelType.none,
-                      destinations: [
-                        for (var tab in _rankController.tabs)
-                          NavigationRailDestination(
-                            icon: Text(tab['label']),
-                            // selectedIcon: Text(tab['label']),
-                            label: const SizedBox.shrink(),
-                          ),
-                      ],
-                    ))));
-          }),
-          Expanded(
-            child: TabBarView(
-              controller: _rankController.tabController,
-              children: _rankController.tabsPageList,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

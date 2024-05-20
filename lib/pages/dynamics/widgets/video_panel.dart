@@ -105,8 +105,8 @@ Widget videoSeasonWidget(item, context, type, {floor = 1}) {
                   right: 0,
                   bottom: 0,
                   child: Container(
-                    height: 80,
-                    padding: const EdgeInsets.fromLTRB(12, 0, 10, 10),
+                    height: 70,
+                    padding: const EdgeInsets.fromLTRB(10, 0, 8, 8),
                     clipBehavior: Clip.hardEdge,
                     decoration: BoxDecoration(
                         gradient: const LinearGradient(
@@ -139,17 +139,17 @@ Widget videoSeasonWidget(item, context, type, {floor = 1}) {
                                       '时长${Utils.durationReadFormat(content.durationText)}',
                                 ),
                               if (content.durationText != null)
-                                const SizedBox(width: 10),
+                                const SizedBox(width: 6),
                               Text(content.stat.play + '次围观'),
-                              const SizedBox(width: 10),
+                              const SizedBox(width: 6),
                               Text(content.stat.danmu + '条弹幕')
                             ],
                           ),
                         ),
                         Image.asset(
                           'assets/images/play.png',
-                          width: 60,
-                          height: 60,
+                          width: 50,
+                          height: 50,
                         ),
                       ],
                     ),

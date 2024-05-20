@@ -82,8 +82,8 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
         slivers: [
           SliverPadding(
             // 单列布局 EdgeInsets.zero
-            padding:
-                const EdgeInsets.fromLTRB(0, StyleString.safeSpace - 5, 0, 0),
+            padding: const EdgeInsets.fromLTRB(
+                StyleString.safeSpace, StyleString.safeSpace - 5, 0, 0),
             sliver: FutureBuilder(
               future: _futureBuilderFuture,
               builder: (context, snapshot) {
@@ -92,19 +92,12 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
                   if (data['status']) {
                     return Obx(
                       () => SliverGrid(
-                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                            // 行间距
-                            mainAxisSpacing: StyleString.cardSpace,
-                            // 列间距
-                            crossAxisSpacing: StyleString.cardSpace,
-                            // 最大宽度
+                        gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                            mainAxisSpacing: StyleString.safeSpace,
+                            crossAxisSpacing: StyleString.safeSpace,
                             maxCrossAxisExtent: Grid.maxRowWidth * 2,
-                            mainAxisExtent: Grid.calculateActualWidth(
-                                    context,
-                                    Grid.maxRowWidth * 2,
-                                    StyleString.safeSpace) /
-                                2.1 /
-                                StyleString.aspectRatio),
+                            childAspectRatio: StyleString.aspectRatio * 2.3,
+                            mainAxisExtent: 0),
                         delegate: SliverChildBuilderDelegate((context, index) {
                           return VideoCardH(
                             videoItem: _hotController.videoList[index],
@@ -135,7 +128,12 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
                   }
                 } else {
                   // 骨架屏
-                  return SliverList(
+                  return SliverGrid(
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                        mainAxisSpacing: StyleString.cardSpace,
+                        crossAxisSpacing: StyleString.cardSpace,
+                        maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                        childAspectRatio: StyleString.aspectRatio * 2.3),
                     delegate: SliverChildBuilderDelegate((context, index) {
                       return const VideoCardHSkeleton();
                     }, childCount: 10),

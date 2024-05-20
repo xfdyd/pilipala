@@ -151,7 +151,10 @@ class _MinePageState extends State<MinePage> {
                         semanticsLabel: '头像',
                         width: 85,
                         height: 85)
-                    : Image.asset('assets/images/noface.jpeg',semanticLabel: "默认头像",),
+                    : Image.asset(
+                        'assets/images/noface.jpeg',
+                        semanticLabel: "默认头像",
+                      ),
               ),
             ),
           ),
@@ -183,8 +186,8 @@ class _MinePageState extends State<MinePage> {
                   style:
                       TextStyle(color: Theme.of(context).colorScheme.outline)),
               TextSpan(
-                  text: (_mineController.userInfo.value.money ?? '-')
-                      .toString(),
+                  text:
+                      (_mineController.userInfo.value.money ?? '-').toString(),
                   style:
                       TextStyle(color: Theme.of(context).colorScheme.primary)),
             ]))
@@ -256,12 +259,12 @@ class _MinePageState extends State<MinePage> {
                   color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.bold);
               return SizedBox(
-                height: constraints.maxWidth / 3 * 0.6,
+                height: constraints.maxWidth * 0.33 * 0.6,
                 child: GridView.count(
                   primary: false,
                   padding: const EdgeInsets.all(0),
                   crossAxisCount: 3,
-                  childAspectRatio: 1.67,
+                  childAspectRatio: 1.66,
                   children: <Widget>[
                     InkWell(
                       onTap: () => _mineController.pushDynamic(),

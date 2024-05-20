@@ -203,17 +203,19 @@ class _WhisperPageState extends State<WhisperPage> {
                                                         .content !=
                                                     ''
                                             ? (sessionList[i]
-                                                    .lastMsg
-                                                    .content['text'] ??
-                                                sessionList[i]
-                                                    .lastMsg
-                                                    .content['content'] ??
-                                                sessionList[i]
-                                                    .lastMsg
-                                                    .content['title'] ??
-                                                sessionList[i]
-                                                    .lastMsg
-                                                    .content['reply_content'])
+                                                        .lastMsg
+                                                        .content['text'] ??
+                                                    sessionList[i]
+                                                        .lastMsg
+                                                        .content['content'] ??
+                                                    sessionList[i]
+                                                        .lastMsg
+                                                        .content['title'] ??
+                                                    sessionList[i]
+                                                            .lastMsg
+                                                            .content[
+                                                        'reply_content']) ??
+                                                sessionList[i].lastMsg.content
                                             : '不支持的消息类型',
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,

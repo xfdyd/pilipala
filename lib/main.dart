@@ -30,7 +30,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
   await GStrorage.init();
-  if (GStrorage.setting.get(SettingBoxKey.autoClearCache, defaultValue: true)) {
+  if (GStrorage.setting.get(SettingBoxKey.autoClearCache, defaultValue: false)) {
     await CacheManage.clearLibraryCache();
   }
   if (GStrorage.setting

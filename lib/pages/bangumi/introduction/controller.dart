@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -231,9 +232,29 @@ class BangumiIntroController extends GetxController {
 
   // 分享视频
   Future actionShareVideo() async {
-    var result = await Share.share('${HttpString.baseUrl}/video/$bvid')
-        .whenComplete(() {});
-    return result;
+    showDialog(
+        context: Get.context!,
+        builder: (context) {
+          String videoUrl = '${HttpString.baseUrl}/video/$bvid';
+          return AlertDialog(
+            title: const Text('分享方式'),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: videoUrl));
+                    SmartDialog.showToast('已复制');
+                  },
+                  child: const Text('复制链接到剪贴板')),
+              TextButton(
+                  onPressed: () async {
+                    var result =
+                        await Share.share(videoUrl).whenComplete(() {});
+                    return result;
+                  },
+                  child: const Text('分享视频')),
+            ],
+          );
+        });
   }
 
   // 选择文件夹

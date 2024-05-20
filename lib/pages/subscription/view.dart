@@ -58,17 +58,12 @@ class _SubPageState extends State<SubPage> {
                       physics: const AlwaysScrollableScrollPhysics(),
                       slivers: [
                         SliverGrid(
-                          gridDelegate:
-                              SliverGridDelegateWithMaxCrossAxisExtent(
-                                  mainAxisSpacing: StyleString.cardSpace,
-                                  crossAxisSpacing: StyleString.safeSpace,
-                                  maxCrossAxisExtent: Grid.maxRowWidth * 2,
-                                  mainAxisExtent: Grid.calculateActualWidth(
-                                          context,
-                                          Grid.maxRowWidth * 2,
-                                          StyleString.safeSpace) /
-                                      2.1 /
-                                      StyleString.aspectRatio),
+                          gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                              mainAxisSpacing: StyleString.cardSpace,
+                              crossAxisSpacing: StyleString.safeSpace,
+                              maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                              childAspectRatio: StyleString.aspectRatio * 2.3,
+                              mainAxisExtent: 0),
                           delegate: SliverChildBuilderDelegate(
                             childCount:
                                 _subController.subFolderData.value.list!.length,

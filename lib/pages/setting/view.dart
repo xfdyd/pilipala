@@ -56,7 +56,7 @@ class SettingPage extends StatelessWidget {
             leading: const Icon(Icons.style_outlined),
             dense: false,
             title: const Text('外观设置'),
-            subtitle: Text('横屏适配（平板）、列宽、首页、主题、字号、图片、动态红点、帧率等', style: subTitleStyle),
+            subtitle: Text('横屏适配（平板）、侧栏、列宽、首页、动态红点、主题、字号、图片、帧率等', style: subTitleStyle),
           ),
           ListTile(
             onTap: () => Get.toNamed('/extraSetting'),
@@ -81,7 +81,7 @@ class SettingPage extends StatelessWidget {
               visible: settingController.userLogin.value,
               child: ListTile(
                 leading: const Icon(Icons.logout_outlined),
-                onTap: () => settingController.loginOut(),
+                onTap: () => settingController.loginOut(context),
                 dense: false,
                 title: const Text('退出登录'),
               ),

@@ -46,104 +46,78 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    Brightness currentBrightness = MediaQuery.of(context).platformBrightness;
-    // 设置状态栏图标的亮度
-    if (_homeController.enableGradientBg) {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarIconBrightness: currentBrightness == Brightness.light
-            ? Brightness.dark
-            : Brightness.light,
-      ));
-    }
+    // Brightness currentBrightness = MediaQuery.of(context).platformBrightness;
+    // // 设置状态栏图标的亮度
+    // if (_homeController.enableGradientBg) {
+    //   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    //     statusBarIconBrightness: currentBrightness == Brightness.light
+    //         ? Brightness.dark
+    //         : Brightness.light,
+    //   ));
+    // }
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
-      appBar: _homeController.enableGradientBg
-          ? null
-          : AppBar(toolbarHeight: 0, elevation: 0),
-      body: Stack(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        toolbarHeight: 0,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarIconBrightness:
+              MediaQuery.of(context).platformBrightness == Brightness.dark
+                  ? Brightness.light
+                  : Brightness.dark,
+        ),
+      ),
+      body: Column(
         children: [
-          // gradient background
-          if (_homeController.enableGradientBg) ...[
-            Align(
-              alignment: Alignment.topLeft,
-              child: Opacity(
-                opacity: 0.6,
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        colors: [
-                          Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withOpacity(0.9),
-                          Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withOpacity(0.5),
-                          Theme.of(context).colorScheme.surface
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        stops: const [0, 0.0034, 0.34]),
+          CustomAppBar(
+            stream: _homeController.hideSearchBar
+                ? stream
+                : StreamController<bool>.broadcast().stream,
+            ctr: _homeController,
+            callback: showUserBottomSheet,
+          ),
+          if (_homeController.tabs.length > 1) ...[
+            if (_homeController.enableGradientBg) ...[
+              const CustomTabs(),
+            ] else ...[
+              const SizedBox(height: 4),
+              SizedBox(
+                width: double.infinity,
+                height: 42,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: TabBar(
+                    controller: _homeController.tabController,
+                    tabs: [
+                      for (var i in _homeController.tabs) Tab(text: i['label'])
+                    ],
+                    isScrollable: true,
+                    dividerColor: Colors.transparent,
+                    enableFeedback: true,
+                    splashBorderRadius: BorderRadius.circular(10),
+                    tabAlignment: TabAlignment.center,
+                    onTap: (value) {
+                      feedBack();
+                      if (_homeController.initialIndex.value == value) {
+                        _homeController.tabsCtrList[value]().animateToTop();
+                      }
+                      _homeController.initialIndex.value = value;
+                    },
                   ),
-                ),
-              ),
-            ),
-          ],
-          Column(
-            children: [
-              CustomAppBar(
-                stream: _homeController.hideSearchBar
-                    ? stream
-                    : StreamController<bool>.broadcast().stream,
-                ctr: _homeController,
-                callback: showUserBottomSheet,
-              ),
-              if (_homeController.tabs.length > 1) ...[
-                if (_homeController.enableGradientBg) ...[
-                  const CustomTabs(),
-                ] else ...[
-                  const SizedBox(height: 4),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 42,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: TabBar(
-                        controller: _homeController.tabController,
-                        tabs: [
-                          for (var i in _homeController.tabs)
-                            Tab(text: i['label'])
-                        ],
-                        isScrollable: true,
-                        dividerColor: Colors.transparent,
-                        enableFeedback: true,
-                        splashBorderRadius: BorderRadius.circular(10),
-                        tabAlignment: TabAlignment.center,
-                        onTap: (value) {
-                          feedBack();
-                          if (_homeController.initialIndex.value == value) {
-                            _homeController.tabsCtrList[value]().animateToTop();
-                          }
-                          _homeController.initialIndex.value = value;
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ] else ...[
-                const SizedBox(height: 6),
-              ],
-              Expanded(
-                child: TabBarView(
-                  controller: _homeController.tabController,
-                  children: _homeController.tabsPageList,
                 ),
               ),
             ],
+          ] else ...[
+            const SizedBox(height: 6),
+          ],
+          Expanded(
+            child: TabBarView(
+              controller: _homeController.tabController,
+              children: _homeController.tabsPageList,
+            ),
           ),
         ],
       ),

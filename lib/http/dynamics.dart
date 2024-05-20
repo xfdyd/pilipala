@@ -5,15 +5,13 @@ import 'index.dart';
 class DynamicsHttp {
   static Future followDynamic({
     String? type,
-    int? page,
     String? offset,
     int? mid,
   }) async {
     Map<String, dynamic> data = {
       'type': type ?? 'all',
-      'page': page ?? 1,
       'timezone_offset': '-480',
-      'offset': page == 1 ? '' : offset,
+      'offset': offset,
       'features': 'itemOpusStyle'
     };
     if (mid != -1) {

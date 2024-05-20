@@ -59,6 +59,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late bool enableVerticalExpand;
   late bool autoPiP;
   late bool pipNoDanmaku;
+  late bool removeSafeArea;
   final Floating floating = Floating();
   // 生命周期监听
   // late final AppLifecycleListener _lifecycleListener;
@@ -66,7 +67,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   RxBool isFullScreen = false.obs;
   late StreamSubscription<bool> fullScreenStatusListener;
   late final MethodChannel onUserLeaveHintListener;
-  StreamSubscription<Duration>? _bufferedListener;
+  // StreamSubscription<Duration>? _bufferedListener;
 
   @override
   void initState() {
@@ -97,6 +98,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     pipNoDanmaku = setting.get(SettingBoxKey.pipNoDanmaku, defaultValue: true);
     enableVerticalExpand =
         setting.get(SettingBoxKey.enableVerticalExpand, defaultValue: false);
+    removeSafeArea = setting.get(SettingBoxKey.videoPlayerRemoveSafeArea,
+        defaultValue: false);
+    if (removeSafeArea) hideStatusBar();
     videoSourceInit();
     appbarStreamListen();
     // lifecycleListener();
@@ -146,6 +150,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     if (status == PlayerStatus.completed) {
       shutdownTimerService.handleWaitingFinished();
       bool notExitFlag = false;
+
       /// 顺序播放 列表循环
       if (plPlayerController!.playRepeat != PlayRepeat.pause &&
           plPlayerController!.playRepeat != PlayRepeat.singleCycle) {
@@ -246,7 +251,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       AutoOrientation.portraitUpMode();
     }
     shutdownTimerService.handleWaitingFinished();
-    _bufferedListener?.cancel();
+    // _bufferedListener?.cancel();
     if (plPlayerController != null) {
       plPlayerController!.removeStatusLister(playerListener);
       fullScreenStatusListener.cancel();
@@ -262,7 +267,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   @override
   // 离开当前页面时
   void didPushNext() async {
-    _bufferedListener?.cancel();
+    // _bufferedListener?.cancel();
 
     /// 开启
     if (setting.get(SettingBoxKey.enableAutoBrightness, defaultValue: false)
@@ -392,10 +397,57 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             return const SizedBox();
           }
         });
+    Widget manualPlayerWidget = Obx(
+      () => Visibility(
+          visible: videoDetailController.isShowCover.value &&
+              videoDetailController.isEffective.value,
+          child: Stack(
+            children: [
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: AppBar(
+                  primary: false,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  scrolledUnderElevation: 0,
+                  backgroundColor: Colors.transparent,
+                  actions: [
+                    IconButton(
+                      tooltip: '稍后再看',
+                      onPressed: () async {
+                        var res = await UserHttp.toViewLater(
+                            bvid: videoDetailController.bvid);
+                        SmartDialog.showToast(res['msg']);
+                      },
+                      icon: const Icon(Icons.history_outlined),
+                    ),
+                    const SizedBox(width: 14)
+                  ],
+                ),
+              ),
+              Positioned(
+                right: 12,
+                bottom: 10,
+                child: IconButton(
+                    tooltip: '播放',
+                    onPressed: () => handlePlay(),
+                    icon: Image.asset(
+                      'assets/images/play.png',
+                      width: 60,
+                      height: 60,
+                    )),
+              ),
+            ],
+          )),
+    );
     Widget childWhenDisabled = SafeArea(
-      top: MediaQuery.of(context).orientation == Orientation.portrait &&
+      top: !removeSafeArea &&
+          MediaQuery.of(context).orientation == Orientation.portrait &&
           isFullScreen.value == true,
-      bottom: MediaQuery.of(context).orientation == Orientation.portrait &&
+      bottom: !removeSafeArea &&
+          MediaQuery.of(context).orientation == Orientation.portrait &&
           isFullScreen.value == true,
       left: false, //isFullScreen != true,
       right: false, //isFullScreen != true,
@@ -404,17 +456,26 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           Scaffold(
               resizeToAvoidBottomInset: false,
               key: videoDetailController.scaffoldKey,
-              backgroundColor: Colors.black,
-              appBar: PreferredSize(
-                preferredSize: const Size.fromHeight(0),
-                child: AppBar(
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  // systemOverlayStyle: const SystemUiOverlayStyle(
-                  //     statusBarColor: Colors.transparent,
-                  //     statusBarIconBrightness: Brightness.light),
-                ),
-              ),
+              // backgroundColor: Colors.black,
+              appBar: removeSafeArea
+                  ? null
+                  : AppBar(
+                      backgroundColor: Colors.black,
+                      elevation: 0,
+                      toolbarHeight: 0,
+                      systemOverlayStyle: const SystemUiOverlayStyle(
+                          statusBarIconBrightness: Brightness.light),
+                    ),
+              // appBar: PreferredSize(
+              //   preferredSize: const Size.fromHeight(0),
+              //   child: AppBar(
+              //     backgroundColor: Colors.transparent,
+              //     elevation: 0,
+              //     systemOverlayStyle: const SystemUiOverlayStyle(
+              //         statusBarColor: Colors.transparent,
+              //         statusBarIconBrightness: Brightness.light),
+              //   ),
+              // ),
               body: Column(
                 children: [
                   Obx(
@@ -424,7 +485,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                       // print(videoDetailController.tabCtr.index);
                       if (enableVerticalExpand &&
                           plPlayerController?.direction.value == 'vertical') {
-                        videoheight = context.width * 5 / 4;
+                        videoheight = context.width;
                       }
                       if (MediaQuery.of(context).orientation ==
                               Orientation.landscape &&
@@ -439,15 +500,17 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                           !isFullScreen.value &&
                           isShowing &&
                           mounted) {
-                        showStatusBar();
+                        if (!removeSafeArea) showStatusBar();
                       }
-                      return SizedBox(
+                      return Container(
+                        color: Colors.black,
                         height: MediaQuery.of(context).orientation ==
                                     Orientation.landscape ||
                                 isFullScreen.value == true
                             ? MediaQuery.sizeOf(context).height -
                                 (MediaQuery.of(context).orientation ==
-                                        Orientation.landscape
+                                            Orientation.landscape ||
+                                        removeSafeArea
                                     ? 0
                                     : MediaQuery.of(context).padding.top)
                             : videoheight,
@@ -498,59 +561,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                       ),
                                     ),
                                   ),
-                                  Obx(
-                                    () => Visibility(
-                                        visible: videoDetailController
-                                                .isShowCover.value &&
-                                            videoDetailController
-                                                .isEffective.value,
-                                        child: Stack(
-                                          children: [
-                                            Positioned(
-                                              top: 0,
-                                              left: 0,
-                                              right: 0,
-                                              child: AppBar(
-                                                primary: false,
-                                                foregroundColor: Colors.white,
-                                                elevation: 0,
-                                                scrolledUnderElevation: 0,
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                actions: [
-                                                  IconButton(
-                                                    tooltip: '稍后再看',
-                                                    onPressed: () async {
-                                                      var res = await UserHttp
-                                                          .toViewLater(
-                                                              bvid:
-                                                                  videoDetailController
-                                                                      .bvid);
-                                                      SmartDialog.showToast(
-                                                          res['msg']);
-                                                    },
-                                                    icon: const Icon(
-                                                        Icons.history_outlined),
-                                                  ),
-                                                  const SizedBox(width: 14)
-                                                ],
-                                              ),
-                                            ),
-                                            Positioned(
-                                              right: 12,
-                                              bottom: 10,
-                                              child: IconButton(
-                                                  tooltip: '播放',
-                                                  onPressed: () => handlePlay(),
-                                                  icon: Image.asset(
-                                                    'assets/images/play.png',
-                                                    width: 60,
-                                                    height: 60,
-                                                  )),
-                                            ),
-                                          ],
-                                        )),
-                                  ),
+                                  manualPlayerWidget,
                                 ]
                               ],
                             )),
@@ -629,15 +640,308 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         ],
       ),
     );
+    Widget childWhenDisabledAlmostSquareInner = Obx(() {
+      if (enableVerticalExpand &&
+          plPlayerController?.direction.value == 'vertical') {
+        final double videoheight = context.height -
+            (removeSafeArea
+                ? 0
+                : (MediaQuery.of(context).padding.top +
+                    MediaQuery.of(context).padding.bottom));
+        final double videowidth = videoheight * 9 / 16;
+        return Row(children: [
+          SizedBox(
+            height: videoheight,
+            width: isFullScreen.value == true ? context.width : videowidth,
+            child: PopScope(
+              canPop: isFullScreen.value != true,
+              onPopInvoked: (bool didPop) {
+                if (isFullScreen.value == true) {
+                  plPlayerController!.triggerFullScreen(status: false);
+                }
+                if (MediaQuery.of(context).orientation ==
+                        Orientation.landscape &&
+                    !horizontalScreen) {
+                  verticalScreenForTwoSeconds();
+                }
+              },
+              child: Stack(children: <Widget>[
+                if (isShowing) plPlayer,
+
+                /// 关闭自动播放时 手动播放
+                if (!videoDetailController.autoPlay.value) ...<Widget>[
+                  Obx(
+                    () => Visibility(
+                      visible: videoDetailController.isShowCover.value,
+                      child: Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: () {
+                            handlePlay();
+                          },
+                          child: NetworkImgLayer(
+                            type: 'emote',
+                            src: videoDetailController.videoItem['pic'],
+                            width: videowidth,
+                            height: videoheight,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  manualPlayerWidget,
+                ]
+              ]),
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              physics: const BouncingScrollPhysics(),
+              controller: videoDetailController.tabCtr,
+              children: <Widget>[
+                CustomScrollView(
+                  key: const PageStorageKey<String>('简介'),
+                  slivers: <Widget>[
+                    if (videoDetailController.videoType ==
+                        SearchType.video) ...[
+                      const VideoIntroPanel(),
+                    ] else if (videoDetailController.videoType ==
+                        SearchType.media_bangumi) ...[
+                      Obx(() => BangumiIntroPanel(
+                          cid: videoDetailController.cid.value)),
+                    ],
+                    SliverToBoxAdapter(
+                      child: Divider(
+                        indent: 12,
+                        endIndent: 12,
+                        color: Theme.of(context).dividerColor.withOpacity(0.06),
+                      ),
+                    ),
+                    const RelatedVideoPanel(),
+                  ],
+                ),
+                Obx(
+                  () => VideoReplyPanel(
+                    bvid: videoDetailController.bvid,
+                    oid: videoDetailController.oid.value,
+                  ),
+                )
+              ],
+            ),
+          ),
+        ]);
+      }
+      final double videoheight = context.height / 2.5;
+      final double videowidth = context.width;
+      return Column(
+        children: [
+          SizedBox(
+            width: videowidth,
+            height: isFullScreen.value == true
+                ? context.height -
+                    (removeSafeArea
+                        ? 0
+                        : (MediaQuery.of(context).padding.top +
+                            MediaQuery.of(context).padding.bottom))
+                : videoheight,
+            child: PopScope(
+              canPop: isFullScreen.value != true,
+              onPopInvoked: (bool didPop) {
+                if (isFullScreen.value == true) {
+                  plPlayerController!.triggerFullScreen(status: false);
+                }
+                if (MediaQuery.of(context).orientation ==
+                        Orientation.landscape &&
+                    !horizontalScreen) {
+                  verticalScreenForTwoSeconds();
+                }
+              },
+              child: Stack(children: <Widget>[
+                if (isShowing) plPlayer,
+
+                /// 关闭自动播放时 手动播放
+                if (!videoDetailController.autoPlay.value) ...<Widget>[
+                  Obx(
+                    () => Visibility(
+                      visible: videoDetailController.isShowCover.value,
+                      child: Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: () {
+                            handlePlay();
+                          },
+                          child: NetworkImgLayer(
+                            type: 'emote',
+                            src: videoDetailController.videoItem['pic'],
+                            width: videowidth,
+                            height: videoheight,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  manualPlayerWidget,
+                ]
+              ]),
+            ),
+          ),
+          Expanded(
+              child: Row(children: [
+            Expanded(
+                child: CustomScrollView(
+              key: PageStorageKey<String>('简介${videoDetailController.bvid}'),
+              slivers: <Widget>[
+                if (videoDetailController.videoType == SearchType.video) ...[
+                  const VideoIntroPanel(),
+                  const RelatedVideoPanel(),
+                ] else if (videoDetailController.videoType ==
+                    SearchType.media_bangumi) ...[
+                  Obx(() =>
+                      BangumiIntroPanel(cid: videoDetailController.cid.value)),
+                ]
+              ],
+            )),
+            Expanded(
+              child: Obx(
+                () => VideoReplyPanel(
+                  bvid: videoDetailController.bvid,
+                  oid: videoDetailController.oid.value,
+                ),
+              ),
+            )
+          ]))
+        ],
+      );
+    });
     Widget childWhenDisabledLandscapeInner = Obx(() {
-      // 系数是以下三个方程（分别代表特定平板、折叠屏内屏、普通手机横屏尺寸）的近似解
-      // 820x+1180y+983.67z=450
-      // 1812x+2176y+1985.68z=680
-      // 1080x+2340y+1589.72z=560
-      final double videoheight = sqrt(context.height * context.width) * 12.555 -
-          context.height * 7.690 -
-          context.width * 4.741;
-      final double videowidth = videoheight * 16 / 9;
+      if (enableVerticalExpand &&
+          plPlayerController?.direction.value == 'vertical') {
+        final double videoheight = context.height -
+            (removeSafeArea
+                ? 0
+                : (MediaQuery.of(context).padding.top +
+                    MediaQuery.of(context).padding.bottom));
+        final double videowidth = videoheight * 9 / 16;
+        return Row(
+          children: [
+            SizedBox(
+              height: videoheight,
+              width: isFullScreen.value == true ? context.width : videowidth,
+              child: PopScope(
+                canPop: isFullScreen.value != true,
+                onPopInvoked: (bool didPop) {
+                  if (isFullScreen.value == true) {
+                    plPlayerController!.triggerFullScreen(status: false);
+                  }
+                  if (MediaQuery.of(context).orientation ==
+                          Orientation.landscape &&
+                      !horizontalScreen) {
+                    verticalScreenForTwoSeconds();
+                  }
+                },
+                child: Stack(
+                  children: <Widget>[
+                    if (isShowing) plPlayer,
+
+                    /// 关闭自动播放时 手动播放
+                    if (!videoDetailController.autoPlay.value) ...<Widget>[
+                      Obx(
+                        () => Visibility(
+                          visible: videoDetailController.isShowCover.value,
+                          child: Positioned(
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            child: GestureDetector(
+                              onTap: () {
+                                handlePlay();
+                              },
+                              child: NetworkImgLayer(
+                                type: 'emote',
+                                src: videoDetailController.videoItem['pic'],
+                                width: videowidth,
+                                height: videoheight,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      manualPlayerWidget,
+                    ]
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+                child: Row(children: [
+              Expanded(
+                  child: CustomScrollView(
+                key: PageStorageKey<String>('简介${videoDetailController.bvid}'),
+                slivers: <Widget>[
+                  if (videoDetailController.videoType == SearchType.video) ...[
+                    const VideoIntroPanel(),
+                    const RelatedVideoPanel(),
+                  ] else if (videoDetailController.videoType ==
+                      SearchType.media_bangumi) ...[
+                    Obx(() => BangumiIntroPanel(
+                        cid: videoDetailController.cid.value)),
+                  ]
+                ],
+              )),
+              Expanded(
+                child: Obx(
+                  () => VideoReplyPanel(
+                    bvid: videoDetailController.bvid,
+                    oid: videoDetailController.oid.value,
+                  ),
+                ),
+              )
+            ]))
+            // Expanded(
+            //   child: TabBarView(
+            //     physics: const BouncingScrollPhysics(),
+            //     controller: videoDetailController.tabCtr,
+            //     children: <Widget>[
+            //       CustomScrollView(
+            //         key: const PageStorageKey<String>('简介'),
+            //         slivers: <Widget>[
+            //           if (videoDetailController.videoType ==
+            //               SearchType.video) ...[
+            //             const VideoIntroPanel(),
+            //           ] else if (videoDetailController.videoType ==
+            //               SearchType.media_bangumi) ...[
+            //             Obx(() => BangumiIntroPanel(
+            //                 cid: videoDetailController.cid.value)),
+            //           ],
+            //           SliverToBoxAdapter(
+            //             child: Divider(
+            //               indent: 12,
+            //               endIndent: 12,
+            //               color: Theme.of(context).dividerColor.withOpacity(0.06),
+            //             ),
+            //           ),
+            //           const RelatedVideoPanel(),
+            //         ],
+            //       ),
+            //       Obx(
+            //             () => VideoReplyPanel(
+            //           bvid: videoDetailController.bvid,
+            //           oid: videoDetailController.oid.value,
+            //         ),
+            //       )
+            //     ],
+            //   ),
+            // ),
+          ],
+        );
+      }
+      final double videowidth =
+          max(context.height / context.width * 1.04, 1 / 2) * context.width;
+      final double videoheight = videowidth * 9 / 16;
       return Row(
         children: [
           Column(
@@ -689,57 +993,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                 ),
                               ),
                             ),
-                            Obx(
-                              () => Visibility(
-                                  visible: videoDetailController
-                                          .isShowCover.value &&
-                                      videoDetailController.isEffective.value,
-                                  child: Stack(
-                                    children: [
-                                      Positioned(
-                                        top: 0,
-                                        left: 0,
-                                        right: 0,
-                                        child: AppBar(
-                                          primary: false,
-                                          foregroundColor: Colors.white,
-                                          elevation: 0,
-                                          scrolledUnderElevation: 0,
-                                          backgroundColor: Colors.transparent,
-                                          actions: [
-                                            IconButton(
-                                              tooltip: '稍后再看',
-                                              onPressed: () async {
-                                                var res =
-                                                    await UserHttp.toViewLater(
-                                                        bvid:
-                                                            videoDetailController
-                                                                .bvid);
-                                                SmartDialog.showToast(
-                                                    res['msg']);
-                                              },
-                                              icon: const Icon(
-                                                  Icons.history_outlined),
-                                            ),
-                                            const SizedBox(width: 14)
-                                          ],
-                                        ),
-                                      ),
-                                      Positioned(
-                                        right: 12,
-                                        bottom: 10,
-                                        child: IconButton(
-                                            tooltip: '播放',
-                                            onPressed: () => handlePlay(),
-                                            icon: Image.asset(
-                                              'assets/images/play.png',
-                                              width: 60,
-                                              height: 60,
-                                            )),
-                                      ),
-                                    ],
-                                  )),
-                            ),
+                            manualPlayerWidget,
                           ]
                         ],
                       ))),
@@ -750,8 +1004,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                       ? 0
                       : context.height -
                           videoheight -
-                          MediaQuery.of(context).padding.top -
-                          MediaQuery.of(context).padding.bottom,
+                          (removeSafeArea
+                              ? 0
+                              : (MediaQuery.of(context).padding.top +
+                                  MediaQuery.of(context).padding.bottom)),
                   child: CustomScrollView(
                     key: PageStorageKey<String>(
                         '简介${videoDetailController.bvid}'),
@@ -759,6 +1015,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                       if (videoDetailController.videoType ==
                           SearchType.video) ...[
                         const VideoIntroPanel(),
+                        const RelatedVideoPanel(),
                       ] else if (videoDetailController.videoType ==
                           SearchType.media_bangumi) ...[
                         Obx(() => BangumiIntroPanel(
@@ -769,59 +1026,88 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             ],
           ),
           SizedBox(
-            width: isFullScreen.value == true
-                ? 0
-                : (context.width -
-                    MediaQuery.of(context).padding.left -
-                    MediaQuery.of(context).padding.right -
-                    videowidth),
-            height: context.height -
-                MediaQuery.of(context).padding.top -
-                MediaQuery.of(context).padding.bottom,
-            child: TabBarView(
-              physics: const BouncingScrollPhysics(),
-              controller: videoDetailController.tabCtr,
-              children: <Widget>[
-                if (videoDetailController.videoType == SearchType.video)
-                  const CustomScrollView(
-                    slivers: [
-                      RelatedVideoPanel(),
-                    ],
-                  ),
-                Obx(
-                  () => VideoReplyPanel(
-                    bvid: videoDetailController.bvid,
-                    oid: videoDetailController.oid.value,
-                  ),
-                )
-              ],
-            ),
-          )
+              width: isFullScreen.value == true
+                  ? 0
+                  : (context.width -
+                      videowidth -
+                      (removeSafeArea
+                          ? 0
+                          : (MediaQuery.of(context).padding.left +
+                              MediaQuery.of(context).padding.right))),
+              height: context.height -
+                  (removeSafeArea
+                      ? 0
+                      : (MediaQuery.of(context).padding.top +
+                          MediaQuery.of(context).padding.bottom)),
+              child:
+                  // TabBarView(
+                  //   physics: const BouncingScrollPhysics(),
+                  //   controller: videoDetailController.tabCtr,
+                  //   children: <Widget>[
+                  //     if (videoDetailController.videoType == SearchType.video)
+                  //       const CustomScrollView(
+                  //         slivers: [
+                  //           RelatedVideoPanel(),
+                  //         ],
+                  //       ),
+                  Obx(
+                () => VideoReplyPanel(
+                  bvid: videoDetailController.bvid,
+                  oid: videoDetailController.oid.value,
+                ),
+              )
+              //   ],
+              // ),
+              )
         ],
       );
     });
-    Widget childWhenDisabledLandscape = Container(
-        color: Theme.of(context).colorScheme.background,
-        child: SafeArea(
-            left: isFullScreen.value != true,
-            right: isFullScreen.value != true,
-            child: Stack(children: [
-              Scaffold(
-                  resizeToAvoidBottomInset: false,
-                  key: videoDetailController.scaffoldKey,
-                  backgroundColor: Theme.of(context).colorScheme.background,
-                  appBar: PreferredSize(
-                    preferredSize: const Size.fromHeight(0),
-                    child: AppBar(
-                      backgroundColor: Colors.transparent,
+    Widget childWhenDisabledLandscape = SafeArea(
+        left: !removeSafeArea && isFullScreen.value != true,
+        right: !removeSafeArea && isFullScreen.value != true,
+        top: !removeSafeArea,
+        bottom: !removeSafeArea,
+        child: Stack(children: [
+          Scaffold(
+              resizeToAvoidBottomInset: false,
+              key: videoDetailController.scaffoldKey,
+              backgroundColor: Colors.black,
+              appBar: removeSafeArea
+                  ? null
+                  : AppBar(
+                      backgroundColor: Colors.black,
                       elevation: 0,
-                      // systemOverlayStyle: const SystemUiOverlayStyle(
-                      //     statusBarColor: Colors.transparent,
-                      //     statusBarIconBrightness: Brightness.dark),
+                      toolbarHeight: 0,
+                      systemOverlayStyle: const SystemUiOverlayStyle(
+                          statusBarIconBrightness: Brightness.light),
                     ),
-                  ),
-                  body: childWhenDisabledLandscapeInner)
-            ])));
+              body: Container(
+                  color: Theme.of(context).colorScheme.background,
+                  child: childWhenDisabledLandscapeInner))
+        ]));
+    Widget childWhenDisabledAlmostSquare = SafeArea(
+        left: !removeSafeArea && isFullScreen.value != true,
+        right: !removeSafeArea && isFullScreen.value != true,
+        top: !removeSafeArea,
+        bottom: !removeSafeArea,
+        child: Stack(children: [
+          Scaffold(
+              resizeToAvoidBottomInset: false,
+              key: videoDetailController.scaffoldKey,
+              backgroundColor: Colors.black,
+              appBar: removeSafeArea
+                  ? null
+                  : AppBar(
+                      backgroundColor: Colors.black,
+                      elevation: 0,
+                      toolbarHeight: 0,
+                      systemOverlayStyle: const SystemUiOverlayStyle(
+                          statusBarIconBrightness: Brightness.light),
+                    ),
+              body: Container(
+                  color: Theme.of(context).colorScheme.background,
+                  child: childWhenDisabledAlmostSquareInner))
+        ]));
     Widget childWhenEnabled = Obx(
       () => !videoDetailController.autoPlay.value
           ? const SizedBox()
@@ -851,7 +1137,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     ),
             ),
     );
-    if (!horizontalScreen) {
+    Widget autoChoose(Widget childWhenDisabled) {
       if (Platform.isAndroid) {
         return PiPSwitcher(
           childWhenDisabled: childWhenDisabled,
@@ -862,34 +1148,59 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       return childWhenDisabled;
     }
 
-    return OrientationBuilder(
-        builder: (BuildContext context, Orientation orientation) {
+    if (!horizontalScreen) {
+      return autoChoose(childWhenDisabled);
+    }
+
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
       if (!isShowing) {
         return ColoredBox(color: Theme.of(context).colorScheme.background);
       }
-      if (orientation == Orientation.landscape) {
-        if (!horizontalScreen) {
-          hideStatusBar();
-          videoDetailController.hiddenReplyReplyPanel();
+      if (constraints.maxWidth > constraints.maxHeight * 1.25) {
+//             hideStatusBar();
+//             videoDetailController.hiddenReplyReplyPanel();
+        return autoChoose(childWhenDisabledLandscape);
+      } else if (constraints.maxWidth * (9 / 16) <
+          (2 / 5) * constraints.maxHeight) {
+        if (!isFullScreen.value) {
+          if (!removeSafeArea) showStatusBar();
         }
+        return autoChoose(childWhenDisabled);
       } else {
         if (!isFullScreen.value) {
-          showStatusBar();
+          if (!removeSafeArea) showStatusBar();
         }
+        return autoChoose(childWhenDisabledAlmostSquare);
       }
-      if (Platform.isAndroid) {
-        return PiPSwitcher(
-          childWhenDisabled:
-              !horizontalScreen || orientation == Orientation.portrait
-                  ? childWhenDisabled
-                  : childWhenDisabledLandscape,
-          childWhenEnabled: childWhenEnabled,
-          floating: floating,
-        );
-      }
-      return !horizontalScreen || orientation == Orientation.portrait
-          ? childWhenDisabled
-          : childWhenDisabledLandscape;
+      //
+      // final Orientation orientation =
+      //     constraints.maxWidth > constraints.maxHeight * 1.25
+      //         ? Orientation.landscape
+      //         : Orientation.portrait;
+      // if (orientation == Orientation.landscape) {
+      //   if (!horizontalScreen) {
+      //     hideStatusBar();
+      //     videoDetailController.hiddenReplyReplyPanel();
+      //   }
+      // } else {
+      //   if (!isFullScreen.value) {
+      //     showStatusBar();
+      //   }
+      // }
+      // if (Platform.isAndroid) {
+      //   return PiPSwitcher(
+      //     childWhenDisabled:
+      //         !horizontalScreen || orientation == Orientation.portrait
+      //             ? childWhenDisabled
+      //             : childWhenDisabledLandscape,
+      //     childWhenEnabled: childWhenEnabled,
+      //     floating: floating,
+      //   );
+      // }
+      // return !horizontalScreen || orientation == Orientation.portrait
+      //     ? childWhenDisabled
+      //     : childWhenDisabledLandscape;
     });
   }
 }

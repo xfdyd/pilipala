@@ -145,6 +145,7 @@ class SettingBoxKey {
       /// 其他
       autoUpdate = 'autoUpdate',
       autoClearCache = 'autoClearCache',
+      defaultShowComment = 'defaultShowComment',
       replySortType = 'replySortType',
       defaultDynamicType = 'defaultDynamicType',
       enableHotKey = 'enableHotKey',
@@ -156,7 +157,7 @@ class SettingBoxKey {
       disableLikeMsg = 'disableLikeMsg',
       defaultHomePage = 'defaultHomePage',
 
-      // 弹幕相关设置 权重（云屏蔽） 屏蔽类型 显示区域 透明度 字体大小 弹幕时间 描边粗细
+      // 弹幕相关设置 权重（云屏蔽） 屏蔽类型 显示区域 透明度 字体大小 弹幕时间 描边粗细 字体粗细
       danmakuWeight = 'danmakuWeight',
       danmakuBlockType = 'danmakuBlockType',
       danmakuShowArea = 'danmakuShowArea',
@@ -164,6 +165,8 @@ class SettingBoxKey {
       danmakuFontScale = 'danmakuFontScale',
       danmakuDuration = 'danmakuDuration',
       strokeWidth = 'strokeWidth',
+      fontWeight = 'fontWeight',
+      danmakuFilterRule = 'danmakuFilterRule',
 
       // 代理host port
       systemProxyHost = 'systemProxyHost',
@@ -177,6 +180,9 @@ class SettingBoxKey {
       enableSingleRow = 'enableSingleRow', // 首页单列
       displayMode = 'displayMode',
       maxRowWidth = 'maxRowWidth', // 首页列最大宽度（dp）
+      videoPlayerRemoveSafeArea = 'videoPlayerHideStatusBar',
+      dynamicsWaterfallFlow = 'dynamicsWaterfallFlow', // 动态瀑布流
+      upPanelPosition = 'upPanelPosition', // up主面板位置
       adaptiveNavBar = 'adaptiveNavBar',
       enableMYBar = 'enableMYBar',
       hideSearchBar = 'hideSearchBar', // 收起顶栏
@@ -184,8 +190,7 @@ class SettingBoxKey {
       tabbarSort = 'tabbarSort', // 首页tabbar
       dynamicBadgeMode = 'dynamicBadgeMode',
       hiddenSettingUnlocked = 'hiddenSettingUnlocked',
-      enableGradientBg = 'enableGradientBg',
-      defaultShowComment = 'defaultShowComment';
+      enableGradientBg = 'enableGradientBg';
 }
 
 class LocalCacheKey {

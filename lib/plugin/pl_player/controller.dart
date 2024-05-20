@@ -243,6 +243,7 @@ class PlPlayerController {
   late double opacityVal;
   late double fontSizeVal;
   late double strokeWidth;
+  late int fontWeight;
   late double danmakuDurationVal;
   late List<double> speedsList;
   double? defaultDuration;
@@ -286,12 +287,10 @@ class PlPlayerController {
         setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: false);
     danmakuWeight.value =
         setting.get(SettingBoxKey.danmakuWeight, defaultValue: 0);
-    blockTypes =
-        setting.get(SettingBoxKey.danmakuBlockType, defaultValue: []);
+    blockTypes = setting.get(SettingBoxKey.danmakuBlockType, defaultValue: []);
     showArea = setting.get(SettingBoxKey.danmakuShowArea, defaultValue: 0.5);
     // 不透明度
-    opacityVal =
-        setting.get(SettingBoxKey.danmakuOpacity, defaultValue: 1.0);
+    opacityVal = setting.get(SettingBoxKey.danmakuOpacity, defaultValue: 1.0);
     // 字体大小
     fontSizeVal =
         setting.get(SettingBoxKey.danmakuFontScale, defaultValue: 1.0);
@@ -300,6 +299,8 @@ class PlPlayerController {
         setting.get(SettingBoxKey.danmakuDuration, defaultValue: 4.0);
     // 描边粗细
     strokeWidth = setting.get(SettingBoxKey.strokeWidth, defaultValue: 1.5);
+    // 弹幕字体粗细
+    fontWeight = setting.get(SettingBoxKey.fontWeight, defaultValue: 5);
     playRepeat = PlayRepeat.values.toList().firstWhere(
           (e) =>
               e.value ==
@@ -312,7 +313,7 @@ class PlPlayerController {
         .get(SettingBoxKey.enableAutoLongPressSpeed, defaultValue: false);
     // 后台播放
     _continuePlayInBackground.value =
-        setting.get(SettingBoxKey.continuePlayInBackground, defaultValue: true);
+        setting.get(SettingBoxKey.continuePlayInBackground, defaultValue: false);
     if (!enableAutoLongPressSpeed) {
       _longPressSpeed.value = videoStorage
           .get(VideoBoxKey.longPressSpeedDefault, defaultValue: 3.0);
@@ -356,7 +357,7 @@ class PlPlayerController {
     double speed = 1.0,
     // 硬件加速
     bool enableHA = true,
-        String? hwdec,
+    String? hwdec,
     double? width,
     double? height,
     Duration? duration,
@@ -458,7 +459,6 @@ class PlPlayerController {
             bufferSize: bufferSize,
           ),
         );
-
     var pp = player.platform as NativePlayer;
     // 解除倍速限制
     await pp.setProperty("af", "scaletempo2=max-speed=8");
@@ -515,7 +515,7 @@ class PlPlayerController {
           configuration: VideoControllerConfiguration(
             enableHardwareAcceleration: enableHA,
             androidAttachSurfaceAfterVideoParameters: false,
-            hwdec: hwdec,
+            hwdec: enableHA ? hwdec: null,
           ),
         );
 
@@ -991,8 +991,7 @@ class PlPlayerController {
 
   /// 设置后台播放
   Future<void> setBackgroundPlay(bool val) async {
-    _continuePlayInBackground.value = val;
-    setting.put(SettingBoxKey.continuePlayInBackground, val);
+    setting.put(SettingBoxKey.enableBackgroundPlay, val);
     videoPlayerServiceHandler.revalidateSetting();
   }
 
@@ -1150,6 +1149,7 @@ class PlPlayerController {
     setting.put(SettingBoxKey.danmakuFontScale, fontSizeVal);
     setting.put(SettingBoxKey.danmakuDuration, danmakuDurationVal);
     setting.put(SettingBoxKey.strokeWidth, strokeWidth);
+    setting.put(SettingBoxKey.fontWeight, fontWeight);
   }
 
   Future<void> dispose({String type = 'single'}) async {
@@ -1161,6 +1161,7 @@ class PlPlayerController {
       return;
     }
     _playerCount.value = 0;
+    pause();
     try {
       _timer?.cancel();
       _timerForVolume?.cancel();

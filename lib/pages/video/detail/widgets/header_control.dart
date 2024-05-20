@@ -237,7 +237,7 @@ class _HeaderControlState extends State<HeaderControl> {
       builder: (BuildContext context) {
         // TODO: 支持更多类型和颜色的弹幕
         return AlertDialog(
-          title: const Text('发送弹幕（测试）'),
+          title: const Text('发送弹幕'),
           content: StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
             return TextField(
@@ -733,6 +733,8 @@ class _HeaderControlState extends State<HeaderControl> {
     double danmakuDurationVal = widget.controller!.danmakuDurationVal;
     // 弹幕描边
     double strokeWidth = widget.controller!.strokeWidth;
+    // 字体粗细
+    int fontWeight = widget.controller!.fontWeight;
 
     final DanmakuController danmakuController =
         widget.controller!.danmakuController!;
@@ -762,7 +764,20 @@ class _HeaderControlState extends State<HeaderControl> {
                     child: Center(child: Text('弹幕设置', style: titleStyle)),
                   ),
                   const SizedBox(height: 10),
-                  Text('智能云屏蔽 $danmakuWeight 级'),
+                  Row(
+                    children: [
+                      Text('智能云屏蔽 $danmakuWeight 级'),
+                      const Spacer(),
+                      TextButton(
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          onPressed: () => Get.toNamed('/danmakuBlock'),
+                          child: const Text("屏蔽管理"))
+                    ],
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(
                       top: 0,
@@ -903,6 +918,45 @@ class _HeaderControlState extends State<HeaderControl> {
                                 danmakuController.option;
                             final DanmakuOption updatedOption =
                                 currentOption.copyWith(opacity: val);
+                            danmakuController.updateOption(updatedOption);
+                          } catch (_) {}
+                        },
+                      ),
+                    ),
+                  ),
+                  Text('字体粗细 ${fontWeight + 1}（可能无法精确调节）'),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: 0,
+                      bottom: 6,
+                      left: 10,
+                      right: 10,
+                    ),
+                    child: SliderTheme(
+                      data: SliderThemeData(
+                        trackShape: MSliderTrackShape(),
+                        thumbColor: Theme.of(context).colorScheme.primary,
+                        activeTrackColor: Theme.of(context).colorScheme.primary,
+                        trackHeight: 10,
+                        thumbShape: const RoundSliderThumbShape(
+                            enabledThumbRadius: 6.0),
+                      ),
+                      child: Slider(
+                        min: 0,
+                        max: 8,
+                        value: fontWeight.toDouble(),
+                        divisions: 9,
+                        label: '${fontWeight + 1}',
+                        onChanged: (double val) {
+                          fontWeight = val.toInt();
+                          widget.controller!.fontWeight = fontWeight;
+                          widget.controller?.putDanmakuSettings();
+                          setState(() {});
+                          try {
+                            final DanmakuOption currentOption =
+                                danmakuController.option;
+                            final DanmakuOption updatedOption =
+                                currentOption.copyWith(fontWeight: fontWeight);
                             danmakuController.updateOption(updatedOption);
                           } catch (_) {}
                         },

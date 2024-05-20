@@ -6,6 +6,7 @@ import 'package:PiliPalaX/models/common/rcmd_type.dart';
 import 'package:PiliPalaX/pages/setting/widgets/select_dialog.dart';
 import 'package:PiliPalaX/utils/recommend_filter.dart';
 import 'package:PiliPalaX/utils/storage.dart';
+import 'package:get/get.dart';
 
 import 'widgets/switch_item.dart';
 
@@ -93,8 +94,9 @@ class _RecommendSettingState extends State<RecommendSetting> {
                       return;
                     }
                     // 显示一个确认框，告知用户可能会导致账号被风控
-                    SmartDialog.show(
-                        animationType: SmartAnimationType.centerFade_otherSlide,
+                    if (!context.mounted) return;
+                    await showDialog(
+                        context: context,
                         builder: (context) {
                           return AlertDialog(
                             title: const Text('提示'),
@@ -104,14 +106,20 @@ class _RecommendSettingState extends State<RecommendSetting> {
                               TextButton(
                                 onPressed: () {
                                   result = null;
-                                  SmartDialog.dismiss();
+                                  Get.back();
                                 },
                                 child: const Text('取消'),
                               ),
                               TextButton(
                                 onPressed: () async {
-                                  SmartDialog.dismiss();
-                                  await MemberHttp.cookieToKey();
+                                  Get.back();
+                                  var res = await MemberHttp.cookieToKey();
+                                  if (res['status']) {
+                                    SmartDialog.showToast(res['msg']);
+                                  } else {
+                                    SmartDialog.showToast(
+                                        '获取access_key失败：${res['msg']}');
+                                  }
                                 },
                                 child: const Text('确定'),
                               ),
@@ -254,10 +262,9 @@ class _RecommendSettingState extends State<RecommendSetting> {
               '* 其它（如热门视频、手动搜索、链接跳转等）均不受过滤器影响。\n'
               '* 设定较严苛的条件可导致推荐项数锐减或多次请求，请酌情选择。\n'
               '* 后续可能会增加更多过滤条件，敬请期待。',
-              style: Theme.of(context)
-                  .textTheme
-                  .labelSmall!
-                  .copyWith(color: Theme.of(context).colorScheme.outline.withOpacity(0.7)),
+              style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                  color:
+                      Theme.of(context).colorScheme.outline.withOpacity(0.7)),
             ),
           )
         ],

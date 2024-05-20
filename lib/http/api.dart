@@ -42,6 +42,12 @@ class Api {
 
   // 视频点踩 web端不支持
 
+  // 点踩 Post(app端)
+  /// access_key str	APP登录Token 必要
+  /// aid num	稿件avid	必要
+  ///
+  static const String dislikeVideo = '${HttpString.appBaseUrl}/x/v2/view/dislike';
+
   // 投币视频（web端）POST
   /// aid	num	稿件avid	必要（可选）	avid与bvid任选一个
   /// bvid	str	稿件bvid	必要（可选）	avid与bvid任选一个
@@ -334,9 +340,25 @@ class Api {
 
   static const String webDanmaku = '/x/v2/dm/web/seg.so';
 
-  //发送视频弹幕
+  // 发送视频弹幕
   //https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/danmaku/action.md
   static const String shootDanmaku = '/x/v2/dm/post';
+
+  // 弹幕屏蔽查询（Get）
+  static const String danmakuFilter = '/x/dm/filter/user';
+
+  // 弹幕屏蔽词添加（Post）
+  // 表单内容：
+  // type: 0（关键词）1（正则）2（用户）
+  // filter: 屏蔽内容
+  // csrf
+  static const String danmakuFilterAdd = '/x/dm/filter/user/add';
+
+  // 弹幕屏蔽词删除（Post）
+  // 表单内容：
+  // ids: 被删除条目编号
+  // csrf
+  static const String danmakuFilterDel = '/x/dm/filter/user/del';
 
   // up主分组
   static const String followUpTag = '/x/relation/tags';
@@ -461,12 +483,12 @@ class Api {
   static const getWebKey = '${HttpString.passBaseUrl}/x/passport-login/web/key';
 
   /// cookie转access_key
-  static const cookieToKey =
+  static const qrcodeConfirm =
       '${HttpString.passBaseUrl}/x/passport-tv-login/h5/qrcode/confirm';
 
   /// 申请二维码(TV端)
   static const getTVCode =
-      'https://passport.snm0516.aisee.tv/x/passport-tv-login/qrcode/auth_code';
+      'https://passport.bilibili.com/x/passport-tv-login/qrcode/auth_code';
 
   ///扫码登录（TV端）
   static const qrcodePoll =

@@ -72,88 +72,73 @@ class VideoCardH extends StatelessWidget {
                   SmartDialog.showToast(err.toString());
                 }
               },
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                    StyleString.safeSpace, 5, StyleString.safeSpace, 5),
-                child: LayoutBuilder(
-                  builder:
-                      (BuildContext context, BoxConstraints boxConstraints) {
-                    final double width = (boxConstraints.maxWidth -
-                            StyleString.cardSpace *
-                                6 /
-                                MediaQuery.textScalerOf(context).scale(1.0)) /
-                        2;
-                    return Container(
-                      constraints: const BoxConstraints(minHeight: 88),
-                      height: width / StyleString.aspectRatio,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          AspectRatio(
-                            aspectRatio: StyleString.aspectRatio,
-                            child: LayoutBuilder(
-                              builder: (BuildContext context,
-                                  BoxConstraints boxConstraints) {
-                                final double maxWidth = boxConstraints.maxWidth;
-                                final double maxHeight =
-                                    boxConstraints.maxHeight;
-                                return Stack(
-                                  children: [
-                                    Hero(
-                                      tag: heroTag,
-                                      child: NetworkImgLayer(
-                                        src: videoItem.pic as String,
-                                        width: maxWidth,
-                                        height: maxHeight,
-                                      ),
-                                    ),
-                                    if (videoItem.duration != 0)
-                                      PBadge(
-                                        text: Utils.timeFormat(videoItem.duration!),
-                                        right: 6.0,
-                                        bottom: 6.0,
-                                        type: 'gray',
-                                      ),
-                                    if (type != 'video')
-                                      PBadge(
-                                        text: type,
-                                        left: 6.0,
-                                        bottom: 6.0,
-                                        type: 'primary',
-                                      ),
-                                    // if (videoItem.rcmdReason != null &&
-                                    //     videoItem.rcmdReason.content != '')
-                                    //   pBadge(videoItem.rcmdReason.content, context,
-                                    //       6.0, 6.0, null, null),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
-                          VideoContent(
-                            videoItem: videoItem,
-                            source: source,
-                            showOwner: showOwner,
-                            showView: showView,
-                            showDanmaku: showDanmaku,
-                            showPubdate: showPubdate,
-                          )
-                        ],
+              child: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints boxConstraints) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      AspectRatio(
+                        aspectRatio: StyleString.aspectRatio,
+                        child: LayoutBuilder(
+                          builder: (BuildContext context,
+                              BoxConstraints boxConstraints) {
+                            final double maxWidth = boxConstraints.maxWidth;
+                            final double maxHeight = boxConstraints.maxHeight;
+                            return Stack(
+                              children: [
+                                Hero(
+                                  tag: heroTag,
+                                  child: NetworkImgLayer(
+                                    src: videoItem.pic as String,
+                                    width: maxWidth,
+                                    height: maxHeight,
+                                  ),
+                                ),
+                                if (videoItem.duration != 0)
+                                  PBadge(
+                                    text: Utils.timeFormat(videoItem.duration!),
+                                    right: 6.0,
+                                    bottom: 6.0,
+                                    type: 'gray',
+                                  ),
+                                if (type != 'video')
+                                  PBadge(
+                                    text: type,
+                                    left: 6.0,
+                                    bottom: 6.0,
+                                    type: 'primary',
+                                  ),
+                                // if (videoItem.rcmdReason != null &&
+                                //     videoItem.rcmdReason.content != '')
+                                //   pBadge(videoItem.rcmdReason.content, context,
+                                //       6.0, 6.0, null, null),
+                              ],
+                            );
+                          },
+                        ),
                       ),
-                    );
-                  },
-                ),
+                      VideoContent(
+                        videoItem: videoItem,
+                        source: source,
+                        showOwner: showOwner,
+                        showView: showView,
+                        showDanmaku: showDanmaku,
+                        showPubdate: showPubdate,
+                      )
+                    ],
+                  );
+                },
               ),
             ),
           )),
       if (source == 'normal')
         Positioned(
-          bottom: 1,
+          bottom: 0,
           right: 10,
           child: VideoPopupMenu(
-            size: 30,
-            iconSize: 16,
+            size: 29,
+            iconSize: 17,
             videoItem: videoItem,
           ),
         ),
@@ -182,6 +167,10 @@ class VideoContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String pubdate = showPubdate
+        ? Utils.dateFormat(videoItem.pubdate!, formatType: 'day')
+        : '';
+    if (pubdate != '') pubdate += ' ';
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(10, 0, 6, 0),
@@ -247,7 +236,7 @@ class VideoContent extends StatelessWidget {
               Expanded(
                 flex: 0,
                 child: Text(
-                  "${showPubdate ? Utils.dateFormat(videoItem.pubdate!, formatType: 'day') + ' ' : ''}  ${showOwner ? videoItem.owner.name : ''}",
+                  "${pubdate}${showOwner ? videoItem.owner.name : ''}",
                   maxLines: 1,
                   style: TextStyle(
                     fontSize: 11,
@@ -276,7 +265,7 @@ class VideoContent extends StatelessWidget {
                 if (source == 'normal') const SizedBox(width: 24),
               ],
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 5),
           ],
         ),
       ),

@@ -87,10 +87,10 @@ class _HistoryPageState extends State<HistoryPage> {
                 // 处理菜单项选择的逻辑
                 switch (type) {
                   case 'pause':
-                    _historyController.onPauseHistory();
+                    _historyController.onPauseHistory(context);
                     break;
                   case 'clear':
-                    _historyController.onClearHistory();
+                    _historyController.onClearHistory(context);
                     break;
                   case 'del':
                     _historyController.onDelHistory();
@@ -162,7 +162,7 @@ class _HistoryPageState extends State<HistoryPage> {
               child: const Text('全选'),
             ),
             TextButton(
-              onPressed: () => _historyController.onDelCheckedHistory(),
+              onPressed: () => _historyController.onDelCheckedHistory(context),
               child: Text(
                 '删除',
                 style: TextStyle(color: Theme.of(context).colorScheme.error),
@@ -194,16 +194,13 @@ class _HistoryPageState extends State<HistoryPage> {
                       () => _historyController.historyList.isNotEmpty
                           ? SliverGrid(
                               gridDelegate:
-                                  SliverGridDelegateWithMaxCrossAxisExtent(
+                                  SliverGridDelegateWithExtentAndRatio(
                                       mainAxisSpacing: StyleString.cardSpace,
                                       crossAxisSpacing: StyleString.safeSpace,
                                       maxCrossAxisExtent: Grid.maxRowWidth * 2,
-                                      mainAxisExtent: Grid.calculateActualWidth(
-                                              context,
-                                              Grid.maxRowWidth * 2,
-                                              StyleString.safeSpace) /
-                                          2.1 /
-                                          StyleString.aspectRatio),
+                                      childAspectRatio:
+                                          StyleString.aspectRatio * 2.3,
+                                      mainAxisExtent: 0),
                               delegate: SliverChildBuilderDelegate(
                                   (context, index) {
                                 return HistoryItem(
@@ -231,7 +228,13 @@ class _HistoryPageState extends State<HistoryPage> {
                   }
                 } else {
                   // 骨架屏
-                  return SliverList(
+                  return SliverGrid(
+                    gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                        mainAxisSpacing: StyleString.cardSpace,
+                        crossAxisSpacing: StyleString.safeSpace,
+                        maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                        childAspectRatio: StyleString.aspectRatio * 2.3,
+                        mainAxisExtent: 0),
                     delegate: SliverChildBuilderDelegate((context, index) {
                       return const VideoCardHSkeleton();
                     }, childCount: 10),

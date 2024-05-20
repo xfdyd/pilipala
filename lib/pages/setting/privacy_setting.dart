@@ -69,11 +69,17 @@ class _PrivacySettingState extends State<PrivacySetting> {
             leading: const Icon(Icons.block),
           ),
           ListTile(
-            onTap: () {
+            onTap: () async {
               if (!userLogin) {
                 SmartDialog.showToast('请先登录');
+                return;
               }
-              MemberHttp.cookieToKey();
+              var res = await MemberHttp.cookieToKey();
+              if (res['status']) {
+                SmartDialog.showToast(res['msg']);
+              } else {
+                SmartDialog.showToast('刷新失败：${res['msg']}');
+              }
             },
             dense: false,
             title: Text('刷新access_key', style: titleStyle),
@@ -115,7 +121,8 @@ class _PrivacySettingState extends State<PrivacySetting> {
               )),
           ListTile(
             onTap: () {
-              SmartDialog.show(
+              showDialog(
+                context: context,
                 builder: (context) {
                   return AlertDialog(
                     title: const Text('查看详情'),
@@ -124,7 +131,7 @@ class _PrivacySettingState extends State<PrivacySetting> {
                     actions: [
                       TextButton(
                         onPressed: () async {
-                          SmartDialog.dismiss();
+                          Get.back();
                         },
                         child: const Text('确认'),
                       )
@@ -144,9 +151,9 @@ class _PrivacySettingState extends State<PrivacySetting> {
   }
 
   void import_export_cookies(TextStyle titleStyle, TextStyle subTitleStyle) {
-    SmartDialog.show(
-      useSystem: true,
-      builder: (BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
         return SimpleDialog(
           title: const Text('导入/导出cookie', style: TextStyle(color: Colors.red)),
           children: [
@@ -169,13 +176,14 @@ class _PrivacySettingState extends State<PrivacySetting> {
                 ),
                 dense: false,
                 onTap: () async {
-                  await SmartDialog.dismiss();
+                  Navigator.of(context).pop();
                   if (!userLogin) {
                     SmartDialog.showToast('请先登录');
                     return;
                   }
                   final String cookie = await CookieTool.exportCookie();
-                  await SmartDialog.show(
+                  await showDialog(
+                    context: context,
                     builder: (context) {
                       return AlertDialog(
                         title: const Text('导出cookie（危险）',
@@ -184,7 +192,7 @@ class _PrivacySettingState extends State<PrivacySetting> {
                         actions: [
                           TextButton(
                             onPressed: () async {
-                              await SmartDialog.dismiss();
+                              Navigator.of(context).pop();
                               await Clipboard.setData(
                                   ClipboardData(text: cookie));
                             },
@@ -193,7 +201,7 @@ class _PrivacySettingState extends State<PrivacySetting> {
                           ),
                           TextButton(
                             onPressed: () async {
-                              await SmartDialog.dismiss();
+                              Navigator.of(context).pop();
                             },
                             child: const Text('取消'),
                           ),
@@ -217,13 +225,14 @@ class _PrivacySettingState extends State<PrivacySetting> {
                 ),
                 dense: false,
                 onTap: () async {
-                  await SmartDialog.dismiss();
                   ClipboardData? data = await Clipboard.getData('text/plain');
                   if (data == null || data.text == null || data.text == '') {
                     SmartDialog.showToast('未检测到剪贴板内容');
                     return;
                   }
-                  await SmartDialog.show(
+                  if (!context.mounted) return;
+                  await showDialog(
+                    context: context,
                     builder: (context) {
                       return AlertDialog(
                         title: const Text('导入剪贴板中的cookie'),
@@ -231,13 +240,13 @@ class _PrivacySettingState extends State<PrivacySetting> {
                         actions: [
                           TextButton(
                             onPressed: () async {
-                              await SmartDialog.dismiss();
+                              Get.back();
                             },
                             child: const Text('取消'),
                           ),
                           TextButton(
                             onPressed: () async {
-                              await SmartDialog.dismiss();
+                              Get.back();
                               final String cookie = data.text!;
                               try {
                                 await CookieTool.importCookie(cookie);

@@ -11,6 +11,7 @@ import 'package:PiliPalaX/pages/setting/pages/logs.dart';
 
 import '../pages/about/index.dart';
 import '../pages/blacklist/index.dart';
+import '../pages/danmaku_block/index.dart';
 import '../pages/dynamics/detail/index.dart';
 import '../pages/dynamics/index.dart';
 import '../pages/fan/index.dart';
@@ -184,6 +185,8 @@ class Routes {
     CustomGetPage(name: '/subscription', page: () => const SubPage()),
     // 订阅详情
     CustomGetPage(name: '/subDetail', page: () => const SubDetailPage()),
+    // 弹幕屏蔽管理
+    CustomGetPage(name: '/danmakuBlock', page: () => const DanmakuBlockPage()),
   ];
 }
 

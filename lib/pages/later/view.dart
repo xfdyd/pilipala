@@ -47,7 +47,7 @@ class _LaterPageState extends State<LaterPage> {
           Obx(
             () => _laterController.laterList.isNotEmpty
                 ? TextButton(
-                    onPressed: () => _laterController.toViewDel(),
+                    onPressed: () => _laterController.toViewDel(context),
                     child: const Text('移除已看'),
                   )
                 : const SizedBox(),
@@ -56,7 +56,7 @@ class _LaterPageState extends State<LaterPage> {
             () => _laterController.laterList.isNotEmpty
                 ? IconButton(
                     tooltip: '一键清空',
-                    onPressed: () => _laterController.toViewClear(),
+                    onPressed: () => _laterController.toViewClear(context),
                     icon: Icon(
                       Icons.clear_all_outlined,
                       size: 21,
@@ -72,61 +72,73 @@ class _LaterPageState extends State<LaterPage> {
         physics: const AlwaysScrollableScrollPhysics(),
         controller: _laterController.scrollController,
         slivers: [
-          FutureBuilder(
-            future: _futureBuilderFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                Map data = snapshot.data as Map;
-                if (data['status']) {
-                  return Obx(
-                    () => _laterController.laterList.isNotEmpty &&
-                            !_laterController.isLoading.value
-                        ? SliverGrid(
-                            gridDelegate:
-                                SliverGridDelegateWithMaxCrossAxisExtent(
-                                    mainAxisSpacing: StyleString.cardSpace,
-                                    crossAxisSpacing: StyleString.safeSpace,
-                                    maxCrossAxisExtent: Grid.maxRowWidth * 2,
-                                    mainAxisExtent: Grid.calculateActualWidth(
-                                            context,
+          SliverPadding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: StyleString.safeSpace),
+              sliver: FutureBuilder(
+                future: _futureBuilderFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    Map data = snapshot.data as Map;
+                    if (data['status']) {
+                      return Obx(
+                        () => _laterController.laterList.isNotEmpty &&
+                                !_laterController.isLoading.value
+                            ? SliverGrid(
+                                gridDelegate:
+                                    SliverGridDelegateWithExtentAndRatio(
+                                        mainAxisSpacing: StyleString.safeSpace,
+                                        crossAxisSpacing: StyleString.safeSpace,
+                                        maxCrossAxisExtent:
                                             Grid.maxRowWidth * 2,
-                                            StyleString.safeSpace) /
-                                        2.1 /
-                                        StyleString.aspectRatio),
-                            delegate:
-                                SliverChildBuilderDelegate((context, index) {
-                              var videoItem = _laterController.laterList[index];
-                              return VideoCardH(
-                                  videoItem: videoItem,
-                                  source: 'later',
-                                  longPress: () => _laterController.toViewDel(
-                                      aid: videoItem.aid));
-                            }, childCount: _laterController.laterList.length),
-                          )
-                        : _laterController.isLoading.value
-                            ? const SliverToBoxAdapter(
-                                child: Center(child: Text('加载中')),
+                                        childAspectRatio:
+                                            StyleString.aspectRatio * 2.3,
+                                        mainAxisExtent: 0),
+                                delegate: SliverChildBuilderDelegate(
+                                    (context, index) {
+                                  var videoItem =
+                                      _laterController.laterList[index];
+                                  return VideoCardH(
+                                      videoItem: videoItem,
+                                      source: 'later',
+                                      longPress: () =>
+                                          _laterController.toViewDel(context,
+                                              aid: videoItem.aid));
+                                },
+                                    childCount:
+                                        _laterController.laterList.length),
                               )
-                            : const NoData(),
-                  );
-                } else {
-                  return HttpError(
-                    errMsg: data['msg'],
-                    fn: () => setState(() {
-                      _futureBuilderFuture = _laterController.queryLaterList();
-                    }),
-                  );
-                }
-              } else {
-                // 骨架屏
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    return const VideoCardHSkeleton();
-                  }, childCount: 10),
-                );
-              }
-            },
-          ),
+                            : _laterController.isLoading.value
+                                ? const SliverToBoxAdapter(
+                                    child: Center(child: Text('加载中')),
+                                  )
+                                : const NoData(),
+                      );
+                    } else {
+                      return HttpError(
+                        errMsg: data['msg'],
+                        fn: () => setState(() {
+                          _futureBuilderFuture =
+                              _laterController.queryLaterList();
+                        }),
+                      );
+                    }
+                  } else {
+                    // 骨架屏
+                    return SliverGrid(
+                      gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                          mainAxisSpacing: StyleString.safeSpace,
+                          crossAxisSpacing: StyleString.safeSpace,
+                          maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                          childAspectRatio: StyleString.aspectRatio * 2.3,
+                          mainAxisExtent: 0),
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        return const VideoCardHSkeleton();
+                      }, childCount: 10),
+                    );
+                  }
+                },
+              )),
           SliverToBoxAdapter(
             child: SizedBox(
               height: MediaQuery.of(context).padding.bottom + 10,

@@ -266,7 +266,7 @@ class VideoDetailController extends GetxController
         type: DataSourceType.network,
         httpHeaders: {
           'user-agent':
-              'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_3_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.4 Safari/605.1.15',
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
           'referer': HttpString.baseUrl
         },
       ),
@@ -329,7 +329,7 @@ class VideoDetailController extends GetxController
         return result;
       }
       final List<VideoItem> allVideosList = data.dash!.video!;
-      print("allVideosList:${allVideosList}");
+      // print("allVideosList:${allVideosList}");
       // 当前可播放的最高质量视频
       int currentHighVideoQa = allVideosList.first.quality!.code;
       // 预设的画质为null，则当前可用的最高质量
@@ -426,6 +426,7 @@ class VideoDetailController extends GetxController
     } else {
       if (result['code'] == -404) {
         isShowCover.value = false;
+        SmartDialog.showToast('视频不存在或已被删除');
       }
       if (result['code'] == 87008) {
         SmartDialog.showToast("当前视频可能是专属视频，可能需包月充电观看(${result['msg']})");

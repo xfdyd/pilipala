@@ -27,7 +27,6 @@ class ZonePage extends StatefulWidget {
 class _ZonePageState extends State<ZonePage>
     with AutomaticKeepAliveClientMixin {
   late ZoneController _zoneController;
-  List videoList = [];
   Future? _futureBuilderFuture;
   late ScrollController scrollController;
 
@@ -81,12 +80,12 @@ class _ZonePageState extends State<ZonePage>
         return await _zoneController.onRefresh();
       },
       child: CustomScrollView(
-        controller: _zoneController.scrollController,
+        controller: scrollController,
         slivers: [
           SliverPadding(
             // 单列布局 EdgeInsets.zero
             padding:
-                const EdgeInsets.fromLTRB(0, StyleString.safeSpace - 5, 0, 0),
+                const EdgeInsets.fromLTRB(StyleString.safeSpace, StyleString.safeSpace, 0, 0),
             sliver: FutureBuilder(
               future: _futureBuilderFuture,
               builder: (context, snapshot) {
@@ -95,19 +94,12 @@ class _ZonePageState extends State<ZonePage>
                   if (data['status']) {
                     return Obx(
                       () => SliverGrid(
-                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                            // 行间距
-                            mainAxisSpacing: StyleString.cardSpace,
-                            // 列间距
-                            crossAxisSpacing: StyleString.cardSpace,
-                            // 最大宽度
+                        gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                            mainAxisSpacing: StyleString.safeSpace,
+                            crossAxisSpacing: StyleString.safeSpace,
                             maxCrossAxisExtent: Grid.maxRowWidth * 2,
-                            mainAxisExtent: Grid.calculateActualWidth(context,
-                                    Grid.maxRowWidth * 2, StyleString.cardSpace,
-                                    screenWidthOffset:
-                                        StyleString.cardSpace + 55) /
-                                2.1 /
-                                StyleString.aspectRatio),
+                            childAspectRatio: StyleString.aspectRatio * 2.3,
+                            mainAxisExtent: 0),
                         delegate: SliverChildBuilderDelegate((context, index) {
                           return VideoCardH(
                             videoItem: _zoneController.videoList[index],
@@ -138,7 +130,13 @@ class _ZonePageState extends State<ZonePage>
                   }
                 } else {
                   // 骨架屏
-                  return SliverList(
+                  return SliverGrid(
+                    gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                        mainAxisSpacing: StyleString.safeSpace,
+                        crossAxisSpacing: StyleString.safeSpace,
+                        maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                        childAspectRatio: StyleString.aspectRatio * 2.3,
+                        mainAxisExtent: 0),
                     delegate: SliverChildBuilderDelegate((context, index) {
                       return const VideoCardHSkeleton();
                     }, childCount: 10),

@@ -13,14 +13,12 @@ Widget searchLivePanel(BuildContext context, ctr, list) {
     child: GridView.builder(
       primary: false,
       controller: ctr!.scrollController,
-      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+      gridDelegate: SliverGridDelegateWithExtentAndRatio(
         maxCrossAxisExtent: Grid.maxRowWidth,
         crossAxisSpacing: StyleString.safeSpace,
         mainAxisSpacing: StyleString.safeSpace,
-        mainAxisExtent: Grid.calculateActualWidth(
-                    context, Grid.maxRowWidth, StyleString.safeSpace) /
-                StyleString.aspectRatio +
-            MediaQuery.textScalerOf(context).scale(80),
+        childAspectRatio: StyleString.aspectRatio,
+        mainAxisExtent: MediaQuery.textScalerOf(context).scale(80),
       ),
       itemCount: list.length,
       itemBuilder: (context, index) {

@@ -21,7 +21,7 @@ class _TabbarSetPageState extends State<TabbarSetPage> {
     super.initState();
     defaultTabs = tabsConfig;
     tabbarSort = settingStorage.get(SettingBoxKey.tabbarSort,
-        defaultValue: ['live', 'rcmd', 'hot', 'bangumi']);
+        defaultValue: ['live', 'rcmd', 'hot', 'rank', 'bangumi']);
     // 对 tabData 进行排序
     defaultTabs.sort((a, b) {
       int indexA = tabbarSort.indexOf((a['type'] as TabType).id);

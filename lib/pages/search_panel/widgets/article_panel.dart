@@ -12,14 +12,12 @@ Widget searchArticlePanel(BuildContext context, ctr, list) {
       color: Theme.of(context).colorScheme.outline);
   return CustomScrollView(controller: ctr.scrollController, slivers: [
     SliverGrid(
-        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            mainAxisSpacing: StyleString.cardSpace,
+        gridDelegate: SliverGridDelegateWithExtentAndRatio(
+            mainAxisSpacing: StyleString.safeSpace,
             crossAxisSpacing: StyleString.safeSpace,
             maxCrossAxisExtent: Grid.maxRowWidth * 2,
-            mainAxisExtent: Grid.calculateActualWidth(
-                    context, Grid.maxRowWidth * 2, StyleString.safeSpace) /
-                2.1 /
-                StyleString.aspectRatio),
+            childAspectRatio: StyleString.aspectRatio * 2.3,
+            mainAxisExtent: 0),
         delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) {
             return InkWell(
@@ -32,8 +30,8 @@ Widget searchArticlePanel(BuildContext context, ctr, list) {
                 });
               },
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                    StyleString.safeSpace, 5, StyleString.safeSpace, 5),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: StyleString.safeSpace),
                 child: LayoutBuilder(builder: (context, boxConstraints) {
                   final double width = (boxConstraints.maxWidth -
                           StyleString.cardSpace *

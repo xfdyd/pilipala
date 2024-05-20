@@ -13,6 +13,7 @@ import 'package:PiliPalaX/utils/global_data.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 
 import '../../models/common/dynamic_badge_mode.dart';
+import '../../models/common/up_panel_position.dart';
 import '../../plugin/pl_player/utils/fullscreen.dart';
 import '../../models/common/nav_bar_config.dart';
 import 'controller.dart';
@@ -34,13 +35,18 @@ class _StyleSettingState extends State<StyleSetting> {
   late int picQuality;
   late ThemeType _tempThemeValue;
   late double maxRowWidth;
+  late UpPanelPosition upPanelPosition;
 
   @override
   void initState() {
     super.initState();
     picQuality = setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10);
     _tempThemeValue = settingController.themeType.value;
-    maxRowWidth = setting.get(SettingBoxKey.maxRowWidth, defaultValue: 240.0) as double;
+    maxRowWidth =
+        setting.get(SettingBoxKey.maxRowWidth, defaultValue: 240.0) as double;
+    upPanelPosition = UpPanelPosition.values[setting.get(
+        SettingBoxKey.upPanelPosition,
+        defaultValue: UpPanelPosition.leftFixed.code)];
   }
 
   @override
@@ -70,15 +76,15 @@ class _StyleSettingState extends State<StyleSetting> {
               callFn: (value) {
                 if (value) {
                   autoScreen();
-                  SmartDialog.showToast('已开启横屏适配');
+                  SmartDialog.showToast('已开启横屏适配，推荐将全屏方式设为【不改变当前方向】');
                 } else {
                   AutoOrientation.portraitUpMode();
                   SmartDialog.showToast('已关闭横屏适配');
                 }
               }),
           const SetSwitchItem(
-            title: '自适应底栏/侧边栏',
-            subTitle: '横竖屏自动切换（其它底栏设置失效）',
+            title: '改用侧边栏',
+            subTitle: '开启后底栏被替换，且底栏相关设置失效',
             leading: Icon(Icons.chrome_reader_mode_outlined),
             setKey: SettingBoxKey.adaptiveNavBar,
             defaultVal: false,
@@ -89,6 +95,94 @@ class _StyleSettingState extends State<StyleSetting> {
             leading: Icon(Icons.design_services_outlined),
             setKey: SettingBoxKey.enableMYBar,
             defaultVal: true,
+          ),
+          const SetSwitchItem(
+            title: '首页背景渐变',
+            setKey: SettingBoxKey.enableGradientBg,
+            leading: Icon(Icons.gradient_outlined),
+            defaultVal: true,
+            needReboot: true,
+          ),
+          ListTile(
+            onTap: () async {
+              double? result = await showDialog(
+                  context: context,
+                  builder: (context) {
+                    return SlideDialog<double>(
+                      title: '最大列宽度（默认240dp）',
+                      value: maxRowWidth,
+                      min: 150.0,
+                      max: 500.0,
+                      divisions: 35,
+                      suffix: 'dp',
+                    );
+                  });
+              if (result != null) {
+                maxRowWidth = result;
+                setting.put(SettingBoxKey.maxRowWidth, result);
+                SmartDialog.showToast('重启生效');
+                setState(() {});
+              }
+            },
+            leading: const Icon(Icons.calendar_view_week_outlined),
+            dense: false,
+            title: Text('列表宽度（dp）限制', style: titleStyle),
+            subtitle: Text(
+              '当前:${maxRowWidth.toInt()}dp，屏幕宽度:${MediaQuery.of(context).size.width.toPrecision(2)}dp。'
+              '宽度越小列数越多，横条、大卡会2倍折算',
+              style: subTitleStyle,
+            ),
+          ),
+          const SetSwitchItem(
+            title: '播放页移除安全边距',
+            subTitle: '隐藏状态栏、撑满屏幕，但播放控件仍处于安全域内',
+            leading: Icon(Icons.crop_outlined),
+            setKey: SettingBoxKey.videoPlayerRemoveSafeArea,
+            defaultVal: false,
+            needReboot: true,
+          ),
+          const SetSwitchItem(
+            title: '动态页启用瀑布流',
+            subTitle: '关闭会显示为单列',
+            leading: Icon(Icons.view_array_outlined),
+            setKey: SettingBoxKey.dynamicsWaterfallFlow,
+            defaultVal: true,
+            needReboot: true,
+          ),
+          ListTile(
+            dense: false,
+            title: Text('动态页Up主显示位置', style: titleStyle),
+            leading: const Icon(Icons.person_outlined),
+            subtitle: Text('当前：${upPanelPosition.labels}', style: subTitleStyle),
+            onTap: () async {
+              UpPanelPosition? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SelectDialog<UpPanelPosition>(
+                    title: '动态页Up主显示位置',
+                    value: upPanelPosition,
+                    values: UpPanelPosition.values.map((e) {
+                      return {'title': e.labels, 'value': e};
+                    }).toList(),
+                  );
+                },
+              );
+              if (result != null) {
+                upPanelPosition = result;
+                setting.put(SettingBoxKey.upPanelPosition, result.code);
+                SmartDialog.showToast('重启生效');
+                setState(() {});
+              }
+            },
+          ),
+          ListTile(
+            dense: false,
+            onTap: () => settingController.setDynamicBadgeMode(context),
+            title: Text('动态未读标记', style: titleStyle),
+            leading: const Icon(Icons.motion_photos_on_outlined),
+            subtitle: Obx(() => Text(
+                '当前标记样式：${settingController.dynamicBadgeType.value.description}',
+                style: subTitleStyle)),
           ),
           const SetSwitchItem(
             title: '首页顶栏收起',
@@ -105,44 +199,6 @@ class _StyleSettingState extends State<StyleSetting> {
             setKey: SettingBoxKey.hideTabBar,
             defaultVal: false,
             needReboot: true,
-          ),
-          const SetSwitchItem(
-            title: '首页背景渐变',
-            setKey: SettingBoxKey.enableGradientBg,
-            leading: Icon(Icons.gradient_outlined),
-            defaultVal: true,
-            needReboot: true,
-          ),
-          ListTile(
-            onTap: () async {
-              double? result = await showDialog(
-                context: context,
-                builder: (context) {
-                  return SlideDialog<double>(
-                    title: '最大列宽度（默认240dp）',
-                    value: maxRowWidth,
-                    min: 150.0,
-                    max: 500.0,
-                    divisions: 35,
-                    suffix: 'dp',
-                  );
-                }
-              );
-              if (result != null) {
-                maxRowWidth = result;
-                setting.put(SettingBoxKey.maxRowWidth, result);
-                SmartDialog.showToast('重启生效');
-                setState(() {});
-              }
-            },
-            leading: const Icon(Icons.calendar_view_week_outlined),
-            dense: false,
-            title: Text('列表宽度（dp）上限', style: titleStyle),
-            subtitle: Text(
-              '当前:${maxRowWidth.toInt()}dp，屏幕宽度:${MediaQuery.of(context).size.width.toPrecision(2)}dp。'
-                  '宽度越小列数越多，横条、大卡会2倍折算',
-              style: subTitleStyle,
-            ),
           ),
           ListTile(
             dense: false,
@@ -235,6 +291,9 @@ class _StyleSettingState extends State<StyleSetting> {
             leading: const Icon(Icons.opacity_outlined),
             title: Text('气泡提示不透明度', style: titleStyle),
             subtitle: Text('自定义气泡提示(Toast)不透明度', style: subTitleStyle),
+            trailing: Obx(() => Text(
+                settingController.toastOpacity.value.toStringAsFixed(1),
+                style: Theme.of(context).textTheme.titleSmall)),
           ),
           ListTile(
             dense: false,
@@ -265,28 +324,12 @@ class _StyleSettingState extends State<StyleSetting> {
           ),
           ListTile(
             dense: false,
-            onTap: () => settingController.setDynamicBadgeMode(context),
-            title: Text('动态未读标记', style: titleStyle),
-            leading: const Icon(Icons.motion_photos_on_outlined),
-            subtitle: Obx(() => Text(
-                '当前标记样式：${settingController.dynamicBadgeType.value.description}',
-                style: subTitleStyle)),
-          ),
-          ListTile(
-            dense: false,
             onTap: () => Get.toNamed('/colorSetting'),
             leading: const Icon(Icons.color_lens_outlined),
             title: Text('应用主题', style: titleStyle),
             subtitle: Obx(() => Text(
                 '当前主题：${colorSelectController.type.value == 0 ? '动态取色' : '指定颜色'}',
                 style: subTitleStyle)),
-          ),
-          const SetSwitchItem(
-            title: '默认展示评论区',
-            subTitle: '在视频详情页默认切换至评论区页',
-            leading: Icon(Icons.mode_comment_outlined),
-            setKey: SettingBoxKey.defaultShowComment,
-            defaultVal: false,
           ),
           ListTile(
             dense: false,

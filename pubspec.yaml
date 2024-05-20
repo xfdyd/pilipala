@@ -37,8 +37,6 @@ dependencies:
   cupertino_icons: ^1.0.5
   # 动态取色
   dynamic_color: ^1.6.8
-  # Adaptive scaffold
-  flutter_adaptive_scaffold: ^0.1.10+1
 
   get: ^4.6.5
 
@@ -117,7 +115,7 @@ dependencies:
   # 弹幕
   ns_danmaku:
     git:
-      url: https://github.com/guozhigq/flutter_ns_danmaku.git
+      url: https://github.com/orz12/flutter_ns_danmaku.git
       ref: master
   # 状态栏图标控制
   status_bar_control: ^3.2.1

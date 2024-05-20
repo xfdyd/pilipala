@@ -62,34 +62,35 @@ class _MediaPageState extends State<MediaPage>
     super.build(context);
     Color primary = Theme.of(context).colorScheme.primary;
     return Scaffold(
-      appBar: AppBar(toolbarHeight: 30),
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(toolbarHeight: 30, backgroundColor: Colors.transparent),
       body: SingleChildScrollView(
         controller: mediaController.scrollController,
         child: Column(
           children: [
             ListTile(
-              leading: null,
-              title: Padding(
-                padding: const EdgeInsets.only(left: 20),
-                child: Text(
-                  '媒体库',
-                  style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
-                    fontWeight: FontWeight.bold,
+                leading: null,
+                title: Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: Text(
+                    '媒体库',
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.titleLarge!.fontSize,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              trailing: IconButton(
-                tooltip: '设置',
-                onPressed: () {
-                  Get.toNamed('/setting');
-                },
-                icon: const Icon(
-                  Icons.settings_outlined,
-                  size: 20,
-                ),
-              )
-            ),
+                trailing: IconButton(
+                  tooltip: '设置',
+                  onPressed: () {
+                    Get.toNamed('/setting');
+                  },
+                  icon: const Icon(
+                    Icons.settings_outlined,
+                    size: 20,
+                  ),
+                )),
             for (var i in mediaController.list) ...[
               ListTile(
                 onTap: () => i['onTap'](),
@@ -145,14 +146,19 @@ class _MediaPageState extends State<MediaPage>
                     ),
                     if (mediaController.favFolderData.value.count != null)
                       TextSpan(
-                        text: mediaController.favFolderData.value.count
-                            .toString(),
+                        text: "${mediaController.favFolderData.value.count}  ",
                         style: TextStyle(
                           fontSize:
                               Theme.of(context).textTheme.titleSmall!.fontSize,
                           color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
+                    WidgetSpan(
+                        child: Icon(
+                      Icons.arrow_forward_ios,
+                      size: 18,
+                      color: Theme.of(context).colorScheme.primary,
+                    )),
                   ],
                 ),
               ),
@@ -275,10 +281,16 @@ class FavFolderItem extends StatelessWidget {
               clipBehavior: Clip.hardEdge,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                color: Theme.of(context).colorScheme.onInverseSurface,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onInverseSurface
+                    .withOpacity(0.4),
                 boxShadow: [
                   BoxShadow(
-                    color: Theme.of(context).colorScheme.onInverseSurface,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onInverseSurface
+                        .withOpacity(0.4),
                     offset: const Offset(4, -12), // 阴影与容器的距离
                     blurRadius: 0.0, // 高斯的标准偏差与盒子的形状卷积。
                     spreadRadius: 0.0, // 在应用模糊之前，框应该膨胀的量。

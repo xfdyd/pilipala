@@ -28,7 +28,8 @@ class SearchVideoPanel extends StatelessWidget {
         Container(
           width: context.width,
           height: 34,
-          padding: const EdgeInsets.only(left: 8, top: 0, right: 12),
+          padding: const EdgeInsets.only(
+              left: StyleString.safeSpace, top: 0, right: 12),
           child: Row(
             children: [
               Expanded(
@@ -69,7 +70,7 @@ class SearchVideoPanel extends StatelessWidget {
                   style: ButtonStyle(
                     padding: MaterialStateProperty.all(EdgeInsets.zero),
                   ),
-                  onPressed: () => controller.onShowFilterDialog(ctr),
+                  onPressed: () => controller.onShowFilterDialog(context, ctr),
                   icon: Icon(
                     Icons.filter_list_outlined,
                     size: 18,
@@ -84,22 +85,23 @@ class SearchVideoPanel extends StatelessWidget {
             child: CustomScrollView(
           controller: ctr.scrollController,
           slivers: [
-            SliverGrid(
-              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                  mainAxisSpacing: StyleString.cardSpace,
-                  crossAxisSpacing: StyleString.safeSpace,
-                  maxCrossAxisExtent: Grid.maxRowWidth * 2,
-                  mainAxisExtent: Grid.calculateActualWidth(context,
-                          Grid.maxRowWidth * 2, StyleString.safeSpace) /
-                      2.1 /
-                      StyleString.aspectRatio),
-              delegate: SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-                  return VideoCardH(videoItem: list[index], showPubdate: true);
-                },
-                childCount: list.length,
-              ),
-            ),
+            SliverPadding(
+                padding: const EdgeInsets.all(StyleString.safeSpace),
+                sliver: SliverGrid(
+                  gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                      mainAxisSpacing: StyleString.safeSpace,
+                      crossAxisSpacing: StyleString.safeSpace,
+                      maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                      childAspectRatio: StyleString.aspectRatio * 2.3,
+                      mainAxisExtent: 0),
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      return VideoCardH(
+                          videoItem: list[index], showPubdate: true);
+                    },
+                    childCount: list.length,
+                  ),
+                )),
           ],
         )),
       ],
@@ -176,10 +178,10 @@ class VideoPanelController extends GetxController {
     super.onInit();
   }
 
-  onShowFilterDialog(searchPanelCtr) {
-    SmartDialog.show(
-      animationType: SmartAnimationType.centerFade_otherSlide,
-      builder: (BuildContext context) {
+  onShowFilterDialog(BuildContext context, SearchPanelController searchPanelCtr) {
+    showDialog(
+    context: context,
+    builder: (context) {
         TextStyle textStyle = Theme.of(context).textTheme.titleMedium!;
         return AlertDialog(
           title: const Text('时长筛选'),

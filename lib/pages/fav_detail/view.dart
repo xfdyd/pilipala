@@ -215,16 +215,13 @@ class _FavDetailPageState extends State<FavDetailPage> {
                           ? const SliverToBoxAdapter(child: SizedBox())
                           : SliverGrid(
                               gridDelegate:
-                                  SliverGridDelegateWithMaxCrossAxisExtent(
+                                  SliverGridDelegateWithExtentAndRatio(
                                       mainAxisSpacing: StyleString.cardSpace,
                                       crossAxisSpacing: StyleString.safeSpace,
                                       maxCrossAxisExtent: Grid.maxRowWidth * 2,
-                                      mainAxisExtent: Grid.calculateActualWidth(
-                                              context,
-                                              Grid.maxRowWidth * 2,
-                                              StyleString.safeSpace) /
-                                          2.1 /
-                                          StyleString.aspectRatio),
+                                      childAspectRatio:
+                                          StyleString.aspectRatio * 2.3,
+                                      mainAxisExtent: 0),
                               delegate:
                                   SliverChildBuilderDelegate((context, index) {
                                 return FavVideoCardH(
@@ -244,7 +241,13 @@ class _FavDetailPageState extends State<FavDetailPage> {
                 }
               } else {
                 // 骨架屏
-                return SliverList(
+                return SliverGrid(
+                  gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                      mainAxisSpacing: StyleString.cardSpace,
+                      crossAxisSpacing: StyleString.safeSpace,
+                      maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                      childAspectRatio: StyleString.aspectRatio * 2.3,
+                      mainAxisExtent: 0),
                   delegate: SliverChildBuilderDelegate((context, index) {
                     return const VideoCardHSkeleton();
                   }, childCount: 10),

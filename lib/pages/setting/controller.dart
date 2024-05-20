@@ -48,17 +48,16 @@ class SettingController extends GetxController {
         setting.get(SettingBoxKey.defaultHomePage, defaultValue: 0);
   }
 
-  loginOut() async {
-    SmartDialog.show(
-      useSystem: true,
-      animationType: SmartAnimationType.centerFade_otherSlide,
-      builder: (BuildContext context) {
+  loginOut(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
         return AlertDialog(
           title: const Text('提示'),
           content: const Text('确认要退出登录吗'),
           actions: [
             TextButton(
-              onPressed: () => SmartDialog.dismiss(),
+              onPressed: () => Get.back(),
               child: const Text('点错了'),
             ),
             TextButton(
@@ -73,7 +72,7 @@ class SettingController extends GetxController {
                     .put(LocalCacheKey.accessKey, {'mid': -1, 'value': ''});
 
                 await LoginUtils.refreshLoginStatus(false);
-                SmartDialog.dismiss().then((value) => Get.back());
+                Get.back();
               },
               child: const Text('确认'),
             )

@@ -146,17 +146,15 @@ class _RcmdPageState extends State<RcmdPage>
 
   Widget contentGrid(ctr, videoList) {
     return SliverGrid(
-      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+      gridDelegate: SliverGridDelegateWithExtentAndRatio(
         // 行间距
         mainAxisSpacing: StyleString.cardSpace,
         // 列间距
         crossAxisSpacing: StyleString.cardSpace,
         // 最大宽度
         maxCrossAxisExtent: Grid.maxRowWidth,
-        mainAxisExtent: Grid.calculateActualWidth(
-                    context, Grid.maxRowWidth, StyleString.safeSpace) /
-                StyleString.aspectRatio +
-            MediaQuery.textScalerOf(context).scale(90),
+        childAspectRatio: StyleString.aspectRatio,
+        mainAxisExtent: MediaQuery.textScalerOf(context).scale(90),
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {

@@ -86,14 +86,12 @@ class _HistorySearchPageState extends State<HistorySearchPage> {
                 controller: scrollController,
                 slivers: [
                   Obx(() => SliverGrid(
-                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      gridDelegate: SliverGridDelegateWithExtentAndRatio(
                           mainAxisSpacing: StyleString.cardSpace,
                           crossAxisSpacing: StyleString.safeSpace,
                           maxCrossAxisExtent: Grid.maxRowWidth * 2,
-                          mainAxisExtent: Grid.calculateActualWidth(context,
-                                  Grid.maxRowWidth * 2, StyleString.safeSpace) /
-                              2.1 /
-                              StyleString.aspectRatio),
+                          childAspectRatio: StyleString.aspectRatio * 2.3,
+                          mainAxisExtent: 0),
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
                           return HistoryItem(

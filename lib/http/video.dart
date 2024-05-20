@@ -10,6 +10,7 @@ import '../models/user/fav_folder.dart';
 import '../models/video/ai.dart';
 import '../models/video/play/url.dart';
 import '../models/video_detail_res.dart';
+import '../utils/id_utils.dart';
 import '../utils/recommend_filter.dart';
 import '../utils/storage.dart';
 import '../utils/wbi_sign.dart';
@@ -313,6 +314,29 @@ class VideoHttp {
       },
     );
     if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
+  }
+
+  // （取消）点踩
+  static Future dislikeVideo({required String bvid, required bool type}) async {
+    String? accessKey = GStrorage.localCache
+        .get(LocalCacheKey.accessKey, defaultValue: {})['value'];
+    if (accessKey == null || accessKey == "") {
+      return {'status': false, 'data': [], 'msg': "本操作使用app端接口，请前往【隐私设置】刷新access_key"};
+    }
+    var res = await Request().post(
+      Api.dislikeVideo,
+      queryParameters: {
+        'aid': IdUtils.bv2av(bvid),
+        'dislike': type ? 0 : 1,
+        'access_key': accessKey,
+      },
+    );
+    print(res);
+    if (res.data is! String && res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {
       return {'status': false, 'data': [], 'msg': res.data['message']};

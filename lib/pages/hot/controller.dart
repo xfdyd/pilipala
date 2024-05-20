@@ -31,6 +31,7 @@ class HotController extends GetxController {
         videoList.addAll(res['data']);
       }
       _currentPage += 1;
+      if (_currentPage == 2) queryHotFeed('onLoad');
     }
     isLoadingMore = false;
     return res;

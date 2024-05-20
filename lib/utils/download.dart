@@ -10,15 +10,15 @@ import 'dart:io';
 
 class DownloadUtils {
   // 获取存储权限
-  static Future<bool> requestStoragePer() async {
+  static Future<bool> requestStoragePer(BuildContext context) async {
     await Permission.storage.request();
     PermissionStatus status = await Permission.storage.status;
     if (status == PermissionStatus.denied ||
         status == PermissionStatus.permanentlyDenied) {
-      SmartDialog.show(
-        useSystem: true,
-        animationType: SmartAnimationType.centerFade_otherSlide,
-        builder: (BuildContext context) {
+      if (!context.mounted) return false;
+      await showDialog(
+        context: context,
+        builder: (context) {
           return AlertDialog(
             title: const Text('提示'),
             content: const Text('存储权限未授权'),
@@ -69,21 +69,22 @@ class DownloadUtils {
     }
   }
 
-  static Future<bool> checkPermissionDependOnSdkInt() async {
+  static Future<bool> checkPermissionDependOnSdkInt(BuildContext context) async {
     if (Platform.isAndroid) {
       final androidInfo = await DeviceInfoPlugin().androidInfo;
       if (androidInfo.version.sdkInt <= 32) {
-        return await requestStoragePer();
+        if (!context.mounted) return false;
+        return await requestStoragePer(context);
       } else {
         return await requestPhotoPer();
       }
     }
-    return await requestStoragePer();
+    return await requestStoragePer(context);
   }
-  static Future<bool> downloadImg(String imgUrl,
+  static Future<bool> downloadImg(BuildContext context, String imgUrl,
       {String imgType = 'cover'}) async {
     try {
-      if (!await checkPermissionDependOnSdkInt()) {
+      if (!await checkPermissionDependOnSdkInt(context)) {
       //   // return false;
       }
       SmartDialog.showLoading(msg: '正在下载原图');

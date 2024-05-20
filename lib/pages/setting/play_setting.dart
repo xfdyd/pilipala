@@ -120,7 +120,7 @@ class _PlaySettingState extends State<PlaySetting> {
           ),
           const SetSwitchItem(
             title: '竖屏扩大展示',
-            subTitle: '小屏竖屏视频宽高比由16:9扩大至4:5（！暂不支持临时收起）',
+            subTitle: '小屏竖屏视频宽高比由16:9扩大至1:1（不支持收起）；横屏适配时，扩大至9:16',
             leading: Icon(Icons.expand_outlined),
             setKey: SettingBoxKey.enableVerticalExpand,
             defaultVal: false,
@@ -151,7 +151,7 @@ class _PlaySettingState extends State<PlaySetting> {
             subTitle: '进入后台时继续播放',
             leading: Icon(Icons.motion_photos_pause_outlined),
             setKey: SettingBoxKey.continuePlayInBackground,
-            defaultVal: true,
+            defaultVal: false,
           ),
           if (Platform.isAndroid)
             SetSwitchItem(

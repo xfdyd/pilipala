@@ -1,14 +1,13 @@
 import 'dart:async';
 
+import 'package:PiliPalaX/common/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:PiliPalaX/models/common/dynamic_badge_mode.dart';
 import 'package:PiliPalaX/pages/dynamics/index.dart';
 import 'package:PiliPalaX/pages/home/index.dart';
 import 'package:PiliPalaX/pages/media/index.dart';
-import 'package:PiliPalaX/pages/rank/index.dart';
 import 'package:PiliPalaX/utils/event_bus.dart';
 import 'package:PiliPalaX/utils/feed_back.dart';
 import 'package:PiliPalaX/utils/storage.dart';
@@ -24,7 +23,6 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   final MainController _mainController = Get.put(MainController());
   final HomeController _homeController = Get.put(HomeController());
-  final RankController _rankController = Get.put(RankController());
   final DynamicsController _dynamicController = Get.put(DynamicsController());
   final MediaController _mediaController = Get.put(MediaController());
 
@@ -32,6 +30,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   Box setting = GStrorage.setting;
   late bool enableMYBar;
   late bool adaptiveNavBar;
+  late bool enableGradientBg;
 
   @override
   void initState() {
@@ -42,6 +41,8 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     enableMYBar = setting.get(SettingBoxKey.enableMYBar, defaultValue: true);
     adaptiveNavBar =
         setting.get(SettingBoxKey.adaptiveNavBar, defaultValue: false);
+    enableGradientBg = setting.get(SettingBoxKey.enableGradientBg,
+        defaultValue: true);
   }
 
   void setIndex(int value) async {
@@ -63,20 +64,20 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
       _homeController.flag = false;
     }
 
-    if (currentPage is RankPage) {
-      if (_rankController.flag) {
-        // 单击返回顶部 双击并刷新
-        if (DateTime.now().millisecondsSinceEpoch - _lastSelectTime! < 500) {
-          _rankController.onRefresh();
-        } else {
-          _rankController.animateToTop();
-        }
-        _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
-      }
-      _rankController.flag = true;
-    } else {
-      _rankController.flag = false;
-    }
+    // if (currentPage is RankPage) {
+    //   if (_rankController.flag) {
+    //     // 单击返回顶部 双击并刷新
+    //     if (DateTime.now().millisecondsSinceEpoch - _lastSelectTime! < 500) {
+    //       _rankController.onRefresh();
+    //     } else {
+    //       _rankController.animateToTop();
+    //     }
+    //     _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
+    //   }
+    //   _rankController.flag = true;
+    // } else {
+    //   _rankController.flag = false;
+    // }
 
     if (currentPage is DynamicsPage) {
       if (_dynamicController.flag) {
@@ -113,55 +114,100 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
       onPopInvoked: (bool didPop) async {
         _mainController.onBackPressed(context);
       },
-      child: adaptiveNavBar
-          ? AdaptiveScaffold(
-              body: (_) => PageView(
-                    physics: const NeverScrollableScrollPhysics(),
-                    controller: _mainController.pageController,
-                    onPageChanged: (index) {
-                      _mainController.selectedIndex = index;
-                      setState(() {});
-                    },
-                    children: _mainController.pages,
+      child: Scaffold(
+        extendBody: true,
+        body: Stack(children: [
+          // gradient background
+          if (enableGradientBg) ...[
+            Align(
+              alignment: Alignment.topLeft,
+              child: Opacity(
+                opacity: 0.6,
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.9),
+                          Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.5),
+                          Theme.of(context).colorScheme.surface
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        stops: const [0, 0.0034, 0.34]),
                   ),
-              destinations: _mainController.navigationBars
-                  .map((e) => NavigationDestination(
-                        icon: Badge(
-                          label: _mainController.dynamicBadgeType ==
-                                  DynamicBadgeMode.number
-                              ? Text(e['count'].toString())
-                              : null,
-                          padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
-                          isLabelVisible: _mainController.dynamicBadgeType !=
-                                  DynamicBadgeMode.hidden &&
-                              e['count'] > 0,
-                          child: e['icon'],
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                          textColor:
-                              Theme.of(context).colorScheme.onInverseSurface,
-                        ),
-                        selectedIcon: e['selectIcon'],
-                        label: e['label'],
-                      ))
-                  .toList(),
-              onSelectedIndexChange: (value) => setIndex(value),
-              selectedIndex: _mainController.selectedIndex,
-              extendedNavigationRailWidth: 180,
-              transitionDuration: const Duration(milliseconds: 500),
-              useDrawer: true)
-          : Scaffold(
-              extendBody: true,
-              body: PageView(
-                physics: const NeverScrollableScrollPhysics(),
-                controller: _mainController.pageController,
-                onPageChanged: (index) {
-                  _mainController.selectedIndex = index;
-                  setState(() {});
-                },
-                children: _mainController.pages,
+                ),
               ),
-              bottomNavigationBar: StreamBuilder(
+            ),
+          ],
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (adaptiveNavBar) ...[
+                SizedBox(
+                    width: 55,
+                    child: NavigationRail(
+                      groupAlignment: 0.0,
+                      minWidth: 40.0,
+                      backgroundColor: Theme.of(context)
+                          .colorScheme
+                          .surface
+                          .withOpacity(0.2),
+                      selectedIndex: _mainController.selectedIndex,
+                      onDestinationSelected: (value) => setIndex(value),
+                      labelType: NavigationRailLabelType.none,
+                      destinations: _mainController.navigationBars
+                          .map((e) => NavigationRailDestination(
+                                icon: Badge(
+                                  label: _mainController.dynamicBadgeType ==
+                                          DynamicBadgeMode.number
+                                      ? Text(e['count'].toString())
+                                      : null,
+                                  padding:
+                                      const EdgeInsets.fromLTRB(2, 0, 2, 0),
+                                  isLabelVisible:
+                                      _mainController.dynamicBadgeType !=
+                                              DynamicBadgeMode.hidden &&
+                                          e['count'] > 0,
+                                  child: e['icon'],
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.primary,
+                                  textColor: Theme.of(context)
+                                      .colorScheme
+                                      .onInverseSurface,
+                                ),
+                                selectedIcon: e['selectIcon'],
+                                label: Text(e['label']),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 6),
+                              ))
+                          .toList(),
+                    )),
+              ],
+              Expanded(
+                child: PageView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  controller: _mainController.pageController,
+                  onPageChanged: (index) {
+                    _mainController.selectedIndex = index;
+                    setState(() {});
+                  },
+                  children: _mainController.pages,
+                ),
+              ),
+            ],
+          )
+        ]),
+        bottomNavigationBar: adaptiveNavBar
+            ? null
+            : StreamBuilder(
                 stream: _mainController.hideTabBar
                     ? _mainController.bottomBarStream.stream
                     : StreamController<bool>.broadcast().stream,
@@ -243,7 +289,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                   );
                 },
               ),
-            ),
+      ),
     );
   }
 }

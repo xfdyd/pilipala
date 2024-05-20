@@ -191,8 +191,8 @@ class VideoCardV extends StatelessWidget {
             right: 0,
             bottom: 0,
             child: VideoPopupMenu(
-              size: 30,
-              iconSize: 16,
+              size: 29,
+              iconSize: 17,
               videoItem: videoItem,
             )),
     ]);
@@ -224,7 +224,8 @@ class VideoContent extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 2),
+            const Spacer(),
+            // const SizedBox(height: 2),
             VideoStat(
               videoItem: videoItem,
             ),

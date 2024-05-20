@@ -268,15 +268,22 @@ class PiliSchame {
           Get.toNamed('/member?mid=$area', arguments: {'face': ''});
           break;
         default:
-          SmartDialog.showToast('未知路径或匹配错误:${value.dataString}，先采用浏览器打开');
-          Get.toNamed(
-            '/webview',
-            parameters: {
-              'url': value.dataString ?? "",
-              'type': 'url',
-              'pageTitle': ''
-            },
-          );
+          var res = IdUtils.matchAvorBv(input: area.split('?').first);
+          if (res.containsKey('AV')) {
+            _videoPush(res['AV']! as int, null);
+          } else if (res.containsKey('BV')) {
+            _videoPush(null, res['BV'] as String);
+          } else {
+            SmartDialog.showToast('未知路径或匹配错误:${value.dataString}，先采用浏览器打开');
+            Get.toNamed(
+              '/webview',
+              parameters: {
+                'url': value.dataString ?? "",
+                'type': 'url',
+                'pageTitle': ''
+              },
+            );
+          }
       }
     }
   }

@@ -36,6 +36,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
   late double fontSizeVal;
   late double danmakuDurationVal;
   late double strokeWidth;
+  late int fontWeight;
   int latestAddedPosition = -1;
 
   @override
@@ -68,6 +69,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
     opacityVal = playerController.opacityVal;
     fontSizeVal = playerController.fontSizeVal;
     strokeWidth = playerController.strokeWidth;
+    fontWeight = playerController.fontWeight;
     danmakuDurationVal = playerController.danmakuDurationVal;
   }
 
@@ -132,6 +134,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
             },
             option: DanmakuOption(
               fontSize: 15 * fontSizeVal,
+              fontWeight: fontWeight,
               area: showArea,
               opacity: opacityVal,
               hideTop: blockTypes.contains(5),

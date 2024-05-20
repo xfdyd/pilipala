@@ -127,7 +127,7 @@ class _AboutPageState extends State<AboutPage> {
             ),
           ),
           ListTile(
-            onTap: () => _aboutController.feedback(),
+            onTap: () => _aboutController.feedback(context),
             leading: const Icon(Icons.feedback_outlined),
             title: const Text('问题反馈'),
             trailing: Icon(
@@ -174,7 +174,7 @@ class _AboutPageState extends State<AboutPage> {
           ),
           ListTile(
             onTap: () async {
-              await CacheManage().clearCacheAll();
+              await CacheManage().clearCacheAll(context);
               getCacheSize();
             },
             leading: const Icon(Icons.delete_outline),
@@ -185,17 +185,17 @@ class _AboutPageState extends State<AboutPage> {
               title: const Text('导入/导出设置'),
               dense: false,
               leading: const Icon(Icons.import_export_outlined),
-              onTap: () {
-                SmartDialog.show(
-                  useSystem: true,
-                  builder: (BuildContext context) {
+              onTap: () async {
+                await showDialog(
+                  context: context,
+                  builder: (context) {
                     return SimpleDialog(
                       title: const Text('导入/导出设置'),
                       children: [
                         ListTile(
                           title: const Text('导出设置至剪贴板'),
                           onTap: () async {
-                            SmartDialog.dismiss();
+                            Get.back();
                             String data = await GStrorage.exportAllSettings();
                             Clipboard.setData(ClipboardData(text: data));
                             SmartDialog.showToast('已复制到剪贴板');
@@ -204,30 +204,35 @@ class _AboutPageState extends State<AboutPage> {
                         ListTile(
                           title: const Text('从剪贴板导入设置'),
                           onTap: () async {
-                            SmartDialog.dismiss();
-                            ClipboardData? data = await Clipboard.getData('text/plain');
-                            if (data == null || data.text == null || data.text!.isEmpty) {
+                            Get.back();
+                            ClipboardData? data =
+                                await Clipboard.getData('text/plain');
+                            if (data == null ||
+                                data.text == null ||
+                                data.text!.isEmpty) {
                               SmartDialog.showToast('剪贴板无数据');
                               return;
                             }
-                            SmartDialog.show(
-                              useSystem: true,
-                              builder: (BuildContext context) {
+                            if (!context.mounted) return;
+                            await showDialog(
+                              context: context,
+                              builder: (context) {
                                 return AlertDialog(
                                   title: const Text('是否导入如下设置？'),
                                   content: Text(data.text!),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
-                                        SmartDialog.dismiss();
+                                        Get.back();
                                       },
                                       child: const Text('取消'),
                                     ),
                                     TextButton(
                                       onPressed: () async {
-                                        SmartDialog.dismiss();
-                                        try{
-                                          await GStrorage.importAllSettings(data.text!);
+                                        Get.back();
+                                        try {
+                                          await GStrorage.importAllSettings(
+                                              data.text!);
                                           SmartDialog.showToast('导入成功');
                                         } catch (e) {
                                           SmartDialog.showToast('导入失败：$e');
@@ -249,27 +254,27 @@ class _AboutPageState extends State<AboutPage> {
           ListTile(
             title: const Text('重置所有设置'),
             leading: const Icon(Icons.settings_backup_restore_outlined),
-            onTap: () {
-              SmartDialog.show(
-                useSystem: true,
-                builder: (BuildContext context) {
+            onTap: () async {
+              await showDialog(
+                context: context,
+                builder: (context) {
                   return AlertDialog(
                     title: const Text('重置所有设置'),
                     content: const Text('是否重置所有设置？'),
                     actions: [
                       TextButton(
                         onPressed: () {
-                          SmartDialog.dismiss();
+                          Get.back();
                         },
                         child: const Text('取消'),
                       ),
                       TextButton(
                         onPressed: () {
+                          Get.back();
                           GStrorage.setting.clear();
                           GStrorage.localCache.clear();
                           GStrorage.video.clear();
                           SmartDialog.showToast('重置成功');
-                          SmartDialog.dismiss();
                         },
                         child: const Text('确定'),
                       ),
@@ -384,11 +389,10 @@ class AboutController extends GetxController {
   }
 
   // 问题反馈
-  feedback() {
-    SmartDialog.show(
-      useSystem: true,
-      animationType: SmartAnimationType.centerFade_otherSlide,
-      builder: (BuildContext context) {
+  feedback(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
         return SimpleDialog(
           title: const Text('问题反馈'),
           children: [

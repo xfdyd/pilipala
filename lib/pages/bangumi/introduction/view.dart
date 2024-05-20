@@ -1,3 +1,4 @@
+import 'package:PiliPalaX/plugin/pl_player/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -283,56 +284,35 @@ class _BangumiInfoState extends State<BangumiInfo> {
                                           : bangumiItem!.stat!['danmakus'],
                                       size: 'medium',
                                     ),
+                                    if (isLandscape) ...[
+                                      const SizedBox(width: 6),
+                                      AreasAndPubTime(
+                                          widget: widget,
+                                          bangumiItem: bangumiItem,
+                                          t: t),
+                                      const SizedBox(width: 6),
+                                      NewEpDesc(
+                                          widget: widget,
+                                          bangumiItem: bangumiItem,
+                                          t: t),
+                                    ]
                                   ],
                                 ),
                                 SizedBox(height: isLandscape ? 2 : 6),
-                                Row(
-                                  children: [
-                                    Text(
-                                      !widget.loadingStatus
-                                          ? (widget.bangumiDetail!.areas!
-                                                  .isNotEmpty
-                                              ? widget.bangumiDetail!.areas!
-                                                  .first['name']
-                                              : '')
-                                          : (bangumiItem!.areas!.isNotEmpty
-                                              ? bangumiItem!
-                                                  .areas!.first['name']
-                                              : ''),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: t.colorScheme.outline,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      !widget.loadingStatus
-                                          ? widget.bangumiDetail!
-                                              .publish!['pub_time_show']
-                                          : bangumiItem!
-                                              .publish!['pub_time_show'],
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: t.colorScheme.outline,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                // const SizedBox(height: 4),
-                                Text(
-                                  !widget.loadingStatus
-                                      ? widget.bangumiDetail!.newEp!['desc']
-                                      : bangumiItem!.newEp!['desc'],
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: t.colorScheme.outline,
-                                  ),
-                                ),
-                                // const SizedBox(height: 10),
+                                if (!isLandscape)
+                                  AreasAndPubTime(
+                                      widget: widget,
+                                      bangumiItem: bangumiItem,
+                                      t: t),
+                                if (!isLandscape)
+                                  NewEpDesc(
+                                      widget: widget,
+                                      bangumiItem: bangumiItem,
+                                      t: t),
                                 const Spacer(),
                                 Text(
                                   '简介：${!widget.loadingStatus ? widget.bangumiDetail!.evaluate! : bangumiItem!.evaluate!}',
-                                  maxLines: isLandscape ? 1 : 3,
+                                  maxLines: isLandscape ? 2 : 3,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontSize: 13,
@@ -523,5 +503,75 @@ class _BangumiInfoState extends State<BangumiInfo> {
           loadingStatus: widget.loadingStatus,
           text: '转发'),
     ]);
+  }
+}
+
+class AreasAndPubTime extends StatelessWidget {
+  const AreasAndPubTime({
+    super.key,
+    required this.widget,
+    required this.bangumiItem,
+    required this.t,
+  });
+
+  final BangumiInfo widget;
+  final BangumiInfoModel? bangumiItem;
+  final ThemeData t;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          !widget.loadingStatus
+              ? (widget.bangumiDetail!.areas!.isNotEmpty
+                  ? widget.bangumiDetail!.areas!.first['name']
+                  : '')
+              : (bangumiItem!.areas!.isNotEmpty
+                  ? bangumiItem!.areas!.first['name']
+                  : ''),
+          style: TextStyle(
+            fontSize: 12,
+            color: t.colorScheme.outline,
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          !widget.loadingStatus
+              ? widget.bangumiDetail!.publish!['pub_time_show']
+              : bangumiItem!.publish!['pub_time_show'],
+          style: TextStyle(
+            fontSize: 12,
+            color: t.colorScheme.outline,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class NewEpDesc extends StatelessWidget {
+  const NewEpDesc({
+    super.key,
+    required this.widget,
+    required this.bangumiItem,
+    required this.t,
+  });
+
+  final BangumiInfo widget;
+  final BangumiInfoModel? bangumiItem;
+  final ThemeData t;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      !widget.loadingStatus
+          ? widget.bangumiDetail!.newEp!['desc']
+          : bangumiItem!.newEp!['desc'],
+      style: TextStyle(
+        fontSize: 12,
+        color: t.colorScheme.outline,
+      ),
+    );
   }
 }

@@ -1,3 +1,5 @@
+import 'package:PiliPalaX/common/skeleton/video_card_h.dart';
+import 'package:PiliPalaX/common/skeleton/video_card_v.dart';
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -68,17 +70,12 @@ class _FavPageState extends State<FavPage> {
                       physics: const AlwaysScrollableScrollPhysics(),
                       slivers: [
                         SliverGrid(
-                          gridDelegate:
-                              SliverGridDelegateWithMaxCrossAxisExtent(
-                                  mainAxisSpacing: StyleString.cardSpace,
-                                  crossAxisSpacing: StyleString.safeSpace,
-                                  maxCrossAxisExtent: Grid.maxRowWidth * 2,
-                                  mainAxisExtent: Grid.calculateActualWidth(
-                                          context,
-                                          Grid.maxRowWidth * 2,
-                                          StyleString.safeSpace) /
-                                      2.1 /
-                                      StyleString.aspectRatio),
+                          gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                              mainAxisSpacing: StyleString.cardSpace,
+                              crossAxisSpacing: StyleString.safeSpace,
+                              maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                              childAspectRatio: StyleString.aspectRatio * 2.3,
+                              mainAxisExtent: 0),
                           delegate: SliverChildBuilderDelegate(
                             childCount:
                                 _favController.favFolderData.value.list!.length,
@@ -103,7 +100,25 @@ class _FavPageState extends State<FavPage> {
             }
           } else {
             // 骨架屏
-            return const Text('请求中');
+            return CustomScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              slivers: [
+                SliverGrid(
+                  gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                      mainAxisSpacing: StyleString.cardSpace,
+                      crossAxisSpacing: StyleString.safeSpace,
+                      maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                      childAspectRatio: StyleString.aspectRatio * 2.3,
+                      mainAxisExtent: 0),
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      return const VideoCardHSkeleton();
+                    },
+                    childCount: 10,
+                  ),
+                ),
+              ],
+            );
           }
         },
       ),

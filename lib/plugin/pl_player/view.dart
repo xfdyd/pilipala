@@ -5,6 +5,7 @@ import 'package:PiliPalaX/pages/video/detail/introduction/controller.dart';
 import 'package:PiliPalaX/utils/id_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -17,6 +18,7 @@ import 'package:PiliPalaX/plugin/pl_player/models/fullscreen_mode.dart';
 import 'package:PiliPalaX/plugin/pl_player/utils.dart';
 import 'package:PiliPalaX/utils/feed_back.dart';
 import 'package:PiliPalaX/utils/storage.dart';
+import 'package:saver_gallery/saver_gallery.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
 import '../../common/widgets/audio_video_progress_bar.dart';
@@ -330,8 +332,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                       episodes.addAll(pages);
                       changeFucCall = videoIntroController!.changeSeasonOrbangu;
                     } else if (isBangumi) {
-                      episodes.addAll(bangumiIntroController!.bangumiDetail.value.episodes!);
-                      changeFucCall = bangumiIntroController!.changeSeasonOrbangu;
+                      episodes.addAll(bangumiIntroController!
+                          .bangumiDetail.value.episodes!);
+                      changeFucCall =
+                          bangumiIntroController!.changeSeasonOrbangu;
                     }
                     ListSheet(
                       episodes: episodes,
@@ -500,11 +504,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             controls: NoVideoControls,
             pauseUponEnteringBackgroundMode: !_.continuePlayInBackground.value,
             resumeUponEnteringForegroundMode: true,
-            subtitleViewConfiguration: const SubtitleViewConfiguration(
-              style: subTitleStyle,
-              padding: EdgeInsets.all(24.0),
-              textScaleFactor: 1.0,
-            ),
+            // 字幕尺寸调节
+            subtitleViewConfiguration: SubtitleViewConfiguration(
+                style: subTitleStyle,
+                padding: const EdgeInsets.all(24.0),
+                textScaleFactor: MediaQuery.textScaleFactorOf(context)),
             fit: _.videoFit.value,
           ),
         ),
@@ -848,36 +852,32 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         ),
 
         // 头部、底部控制条
-        SafeArea(
-          top: false,
-          bottom: false,
-          child: Obx(
-            () => Column(
-              children: [
-                if (widget.headerControl != null || _.headerControl != null)
-                  ClipRect(
-                    child: AppBarAni(
-                      controller: animationController,
-                      visible: !_.controlsLock.value && _.showControls.value,
-                      position: 'top',
-                      child: widget.headerControl ?? _.headerControl!,
-                    ),
-                  ),
-                const Spacer(),
+        Obx(
+          () => Column(
+            children: [
+              if (widget.headerControl != null || _.headerControl != null)
                 ClipRect(
                   child: AppBarAni(
                     controller: animationController,
                     visible: !_.controlsLock.value && _.showControls.value,
-                    position: 'bottom',
-                    child: widget.bottomControl ??
-                        BottomControl(
-                          controller: widget.controller,
-                          buildBottomControl: buildBottomControl(),
-                        ),
+                    position: 'top',
+                    child: widget.headerControl ?? _.headerControl!,
                   ),
                 ),
-              ],
-            ),
+              const Spacer(),
+              ClipRect(
+                child: AppBarAni(
+                  controller: animationController,
+                  visible: !_.controlsLock.value && _.showControls.value,
+                  position: 'bottom',
+                  child: widget.bottomControl ??
+                      BottomControl(
+                        controller: widget.controller,
+                        buildBottomControl: buildBottomControl(),
+                      ),
+                ),
+              ),
+            ],
           ),
         ),
 
@@ -981,7 +981,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             child: Align(
               alignment: Alignment.centerLeft,
               child: FractionalTranslation(
-                translation: const Offset(1, 0.0),
+                translation: const Offset(1, -0.4),
                 child: Visibility(
                   visible: _.showControls.value,
                   child: ComBtn(
@@ -995,6 +995,42 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     ),
                     fuc: () => _.onLockControl(!_.controlsLock.value),
                   ),
+                ),
+              ),
+            ),
+          ),
+        ),
+
+        // 截图
+        Obx(
+          () => Align(
+            alignment: Alignment.centerRight,
+            child: FractionalTranslation(
+              translation: const Offset(-1, -0.4),
+              child: Visibility(
+                visible: _.showControls.value && _.isFullScreen.value,
+                child: ComBtn(
+                  tooltip: '截图',
+                  icon: const Icon(
+                    Icons.photo_camera,
+                    size: 20,
+                    color: Colors.white,
+                  ),
+                  fuc: () => {
+                    _.videoPlayerController
+                        ?.screenshot(format: 'image/png')
+                        .then((value) {
+                      if (value != null) {
+                        SmartDialog.showToast('截图成功');
+                        String _name = DateTime.now().toString();
+                        SaverGallery.saveImage(value,
+                            name: _name,
+                            androidRelativePath: "Pictures/Screenshots",
+                            androidExistNotSave: false);
+                        SmartDialog.showToast('$_name.png已保存到相册/截图');
+                      }
+                    })
+                  },
                 ),
               ),
             ),

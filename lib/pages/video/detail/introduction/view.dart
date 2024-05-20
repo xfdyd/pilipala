@@ -244,6 +244,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final ThemeData t = Theme.of(context);
     final Color outline = t.colorScheme.outline;
+    bool isHorizontal = context.width > context.height * 1.25;
     return SliverPadding(
       padding: const EdgeInsets.only(
           left: StyleString.safeSpace, right: StyleString.safeSpace, top: 10),
@@ -252,20 +253,132 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Row(children: [
+                    Expanded(
+                        child: GestureDetector(
+                      onTap: onPushMember,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 1, horizontal: 0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            NetworkImgLayer(
+                              type: 'avatar',
+                              src: loadingStatus
+                                  ? owner.face
+                                  : widget.videoDetail!.owner!.face,
+                              width: 30,
+                              height: 30,
+                              fadeInDuration: Duration.zero,
+                              fadeOutDuration: Duration.zero,
+                            ),
+                            const SizedBox(width: 10),
+                            Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    owner.name,
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: t.colorScheme.primary),
+                                    // semanticsLabel: "Up主：${owner.name}",
+                                  ),
+                                  const SizedBox(height: 0),
+                                  Text(
+                                    follower,
+                                    semanticsLabel: "$follower粉丝",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: outline,
+                                    ),
+                                  ),
+                                ]),
+                            const Spacer(),
+                            Obx(() => AnimatedOpacity(
+                                  opacity: loadingStatus ||
+                                          videoIntroController
+                                              .followStatus.isEmpty
+                                      ? 0
+                                      : 1,
+                                  duration: const Duration(milliseconds: 50),
+                                  child: SizedBox(
+                                    height: 32,
+                                    child: Obx(
+                                      () => videoIntroController
+                                              .followStatus.isNotEmpty
+                                          ? TextButton(
+                                              onPressed: () =>
+                                                  videoIntroController
+                                                      .actionRelationMod(
+                                                          context),
+                                              style: TextButton.styleFrom(
+                                                padding: const EdgeInsets.only(
+                                                    left: 8, right: 8),
+                                                foregroundColor:
+                                                    followStatus['attribute'] !=
+                                                            0
+                                                        ? outline
+                                                        : t.colorScheme
+                                                            .onPrimary,
+                                                backgroundColor:
+                                                    followStatus['attribute'] !=
+                                                            0
+                                                        ? t.colorScheme
+                                                            .onInverseSurface
+                                                        : t.colorScheme
+                                                            .primary, // 设置按钮背景色
+                                              ),
+                                              child: Text(
+                                                followStatus['attribute'] != 0
+                                                    ? '已关注'
+                                                    : '关注',
+                                                style: TextStyle(
+                                                    fontSize: t.textTheme
+                                                        .labelMedium!.fontSize),
+                                              ),
+                                            )
+                                          : ElevatedButton(
+                                              onPressed: () =>
+                                                  videoIntroController
+                                                      .actionRelationMod(
+                                                          context),
+                                              child: const Text('关注'),
+                                            ),
+                                    ),
+                                  ),
+                                )),
+                          ],
+                        ),
+                      ),
+                    )),
+                    if (isHorizontal)
+                      Expanded(
+                          child: actionGrid(context, videoIntroController)),
+                  ]),
+                  const SizedBox(height: 8),
                   GestureDetector(
                     behavior: HitTestBehavior.translucent,
                     onTap: () => showIntroDetail(),
-                    child: Text(
-                      !loadingStatus
-                          ? widget.videoDetail!.title
-                          : videoItem['title'],
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                    child: Row(children: [
+                      Expanded(
+                          child: Text(
+                        !loadingStatus
+                            ? widget.videoDetail!.title
+                            : videoItem['title'],
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      )),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 16,
+                        color: t.colorScheme.outline,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    ]),
                   ),
                   Stack(
                     children: [
@@ -363,7 +476,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   //   ),
                   // ),
                   // 点赞收藏转发 布局样式2
-                  actionGrid(context, videoIntroController),
+                  if (!isHorizontal) actionGrid(context, videoIntroController),
                   // 合集
                   if (!loadingStatus &&
                       widget.videoDetail!.ugcSeason != null) ...[
@@ -387,93 +500,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                           changeFuc: videoIntroController.changeSeasonOrbangu,
                         ))
                   ],
-                  GestureDetector(
-                    onTap: onPushMember,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 8, horizontal: 4),
-                      child: Row(
-                        children: [
-                          NetworkImgLayer(
-                            type: 'avatar',
-                            src: loadingStatus
-                                ? owner.face
-                                : widget.videoDetail!.owner!.face,
-                            width: 34,
-                            height: 34,
-                            fadeInDuration: Duration.zero,
-                            fadeOutDuration: Duration.zero,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            owner.name,
-                            style: const TextStyle(fontSize: 13),
-                            // semanticsLabel: "Up主：${owner.name}",
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            follower,
-                            semanticsLabel: "粉丝数：$follower",
-                            style: TextStyle(
-                              fontSize: t.textTheme.labelSmall!.fontSize,
-                              color: outline,
-                            ),
-                          ),
-                          const Spacer(),
-                          Obx(() => AnimatedOpacity(
-                                opacity: loadingStatus ||
-                                        videoIntroController
-                                            .followStatus.isEmpty
-                                    ? 0
-                                    : 1,
-                                duration: const Duration(milliseconds: 50),
-                                child: SizedBox(
-                                  height: 32,
-                                  child: Obx(
-                                    () => videoIntroController
-                                            .followStatus.isNotEmpty
-                                        ? TextButton(
-                                            onPressed: videoIntroController
-                                                .actionRelationMod,
-                                            style: TextButton.styleFrom(
-                                              padding: const EdgeInsets.only(
-                                                  left: 8, right: 8),
-                                              foregroundColor:
-                                                  followStatus['attribute'] != 0
-                                                      ? outline
-                                                      : t.colorScheme.onPrimary,
-                                              backgroundColor:
-                                                  followStatus['attribute'] != 0
-                                                      ? t.colorScheme
-                                                          .onInverseSurface
-                                                      : t.colorScheme
-                                                          .primary, // 设置按钮背景色
-                                            ),
-                                            child: Text(
-                                              followStatus['attribute'] != 0
-                                                  ? '已关注'
-                                                  : '关注',
-                                              style: TextStyle(
-                                                  fontSize: t.textTheme
-                                                      .labelMedium!.fontSize),
-                                            ),
-                                          )
-                                        : ElevatedButton(
-                                            onPressed: videoIntroController
-                                                .actionRelationMod,
-                                            child: const Text('关注'),
-                                          ),
-                                  ),
-                                ),
-                              )),
-                        ],
-                      ),
-                    ),
-                  ),
                 ],
               )
             : const SizedBox(
-                height: 100,
+                height: 130,
                 child: Center(
                   child: CircularProgressIndicator(),
                 ),
@@ -502,6 +532,16 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   text: !loadingStatus
                       ? Utils.numFormat(widget.videoDetail!.stat!.like!)
                       : '-'),
+            ),
+            Obx(
+              () => ActionItem(
+                  icon: const Icon(FontAwesomeIcons.thumbsDown),
+                  selectIcon: const Icon(FontAwesomeIcons.solidThumbsDown),
+                  onTap: handleState(videoIntroController.actionDislikeVideo),
+                  selectStatus: videoIntroController.hasDislike.value,
+                  loadingStatus: loadingStatus,
+                  semanticsLabel: '点踩',
+                  text: "点踩"),
             ),
             // ActionItem(
             //     icon: const Icon(FontAwesomeIcons.clock),
@@ -536,7 +576,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
             ),
             ActionItem(
                 icon: const Icon(FontAwesomeIcons.comment),
-                onTap: () => videoDetailCtr.tabCtr.animateTo(1),
+                onTap: () => videoDetailCtr.tabCtr
+                    .animateTo(videoDetailCtr.tabCtr.index == 1 ? 0 : 1),
                 selectStatus: false,
                 loadingStatus: loadingStatus,
                 semanticsLabel: '评论',

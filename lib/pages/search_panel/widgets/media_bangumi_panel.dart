@@ -19,10 +19,10 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
     slivers: [
       SliverGrid(
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          mainAxisSpacing: StyleString.cardSpace,
+          mainAxisSpacing: StyleString.safeSpace,
           crossAxisSpacing: StyleString.safeSpace,
           maxCrossAxisExtent: Grid.maxRowWidth * 2,
-          mainAxisExtent: 157,
+          mainAxisExtent: 160,
         ),
         delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
           var i = list![index];
@@ -36,8 +36,8 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
               // });
             },
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                  StyleString.safeSpace, 7, StyleString.safeSpace, 2),
+              padding: const EdgeInsets.fromLTRB(StyleString.safeSpace,
+                  StyleString.safeSpace, StyleString.safeSpace, 2),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -125,7 +125,10 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
                                 if (res['status']) {
                                   EpisodeItem episode =
                                       res['data'].episodes.first;
-                                  int? epId = res['data'].userStatus?.progress?.lastEpId;
+                                  int? epId = res['data']
+                                      .userStatus
+                                      ?.progress
+                                      ?.lastEpId;
                                   if (epId == null) {
                                     epId = episode.epId;
                                   } else {
