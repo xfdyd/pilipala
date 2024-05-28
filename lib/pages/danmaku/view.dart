@@ -45,7 +45,9 @@ class _PlDanmakuState extends State<PlDanmaku> {
     enableShowDanmaku =
         setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: false);
     _plDanmakuController = PlDanmakuController(
-        widget.cid, widget.playerController.danmakuWeight);
+        widget.cid,
+        widget.playerController.danmakuWeight,
+        widget.playerController.danmakuFilterRule);
     if (mounted) {
       playerController = widget.playerController;
       if (enableShowDanmaku || playerController.isOpenDanmu.value) {

@@ -14,29 +14,29 @@ class PiliSchame {
     ///
     final SchemeEntity? value = await appScheme.getInitScheme();
     if (value != null) {
-      _routePush(value);
+      routePush(value);
     }
 
     /// 完整链接进入 b23.无效
     appScheme.getLatestScheme().then((SchemeEntity? value) {
       if (value != null) {
-        _routePush(value);
+        routePush(value);
       }
     });
 
     /// 注册从外部打开的Scheme监听信息 #
     appScheme.registerSchemeListener().listen((SchemeEntity? event) {
       if (event != null) {
-        _routePush(event);
+        routePush(event);
       }
     });
   }
 
   /// 路由跳转
-  static void _routePush(value) async {
-    final String scheme = value.scheme;
-    final String host = value.host;
-    final String path = value.path;
+  static void routePush(SchemeEntity value) async {
+    final String scheme = value.scheme!;
+    final String host = value.host!;
+    final String path = value.path!;
 
     if (scheme == 'bilibili') {
       if (host == 'root') {
@@ -56,9 +56,9 @@ class PiliSchame {
         }
         Map map = IdUtils.matchAvorBv(input: pathQuery);
         if (map.containsKey('AV')) {
-          _videoPush(map['AV'], null);
+          videoPush(map['AV'], null);
         } else if (map.containsKey('BV')) {
-          _videoPush(null, map['BV']);
+          videoPush(null, map['BV']);
         } else {
           SmartDialog.showToast('投稿匹配失败');
         }
@@ -69,7 +69,7 @@ class PiliSchame {
       } else if (host == 'bangumi') {
         if (path.startsWith('/season')) {
           final String seasonId = path.split('/').last;
-          _bangumiPush(int.parse(seasonId), null);
+          bangumiPush(int.parse(seasonId), null);
         }
       } else if (host == 'opus') {
         if (path.startsWith('/detail')) {
@@ -109,12 +109,12 @@ class PiliSchame {
         // );
       }
     } else if (scheme == 'https') {
-      _fullPathPush(value);
+      fullPathPush(value);
     }
   }
 
   // 投稿跳转
-  static Future<void> _videoPush(int? aidVal, String? bvidVal) async {
+  static Future<void> videoPush(int? aidVal, String? bvidVal) async {
     SmartDialog.showLoading<dynamic>(msg: '获取中...');
     try {
       int? aid = aidVal;
@@ -141,7 +141,8 @@ class PiliSchame {
   }
 
   // 番剧跳转
-  static Future<void> _bangumiPush(int? seasonId, int? epId) async {
+  static Future<void> bangumiPush(int? seasonId, int? epId) async {
+    print('seasonId: $seasonId, epId: $epId');
     SmartDialog.showLoading<dynamic>(msg: '获取中...');
     try {
       var result = await SearchHttp.bangumiInfo(seasonId: seasonId, epId: epId);
@@ -169,7 +170,7 @@ class PiliSchame {
     }
   }
 
-  static Future<void> _fullPathPush(SchemeEntity value) async {
+  static Future<void> fullPathPush(SchemeEntity value) async {
     // https://m.bilibili.com/bangumi/play/ss39708
     // https | m.bilibili.com | /bangumi/play/ss39708
     // final String scheme = value.scheme!;
@@ -200,16 +201,16 @@ class PiliSchame {
         final Map<String, dynamic> map =
             IdUtils.matchAvorBv(input: lastPathSegment);
         if (map.containsKey('AV')) {
-          _videoPush(map['AV']! as int, null);
+          videoPush(map['AV']! as int, null);
         } else if (map.containsKey('BV')) {
-          _videoPush(null, map['BV'] as String);
+          videoPush(null, map['BV'] as String);
         } else {
           SmartDialog.showToast('投稿匹配失败');
         }
       } else if (lastPathSegment.startsWith('ep')) {
-        _handleEpisodePath(lastPathSegment, redirectUrl);
+        handleEpisodePath(lastPathSegment, redirectUrl);
       } else if (lastPathSegment.startsWith('ss')) {
-        _handleSeasonPath(lastPathSegment, redirectUrl);
+        handleSeasonPath(lastPathSegment, redirectUrl);
       } else if (lastPathSegment.startsWith('BV')) {
         UrlUtils.matchUrlPush(
           lastPathSegment,
@@ -231,19 +232,25 @@ class PiliSchame {
       switch (area) {
         case 'bangumi':
           print('番剧');
-          if (area.startsWith('ep')) {
-            _bangumiPush(null, matchNum(area).first);
-          } else if (area.startsWith('ss')) {
-            _bangumiPush(matchNum(area).first, null);
+          for (var pathSegment in pathPart) {
+            if (pathSegment.startsWith('ss')) {
+              print(pathSegment);
+              bangumiPush(matchNum(pathSegment).first, null);
+              break;
+            } else if (pathSegment.startsWith('ep')) {
+              print(pathSegment);
+              bangumiPush(null, matchNum(pathSegment).first);
+              break;
+            }
           }
           break;
         case 'video':
           print('投稿');
           final Map<String, dynamic> map = IdUtils.matchAvorBv(input: path);
           if (map.containsKey('AV')) {
-            _videoPush(map['AV']! as int, null);
+            videoPush(map['AV']! as int, null);
           } else if (map.containsKey('BV')) {
-            _videoPush(null, map['BV'] as String);
+            videoPush(null, map['BV'] as String);
           } else {
             SmartDialog.showToast('投稿匹配失败');
           }
@@ -270,9 +277,9 @@ class PiliSchame {
         default:
           var res = IdUtils.matchAvorBv(input: area.split('?').first);
           if (res.containsKey('AV')) {
-            _videoPush(res['AV']! as int, null);
+            videoPush(res['AV']! as int, null);
           } else if (res.containsKey('BV')) {
-            _videoPush(null, res['BV'] as String);
+            videoPush(null, res['BV'] as String);
           } else {
             SmartDialog.showToast('未知路径或匹配错误:${value.dataString}，先采用浏览器打开');
             Get.toNamed(
@@ -295,17 +302,17 @@ class PiliSchame {
     return matches.map((Match match) => int.parse(match.group(0)!)).toList();
   }
 
-  static void _handleEpisodePath(String lastPathSegment, String redirectUrl) {
-    final String seasonId = _extractIdFromPath(lastPathSegment);
-    _bangumiPush(null, matchNum(seasonId).first);
+  static void handleEpisodePath(String lastPathSegment, String redirectUrl) {
+    final String seasonId = extractIdFromPath(lastPathSegment);
+    bangumiPush(null, matchNum(seasonId).first);
   }
 
-  static void _handleSeasonPath(String lastPathSegment, String redirectUrl) {
-    final String seasonId = _extractIdFromPath(lastPathSegment);
-    _bangumiPush(matchNum(seasonId).first, null);
+  static void handleSeasonPath(String lastPathSegment, String redirectUrl) {
+    final String seasonId = extractIdFromPath(lastPathSegment);
+    bangumiPush(matchNum(seasonId).first, null);
   }
 
-  static String _extractIdFromPath(String lastPathSegment) {
+  static String extractIdFromPath(String lastPathSegment) {
     return lastPathSegment.split('/').last;
   }
 }

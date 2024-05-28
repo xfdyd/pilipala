@@ -1,4 +1,3 @@
-import 'package:PiliPalaX/models/dynamics/result.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/pages/dynamics/index.dart';

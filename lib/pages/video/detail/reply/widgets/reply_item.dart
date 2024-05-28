@@ -1,4 +1,5 @@
 import 'package:PiliPalaX/http/video.dart';
+import 'package:appscheme/appscheme.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,6 +17,7 @@ import 'package:PiliPalaX/utils/feed_back.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 import 'package:PiliPalaX/utils/url_utils.dart';
 import 'package:PiliPalaX/utils/utils.dart';
+import '../../../../../utils/app_scheme.dart';
 import 'zan.dart';
 
 Box setting = GStrorage.setting;
@@ -681,30 +683,41 @@ InlineSpan buildContent(
                       } else {
                         final String redirectUrl =
                             await UrlUtils.parseRedirectUrl(matchStr);
-                        if (redirectUrl == matchStr) {
-                          Clipboard.setData(ClipboardData(text: matchStr));
-                          SmartDialog.showToast('地址可能有误');
-                          return;
-                        }
-                        final String pathSegment = Uri.parse(redirectUrl).path;
-                        final String lastPathSegment =
-                            pathSegment.split('/').last;
-                        if (lastPathSegment.startsWith('BV')) {
-                          UrlUtils.matchUrlPush(
-                            lastPathSegment,
-                            title,
-                            redirectUrl,
-                          );
-                        } else {
-                          Get.toNamed(
-                            '/webview',
-                            parameters: {
-                              'url': redirectUrl,
-                              'type': 'url',
-                              'pageTitle': title
-                            },
-                          );
-                        }
+                        // if (redirectUrl == matchStr) {
+                        //   Clipboard.setData(ClipboardData(text: matchStr));
+                        //   SmartDialog.showToast('地址可能有误');
+                        //   return;
+                        // }
+                        Uri uri = Uri.parse(redirectUrl);
+                        SchemeEntity scheme = SchemeEntity(
+                          scheme: uri.scheme,
+                          host: uri.host,
+                          port: uri.port,
+                          path: uri.path,
+                          query: uri.queryParameters,
+                          source: '',
+                          dataString: redirectUrl,
+                        );
+                        PiliSchame.routePush(scheme);
+                        // final String pathSegment = Uri.parse(redirectUrl).path;
+                        // final String lastPathSegment =
+                        //     pathSegment.split('/').last;
+                        // if (lastPathSegment.startsWith('BV')) {
+                        //   UrlUtils.matchUrlPush(
+                        //     lastPathSegment,
+                        //     title,
+                        //     redirectUrl,
+                        //   );
+                        // } else {
+                        //   Get.toNamed(
+                        //     '/webview',
+                        //     parameters: {
+                        //       'url': redirectUrl,
+                        //       'type': 'url',
+                        //       'pageTitle': title
+                        //     },
+                        //   );
+                        // }
                       }
                     } else {
                       if (appUrlSchema.startsWith('bilibili://search')) {

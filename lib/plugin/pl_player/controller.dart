@@ -235,6 +235,8 @@ class PlPlayerController {
 
   /// 弹幕权重
   ValueNotifier<int> danmakuWeight = ValueNotifier(0);
+  ValueNotifier<List<Map<String, dynamic>>> danmakuFilterRule =
+      ValueNotifier([]);
   // 关联弹幕控制器
   DanmakuController? danmakuController;
   // 弹幕相关配置
@@ -287,6 +289,10 @@ class PlPlayerController {
         setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: false);
     danmakuWeight.value =
         setting.get(SettingBoxKey.danmakuWeight, defaultValue: 0);
+    danmakuFilterRule.value = setting.get(SettingBoxKey.danmakuFilterRule,
+        defaultValue: []).map<Map<String, dynamic>>((e) {
+      return Map<String, dynamic>.from(e);
+    }).toList();
     blockTypes = setting.get(SettingBoxKey.danmakuBlockType, defaultValue: []);
     showArea = setting.get(SettingBoxKey.danmakuShowArea, defaultValue: 0.5);
     // 不透明度
@@ -312,8 +318,8 @@ class PlPlayerController {
     enableAutoLongPressSpeed = setting
         .get(SettingBoxKey.enableAutoLongPressSpeed, defaultValue: false);
     // 后台播放
-    _continuePlayInBackground.value =
-        setting.get(SettingBoxKey.continuePlayInBackground, defaultValue: false);
+    _continuePlayInBackground.value = setting
+        .get(SettingBoxKey.continuePlayInBackground, defaultValue: false);
     if (!enableAutoLongPressSpeed) {
       _longPressSpeed.value = videoStorage
           .get(VideoBoxKey.longPressSpeedDefault, defaultValue: 3.0);
@@ -515,7 +521,7 @@ class PlPlayerController {
           configuration: VideoControllerConfiguration(
             enableHardwareAcceleration: enableHA,
             androidAttachSurfaceAfterVideoParameters: false,
-            hwdec: enableHA ? hwdec: null,
+            hwdec: enableHA ? hwdec : null,
           ),
         );
 

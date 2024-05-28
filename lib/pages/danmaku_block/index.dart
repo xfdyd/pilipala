@@ -6,6 +6,7 @@ import 'package:PiliPalaX/utils/storage.dart';
 
 import '../../http/danmaku_block.dart';
 import '../../models/user/danmaku_block.dart';
+import '../../plugin/pl_player/controller.dart';
 
 class DanmakuBlockPage extends StatefulWidget {
   const DanmakuBlockPage({super.key});
@@ -19,71 +20,143 @@ class _DanmakuBlockPageState extends State<DanmakuBlockPage> {
       Get.put(DanmakuBlockController());
   final ScrollController scrollController = ScrollController();
   Box setting = GStrorage.setting;
+  late PlPlayerController plPlayerController;
+
+  static const Map<int, String> ruleLabels = {
+    0: '关键词',
+    1: '正则',
+    2: '用户',
+  };
 
   @override
   void initState() {
     super.initState();
-    _danmakuBlockController.queryDanmakuFilter();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _danmakuBlockController.queryDanmakuFilter();
+    });
+    plPlayerController = Get.arguments as PlPlayerController;
   }
 
   @override
   void dispose() {
-    List<Map<String, dynamic>> simpleRuleList =
-        _danmakuBlockController.danmakuRules.map<Map<String, dynamic>>((e) {
-      return SimpleRule(e.id!, e.type!, e.filter!).toMap();
+    List<Map<String, dynamic>> simpleRuleList = _danmakuBlockController
+        .ruleTypes.values
+        .expand((element) => element)
+        .map<Map<String, dynamic>>((e) {
+      //当正则表达式前后都有"/"时，去掉，避免RegExp解析错误
+      if (e.type == 1 && e.filter.startsWith('/') && e.filter.endsWith('/')) {
+        e.filter = e.filter.substring(1, e.filter.length - 1);
+      }
+      return e.toMap();
     }).toList();
+    print("simpleRuleList:$simpleRuleList");
     setting.put(SettingBoxKey.danmakuFilterRule, simpleRuleList);
+    plPlayerController.danmakuFilterRule.value = simpleRuleList;
     scrollController.removeListener(() {});
+    scrollController.dispose();
     super.dispose();
+  }
+
+  void _showAddDialog(int type) {
+    final TextEditingController textController = TextEditingController();
+    late String hintText;
+    switch (type) {
+      case 0:
+        hintText = '输入过滤的关键词，其它类别请切换标签页后添加';
+        break;
+      case 1:
+        hintText = '输入//之间的正则表达式，无需包含头尾的"/"';
+        break;
+      case 2:
+        hintText = '输入经CRC32B（即小写16进制的CRC32）哈希后的用户UID';
+        break;
+    }
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('添加新的${ruleLabels[type]}规则'),
+          content: Column(mainAxisSize: MainAxisSize.min, children: [
+            Text(hintText),
+            TextField(
+              controller: textController,
+              //decoration: InputDecoration(hintText: hintText),
+            )
+          ]),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('取消'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('添加'),
+              onPressed: () async {
+                String filter = textController.text;
+                if (filter.isNotEmpty) {
+                  await _danmakuBlockController.danmakuFilterAdd(
+                      filter: filter, type: type);
+                  if (!context.mounted) return;
+                  Navigator.of(context).pop();
+                } else {
+                  SmartDialog.showToast('输入内容不能为空');
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Obx(
-          () => TabBar(
+        title: TabBar(
             controller: _danmakuBlockController.tabController,
             dividerColor: Colors.transparent,
             tabs: [
-              Tab(text: '文本(${_danmakuBlockController.textRules.length})'),
-              Tab(text: '正则(${_danmakuBlockController.regexRules.length})'),
-              Tab(text: '用户(${_danmakuBlockController.userRules.length})'),
-            ],
-          ),
-        ),
+              for (var i = 0; i < ruleLabels.length; i++)
+                Obx(() => Tab(
+                    text:
+                        '${ruleLabels[i]}(${_danmakuBlockController.ruleTypes[i]!.length})')),
+            ]),
       ),
-      body: RefreshIndicator(
-        onRefresh: () async =>
-            await _danmakuBlockController.queryDanmakuFilter(),
-        child: TabBarView(
-          controller: _danmakuBlockController.tabController,
-          children: [
-            Obx(() => tabViewBuilder(0, _danmakuBlockController.textRules)),
-            Obx(() => tabViewBuilder(1, _danmakuBlockController.regexRules)),
-            Obx(() => tabViewBuilder(2, _danmakuBlockController.userRules)),
-          ],
-        ),
+      body: TabBarView(
+        controller: _danmakuBlockController.tabController,
+        children: [
+          for (var i = 0; i < ruleLabels.length; i++)
+            Obx(() => tabViewBuilder(i, _danmakuBlockController.ruleTypes[i]!)),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _showAddDialog(_danmakuBlockController.tabController.index);
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }
-  Widget tabViewBuilder(int index, List<SimpleRule> list) {
+
+  Widget tabViewBuilder(int tabIndex, List<SimpleRule> list) {
     return ListView.builder(
       controller: scrollController,
       itemCount: list.length,
-      itemBuilder: (BuildContext context, int index) {
+      padding: const EdgeInsets.only(bottom: 100),
+      itemBuilder: (BuildContext context, int listIndex) {
         return ListTile(
           title: Text(
-            list[index].filter,
+            list[listIndex].filter,
             style: Theme.of(context).textTheme.subtitle1,
           ),
           trailing: IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () async {
-              await _danmakuBlockController.danmakuFilterDel(
-                  1, list[index].id);
-            },
-          ),
+              icon: const Icon(Icons.delete),
+              onPressed: () async {
+                await _danmakuBlockController.danmakuFilterDel(
+                    tabIndex, list[listIndex].id);
+              }),
         );
       },
     );
@@ -93,9 +166,11 @@ class _DanmakuBlockPageState extends State<DanmakuBlockPage> {
 class DanmakuBlockController extends GetxController
     with GetTickerProviderStateMixin {
   RxList<Rule> danmakuRules = <Rule>[].obs;
-  RxList<SimpleRule> textRules = <SimpleRule>[].obs;
-  RxList<SimpleRule> regexRules = <SimpleRule>[].obs;
-  RxList<SimpleRule> userRules = <SimpleRule>[].obs;
+  RxMap<int, List<SimpleRule>> ruleTypes = {
+    0: <SimpleRule>[],
+    1: <SimpleRule>[],
+    2: <SimpleRule>[],
+  }.obs;
   late TabController tabController;
 
   @override
@@ -111,45 +186,31 @@ class DanmakuBlockController extends GetxController
   }
 
   Future queryDanmakuFilter() async {
+    SmartDialog.showLoading(msg: '正在同步弹幕屏蔽规则……');
     var result = await DanmakuFilterHttp.danmakuFilter();
+    SmartDialog.dismiss();
     if (result['status']) {
       danmakuRules.value = result['data'].rule;
       danmakuRules.map((e) {
         SimpleRule simpleRule = SimpleRule(e.id!, e.type!, e.filter!);
-        switch (e.type!) {
-          case 0:
-            textRules.add(simpleRule);
-            break;
-          case 1:
-            regexRules.add(simpleRule);
-            break;
-          case 2:
-            userRules.add(simpleRule);
-            break;
-          default:
-            SmartDialog.showToast('未知的规则类型：${e.type}，内容为：${e.filter}');
-        }
+        ruleTypes[e.type!]!.add(simpleRule);
       }).toList();
+      ruleTypes.refresh();
       SmartDialog.showToast(result['data'].toast);
+    } else {
+      SmartDialog.showToast(result['msg']);
     }
     return result;
   }
 
   Future danmakuFilterDel(int type, int id) async {
+    SmartDialog.showLoading(msg: '正在删除弹幕屏蔽规则……');
     var result = await DanmakuFilterHttp.danmakuFilterDel(ids: id);
+    SmartDialog.dismiss();
     if (result['status']) {
       danmakuRules.removeWhere((e) => e.id == id);
-      switch (type) {
-        case 0:
-          textRules.removeWhere((e) => e.id == id);
-          break;
-        case 1:
-          regexRules.removeWhere((e) => e.id == id);
-          break;
-        case 2:
-          userRules.removeWhere((e) => e.id == id);
-          break;
-      }
+      ruleTypes[type]!.removeWhere((e) => e.id == id);
+      ruleTypes.refresh();
       SmartDialog.showToast(result['msg']);
     } else {
       SmartDialog.showToast(result['msg']);
@@ -157,23 +218,16 @@ class DanmakuBlockController extends GetxController
   }
 
   Future danmakuFilterAdd({required String filter, required int type}) async {
+    SmartDialog.showLoading(msg: '正在添加弹幕屏蔽规则……');
     var result =
         await DanmakuFilterHttp.danmakuFilterAdd(filter: filter, type: type);
+    SmartDialog.dismiss();
     if (result['status']) {
       Rule data = result['data'];
       danmakuRules.add(data);
       SimpleRule simpleRule = SimpleRule(data.id!, data.type!, data.filter!);
-      switch (data.type!) {
-        case 0:
-          textRules.add(simpleRule);
-          break;
-        case 1:
-          regexRules.add(simpleRule);
-          break;
-        case 2:
-          userRules.add(simpleRule);
-          break;
-      }
+      ruleTypes[type]!.add(simpleRule);
+      ruleTypes.refresh();
       SmartDialog.showToast('添加成功');
     } else {
       SmartDialog.showToast(result['msg']);

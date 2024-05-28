@@ -184,10 +184,13 @@ class _BangumiPanelState extends State<BangumiPanel> {
                                 ),
                                 const SizedBox(width: 6)
                               ],
-                              Text(
-                                '第' +
-                                    (widget.pages[i].title ?? "${i + 1}") +
-                                    '话',
+                              Expanded(
+                                  child: Text(
+                                widget.pages[i].title ?? '第${i + 1}话',
+                                maxLines: (widget.pages[i].longTitle != null &&
+                                        widget.pages[i].longTitle != '')
+                                    ? 1
+                                    : 2,
                                 style: TextStyle(
                                     fontSize: 13,
                                     color: i == currentIndex
@@ -195,7 +198,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
                                         : Theme.of(context)
                                             .colorScheme
                                             .onSurface),
-                              ),
+                              )),
                               const SizedBox(width: 2),
                               if (widget.pages[i].badge != null) ...[
                                 const Spacer(),
@@ -219,17 +222,22 @@ class _BangumiPanelState extends State<BangumiPanel> {
                               ]
                             ],
                           ),
-                          const SizedBox(height: 3),
-                          Text(
-                            widget.pages[i].longTitle!,
-                            maxLines: 1,
-                            style: TextStyle(
-                                fontSize: 13,
-                                color: i == currentIndex
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context).colorScheme.onSurface),
-                            overflow: TextOverflow.ellipsis,
-                          )
+                          if (widget.pages[i].longTitle != null &&
+                              widget.pages[i].longTitle != '') ...[
+                            const SizedBox(height: 3),
+                            Text(
+                              widget.pages[i].longTitle!,
+                              maxLines: 1,
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: i == currentIndex
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .onSurface),
+                              overflow: TextOverflow.ellipsis,
+                            )
+                          ]
                         ],
                       ),
                     ),

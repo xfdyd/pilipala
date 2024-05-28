@@ -118,6 +118,7 @@ class _RankPageState extends State<RankPage>
         }),
         Expanded(
           child: TabBarView(
+            physics: const NeverScrollableScrollPhysics(),
             controller: _rankController.tabController,
             children: _rankController.tabsPageList,
           ),

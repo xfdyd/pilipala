@@ -74,7 +74,7 @@ class Rule {
 class SimpleRule {
   final int id;
   final int type;
-  final String filter;
+  String filter;
   SimpleRule(this.id, this.type, this.filter);
   Map<String, dynamic> toMap() {
     return {
