@@ -32,7 +32,19 @@ class _UpPanelState extends State<UpPanel> {
     super.initState();
     userInfo = userInfoCache.get('userInfoCache');
     dynamicsController = Get.find<DynamicsController>();
+
+    
+    // 默认执行的操作
+    _toggleShowLiveItems();
   }
+
+  
+  void _toggleShowLiveItems() {
+    setState(() {
+      _showLiveItems = !_showLiveItems;
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -69,11 +81,7 @@ class _UpPanelState extends State<UpPanel> {
                     const Spacer(),
                   ],
                 ),
-                onPressed: () {
-                  setState(() {
-                    _showLiveItems = !_showLiveItems;
-                  });
-                },
+                onPressed: _toggleShowLiveItems, // 保留点击事件处理
               ),
             ),
           ),
