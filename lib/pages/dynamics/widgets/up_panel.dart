@@ -24,7 +24,7 @@ class _UpPanelState extends State<UpPanel> {
   List<LiveUserItem> liveList = [];
   Box userInfoCache = GStrorage.userInfo;
   var userInfo;
-  bool _showLiveItems = false;
+  bool _showLiveItems = true;
   late DynamicsController dynamicsController;
 
   @override
