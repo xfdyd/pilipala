@@ -85,7 +85,7 @@ jobs:
         id: version
         run: |
           # 更新pubspec.yaml文件中的版本号
-          sed -i "s/version: .*/version: ${{ needs.update_version.outputs.new_version }}/g" pubspec.yaml
+          #sed -i "s/version: .*/version: ${{ needs.update_version.outputs.new_version }}/g" pubspec.yaml
 
       - name: flutter build apk
         run: flutter build apk --release --split-per-abi
@@ -139,7 +139,7 @@ jobs:
         id: version
         run: |
           # 更新pubspec.yaml文件中的版本号
-          sed -i "" "s/version: .*/version: ${{ needs.update_version.outputs.new_version }}/g" pubspec.yaml
+          #sed -i "" "s/version: .*/version: ${{ needs.update_version.outputs.new_version }}/g" pubspec.yaml
 
       - name: flutter build ipa
         run: |
