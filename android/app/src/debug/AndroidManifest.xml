@@ -1,7 +1,7 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.orz12.PiliPalaX">
+    package="com.orz12.PiliPalaX2">
     <!-- The INTERNET permission is required for development. Specifically,
          the Flutter tool needs it to communicate with the running application
          to allow setting breakpoints, to provide hot reload, etc.
@@ -14,7 +14,7 @@
         android:label="PiliPalaX Debug"
         tools:replace="android:label">
         <activity
-            android:name="com.orz12.PiliPalaX.MainActivity"
+            android:name="com.orz12.PiliPalaX2.MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/LaunchTheme"
