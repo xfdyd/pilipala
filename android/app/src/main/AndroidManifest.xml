@@ -45,7 +45,7 @@
         android:fullBackupContent="false"
         tools:replace="android:allowBackup">
         <activity
-            android:name="com.orz12.PiliPalaX.MainActivity"
+            android:name="com.orz12.PiliPalaX2.MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/LaunchTheme"
