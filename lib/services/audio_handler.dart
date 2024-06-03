@@ -12,7 +12,7 @@ Future<VideoPlayerServiceHandler> initAudioService() async {
   return await AudioService.init(
     builder: () => VideoPlayerServiceHandler(),
     config: const AudioServiceConfig(
-      androidNotificationChannelId: 'com.orz12.PiliPalaX.audio',
+      androidNotificationChannelId: 'com.orz12.PiliPalaX2.audio',
       androidNotificationChannelName: 'Audio Service PiliPalaX',
       androidNotificationOngoing: true,
       androidStopForegroundOnPause: true,
