@@ -1,10 +1,8 @@
-import 'package:PiliPalaX/models/danmaku/dm.pb.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
 import 'package:PiliPalaX/models/bangumi/info.dart';
 import 'package:PiliPalaX/models/video_detail_res.dart';
-import 'package:get/get.dart';
 import 'package:PiliPalaX/plugin/pl_player/index.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 
@@ -66,7 +64,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     // print(newMediaItem);
     // print(newMediaItem.title);
     // debugPrint(StackTrace.current.toString());
-    if(!mediaItem.isClosed) mediaItem.add(newMediaItem);
+    if (!mediaItem.isClosed) mediaItem.add(newMediaItem);
   }
 
   Future<void> setPlaybackState(PlayerStatus status, bool isBuffering) async {
@@ -150,6 +148,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (!PlPlayerController.instanceExists()) return;
     _item.add(mediaItem);
     setMediaItem(mediaItem);
+    setPlaybackState(PlPlayerController.getPlayerStatusIfExists()!, true);
   }
 
   onVideoDetailDispose() {
