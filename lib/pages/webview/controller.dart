@@ -1,25 +1,16 @@
 // ignore_for_file: avoid_print
 
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
 import 'package:PiliPalaX/http/init.dart';
-import 'package:PiliPalaX/http/user.dart';
-import 'package:PiliPalaX/pages/home/index.dart';
-import 'package:PiliPalaX/pages/media/index.dart';
-import 'package:PiliPalaX/utils/cookie.dart';
 import 'package:PiliPalaX/utils/event_bus.dart';
 import 'package:PiliPalaX/utils/id_utils.dart';
-import 'package:PiliPalaX/utils/login.dart';
-import 'package:PiliPalaX/utils/storage.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebviewController extends GetxController {
   String url = '';
   RxString type = ''.obs;
   String pageTitle = '';
+  String uaType = '';
   final WebViewController controller = WebViewController();
   RxInt loadProgress = 0.obs;
   RxBool loadShow = true.obs;
@@ -31,13 +22,9 @@ class WebviewController extends GetxController {
     url = Get.parameters['url']!;
     type.value = Get.parameters['type']!;
     pageTitle = Get.parameters['pageTitle']!;
+    uaType = Get.parameters['uaType'] ?? 'mob';
 
-    if (type.value == 'login') {
-      controller.clearCache();
-      controller.clearLocalStorage();
-      WebViewCookieManager().clearCookies();
-    }
-    webviewInit();
+    webviewInit(uaType: uaType);
   }
 
   webviewInit({String uaType = 'mob'}) {
@@ -85,13 +72,7 @@ class WebviewController extends GetxController {
           // 加载完成
           onUrlChange: (UrlChange urlChange) async {
             loadShow.value = false;
-            String url = urlChange.url ?? '';
-            if (type.value == 'login' &&
-                (url.startsWith(
-                        'https://passport.bilibili.com/web/sso/exchange_cookie') ||
-                    url.startsWith('https://m.bilibili.com/'))) {
-              confirmLogin(url);
-            }
+            // String url = urlChange.url ?? '';
           },
           onWebResourceError: (WebResourceError error) {},
           onNavigationRequest: (NavigationRequest request) {
@@ -112,52 +93,4 @@ class WebviewController extends GetxController {
       ..loadRequest(Uri.parse(url));
   }
 
-  confirmLogin(url) async {
-    var content = '';
-    if (url != null) {
-      content = '${content + url}; \n';
-    }
-    try {
-      await CookieTool.onSet();
-      final result = await UserHttp.userInfo();
-      if (result['status'] && result['data'].isLogin) {
-        SmartDialog.showToast('登录成功，当前采用「'
-            '${GStorage.setting.get(SettingBoxKey.defaultRcmdType, defaultValue: 'web')}'
-            '端」推荐');
-        try {
-          Box userInfoCache = GStorage.userInfo;
-          await userInfoCache.put('userInfoCache', result['data']);
-
-          final HomeController homeCtr = Get.find<HomeController>();
-          homeCtr.updateLoginStatus(true);
-          homeCtr.userFace.value = result['data'].face;
-          final MediaController mediaCtr = Get.find<MediaController>();
-          mediaCtr.mid = result['data'].mid;
-          await LoginUtils.refreshLoginStatus(true);
-        } catch (err) {
-          SmartDialog.show(builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('登录遇到问题'),
-              content: Text(err.toString()),
-              actions: [
-                TextButton(
-                  onPressed: () => controller.reload(),
-                  child: const Text('确认'),
-                )
-              ],
-            );
-          });
-        }
-        Get.back();
-      } else {
-        // 获取用户信息失败
-        SmartDialog.showToast(result['msg']);
-        Clipboard.setData(ClipboardData(text: result['msg']));
-      }
-    } catch (e) {
-      SmartDialog.showNotify(msg: e.toString(), notifyType: NotifyType.warning);
-      content = content + e.toString();
-      Clipboard.setData(ClipboardData(text: content));
-    }
-  }
 }

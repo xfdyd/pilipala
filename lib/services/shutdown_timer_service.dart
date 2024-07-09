@@ -7,7 +7,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 import '../plugin/pl_player/controller.dart';
 
-class ShutdownTimerService {
+class ShutdownTimerService with WidgetsBindingObserver {
   static final ShutdownTimerService _instance =
       ShutdownTimerService._internal();
   Timer? _shutdownTimer;
@@ -17,10 +17,24 @@ class ShutdownTimerService {
   bool exitApp = false;
   bool waitForPlayingCompleted = false;
   bool isWaiting = false;
-
+  bool isInBackground = false;
   factory ShutdownTimerService() => _instance;
 
-  ShutdownTimerService._internal();
+  ShutdownTimerService._internal() {
+    WidgetsBinding.instance.addObserver(this); // 添加观察者
+  }
+
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this); // 移除观察者
+    _shutdownTimer?.cancel();
+    _autoCloseDialogTimer?.cancel();
+    _instance.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    isInBackground = state == AppLifecycleState.paused;
+  }
 
   void startShutdownTimer() {
     cancelShutdownTimer(); // Cancel any previous timer
@@ -55,6 +69,11 @@ class ShutdownTimerService {
   }
 
   void _showShutdownDialog() {
+    if (isInBackground) {
+      print("app在后台运行，不弹窗");
+      _executeShutdown();
+      return;
+    }
     SmartDialog.show(
       builder: (BuildContext dialogContext) {
         // Start the 10-second timer to auto close the dialog
@@ -124,6 +143,7 @@ class ShutdownTimerService {
 
   void _executeShutdown() {
     if (exitApp) {
+      PlPlayerController.pauseIfExists();
       //退出app
       exit(0);
     } else {
@@ -136,14 +156,6 @@ class ShutdownTimerService {
       } else {
         SmartDialog.showToast("当前未播放");
       }
-      // PlPlayerController plPlayerController = PlPlayerController.getInstance();
-      // if (plPlayerController.playerStatus.playing) {
-      //   plPlayerController.pause();
-      //   waitForPlayingCompleted = true;
-      //   SmartDialog.showToast("已暂停播放");
-      // } else {
-      //   SmartDialog.showToast("当前未播放");
-      // }
     }
   }
 

@@ -111,7 +111,7 @@ jobs:
       
       - name: 修改pubspec.yaml
         run: |
-          sed -i "s/version: .*/version: ${{ steps.version.outputs.version }}/g" pubspec.yaml
+          sed -i "" "s/version: .*/version: ${{ steps.version.outputs.version }}/g" pubspec.yaml
 
       - name: flutter build ipa
         run: |

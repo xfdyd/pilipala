@@ -7,6 +7,7 @@ import 'package:PiliPalaX/models/common/theme_type.dart';
 import 'package:PiliPalaX/utils/feed_back.dart';
 import 'package:PiliPalaX/utils/login.dart';
 import 'package:PiliPalaX/utils/storage.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import '../../models/common/dynamic_badge_mode.dart';
 import '../../models/common/nav_bar_config.dart';
 import '../main/index.dart';
@@ -32,7 +33,8 @@ class SettingController extends GetxController {
     super.onInit();
     userInfo = userInfoCache.get('userInfoCache');
     userLogin.value = userInfo != null;
-    hiddenSettingUnlocked.value = setting.get(SettingBoxKey.hiddenSettingUnlocked, defaultValue: false);
+    hiddenSettingUnlocked.value =
+        setting.get(SettingBoxKey.hiddenSettingUnlocked, defaultValue: false);
     feedBackEnable.value =
         setting.get(SettingBoxKey.feedBackEnable, defaultValue: false);
     toastOpacity.value =
@@ -65,12 +67,23 @@ class SettingController extends GetxController {
                 // 清空cookie
                 await Request.cookieManager.cookieJar.deleteAll();
                 Request.dio.options.headers['cookie'] = '';
-
                 // 清空本地存储的用户标识
                 userInfoCache.put('userInfoCache', null);
-                localCache
-                    .put(LocalCacheKey.accessKey, {'mid': -1, 'value': ''});
-
+                localCache.put(LocalCacheKey.accessKey,
+                    {'mid': -1, 'value': '', 'refresh': ''});
+                try {
+                  final WebViewController controller = WebViewController();
+                  controller.clearCache();
+                  controller.clearLocalStorage();
+                  WebViewCookieManager().clearCookies();
+                } catch (e) {
+                  print(e);
+                }
+                userLogin.value = false;
+                if (Get.isRegistered<MainController>()) {
+                  MainController mainController = Get.find<MainController>();
+                  mainController.userLogin.value = false;
+                }
                 await LoginUtils.refreshLoginStatus(false);
                 Get.back();
               },
@@ -107,8 +120,7 @@ class SettingController extends GetxController {
       dynamicBadgeType.value = result;
       setting.put(SettingBoxKey.dynamicBadgeMode, result.code);
       MainController mainController = Get.put(MainController());
-      mainController.dynamicBadgeType =
-          DynamicBadgeMode.values[result.code];
+      mainController.dynamicBadgeType = DynamicBadgeMode.values[result.code];
       if (mainController.dynamicBadgeType != DynamicBadgeMode.hidden) {
         mainController.getUnreadDynamic();
       }

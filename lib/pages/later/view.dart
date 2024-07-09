@@ -92,7 +92,7 @@ class _LaterPageState extends State<LaterPage> {
                                         maxCrossAxisExtent:
                                             Grid.maxRowWidth * 2,
                                         childAspectRatio:
-                                            StyleString.aspectRatio * 2.3,
+                                            StyleString.aspectRatio * 2.4,
                                         mainAxisExtent: 0),
                                 delegate: SliverChildBuilderDelegate(
                                     (context, index) {
@@ -130,7 +130,7 @@ class _LaterPageState extends State<LaterPage> {
                           mainAxisSpacing: StyleString.safeSpace,
                           crossAxisSpacing: StyleString.safeSpace,
                           maxCrossAxisExtent: Grid.maxRowWidth * 2,
-                          childAspectRatio: StyleString.aspectRatio * 2.3,
+                          childAspectRatio: StyleString.aspectRatio * 2.4,
                           mainAxisExtent: 0),
                       delegate: SliverChildBuilderDelegate((context, index) {
                         return const VideoCardHSkeleton();

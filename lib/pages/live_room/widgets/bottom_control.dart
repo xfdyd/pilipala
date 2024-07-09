@@ -102,7 +102,9 @@ class _BottomControlState extends State<BottomControl> {
                     canUsePiP = false;
                   }
                   if (canUsePiP) {
-                    await widget.floating!.enable();
+                    await widget.floating!.enable(
+                      const EnableManual()
+                    );
                   } else {}
                 },
                 icon: const Icon(

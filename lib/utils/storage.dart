@@ -129,7 +129,6 @@ class SettingBoxKey {
       continuePlayInBackground = 'continuePlayInBackground',
 
       /// 隐私
-      blackMidsList = 'blackMidsList',
       anonymity = 'anonymity',
 
       /// 推荐
@@ -166,7 +165,6 @@ class SettingBoxKey {
       danmakuDuration = 'danmakuDuration',
       strokeWidth = 'strokeWidth',
       fontWeight = 'fontWeight',
-      danmakuFilterRule = 'danmakuFilterRule',
 
       // 代理host port
       systemProxyHost = 'systemProxyHost',
@@ -198,6 +196,11 @@ class SettingBoxKey {
 class LocalCacheKey {
   // 历史记录暂停状态 默认false 记录
   static const String historyPause = 'historyPause',
+
+      // 隐私设置-黑名单管理
+      blackMidsList = 'blackMidsList',
+      // 弹幕屏蔽规则
+      danmakuFilterRule = 'danmakuFilterRule',
       // access_key
       accessKey = 'accessKey',
 

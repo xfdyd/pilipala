@@ -501,10 +501,10 @@ packages:
     dependency: "direct main"
     description:
       name: floating
-      sha256: "04c3c96909b94dd6d2d121c69707739825e1f3dceca5ae451a9b8c0e652d246b"
+      sha256: ddcd7f28247746dbb62997c48c89d1824118676796df47fdc6f864f8d02849bc
       url: "https://mirrors.tuna.tsinghua.edu.cn/dart-pub/"
     source: hosted
-    version: "2.0.2"
+    version: "3.0.0"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -657,10 +657,10 @@ packages:
     dependency: "direct main"
     description:
       name: gt3_flutter_plugin
-      sha256: "786b3b53e117678845488f8212d1b959cb969a94e7f5e68d7698d98cf6929eef"
+      sha256: "08f35692e937770ad6b3e2017eb8ef81839a82b8a63f5acf3abab14b688fc36c"
       url: "https://mirrors.tuna.tsinghua.edu.cn/dart-pub/"
     source: hosted
-    version: "0.0.9"
+    version: "0.1.0"
   hive:
     dependency: "direct main"
     description:
@@ -1183,6 +1183,22 @@ packages:
       url: "https://mirrors.tuna.tsinghua.edu.cn/dart-pub/"
     source: hosted
     version: "3.1.0"
+  qr:
+    dependency: transitive
+    description:
+      name: qr
+      sha256: "64957a3930367bf97cc211a5af99551d630f2f4625e38af10edd6b19131b64b3"
+      url: "https://mirrors.tuna.tsinghua.edu.cn/dart-pub/"
+    source: hosted
+    version: "3.0.1"
+  qr_flutter:
+    dependency: "direct main"
+    description:
+      name: qr_flutter
+      sha256: "5095f0fc6e3f71d08adef8feccc8cea4f12eec18a2e31c2e8d82cb6019f4b097"
+      url: "https://mirrors.tuna.tsinghua.edu.cn/dart-pub/"
+    source: hosted
+    version: "4.1.0"
   rxdart:
     dependency: transitive
     description:

@@ -9,7 +9,7 @@ import '../utils/storage.dart';
 import 'index.dart';
 
 class SearchHttp {
-  static Box setting = GStorage.setting;
+  static Box localCache = GStorage.localCache;
   static Future hotSearchList() async {
     var res = await Request().get(Api.hotSearchList);
     if (res.data is String) {
@@ -89,8 +89,8 @@ class SearchHttp {
       try {
         switch (searchType) {
           case SearchType.video:
-            List<int> blackMidsList = setting
-                .get(SettingBoxKey.blackMidsList, defaultValue: [-1])
+            List<int> blackMidsList = localCache
+                .get(LocalCacheKey.blackMidsList, defaultValue: [-1])
                 .map<int>((i) => i as int)
                 .toList();
             for (var i in res.data['data']['result']) {

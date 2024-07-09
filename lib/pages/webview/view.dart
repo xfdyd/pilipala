@@ -36,25 +36,14 @@ class _WebviewPageState extends State<WebviewPage> {
               icon: Icon(Icons.refresh_outlined,
                   color: Theme.of(context).colorScheme.primary),
             ),
-            if (_webviewController.type.value != 'login')
-              IconButton(
-                tooltip: '用外部浏览器打开',
-                onPressed: () {
-                  launchUrl(Uri.parse(_webviewController.url));
-                },
-                icon: Icon(Icons.open_in_browser_outlined,
-                    color: Theme.of(context).colorScheme.primary),
-              ),
-            if (_webviewController.type.value == 'login') ...<Widget>[
-              TextButton(
-                onPressed: () => _webviewController.confirmLogin(null),
-                child: const Text('刷新登录态'),
-              ),
-              TextButton(
-                child: const Text('电脑版'),
-                onPressed: () => _webviewController.webviewInit(uaType: 'pc'),
-              )
-            ],
+            IconButton(
+              tooltip: '用外部浏览器打开',
+              onPressed: () {
+                launchUrl(Uri.parse(_webviewController.url));
+              },
+              icon: Icon(Icons.open_in_browser_outlined,
+                  color: Theme.of(context).colorScheme.primary),
+            ),
             const SizedBox(width: 12)
           ],
         ),

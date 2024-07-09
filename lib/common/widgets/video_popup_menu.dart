@@ -77,7 +77,7 @@ class VideoPopupMenu extends StatelessWidget {
               String? accessKey = GStorage.localCache
                   .get(LocalCacheKey.accessKey, defaultValue: {})['value'];
               if (accessKey == null || accessKey == "") {
-                SmartDialog.showToast("本操作使用app端接口，请前往【隐私设置】刷新access_key");
+                SmartDialog.showToast("请退出账号后重新登录");
                 return;
               }
               if (videoItem is RecVideoItemAppModel) {
@@ -262,14 +262,14 @@ class VideoPopupMenu extends StatelessWidget {
                             act: 5,
                             reSrc: 11,
                           );
-                          List<int> blackMidsList = GStorage.setting
-                              .get(SettingBoxKey.blackMidsList,
+                          List<int> blackMidsList = GStorage.localCache
+                              .get(LocalCacheKey.blackMidsList,
                                   defaultValue: [-1])
                               .map<int>((i) => i as int)
                               .toList();
                           blackMidsList.insert(0, videoItem.owner.mid);
-                          GStorage.setting
-                              .put(SettingBoxKey.blackMidsList, blackMidsList);
+                          GStorage.localCache
+                              .put(LocalCacheKey.blackMidsList, blackMidsList);
                           Get.back();
                           SmartDialog.showToast(res['msg'] ?? '成功');
                         },

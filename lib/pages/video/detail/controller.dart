@@ -206,7 +206,9 @@ class VideoDetailController extends GetxController
       }
       if (flag == 1) {
         //currentDecodeFormats
-        firstVideo = videoList.first;
+        firstVideo = videoList.firstWhere(
+            (i) => i.codecs!.startsWith(currentDecodeFormats.code),
+            orElse: () => videoList.first);
       } else {
         if (currentVideoQa == VideoQuality.dolbyVision) {
           currentDecodeFormats =
@@ -217,12 +219,14 @@ class VideoDetailController extends GetxController
           currentDecodeFormats = defaultDecodeFormats;
           firstVideo = videoList.firstWhere(
             (i) => i.codecs!.startsWith(defaultDecodeFormats.code),
+            orElse: () => videoList.first,
           );
         } else if (flag == 4) {
           //secondDecodeFormats
           currentDecodeFormats = secondDecodeFormats;
           firstVideo = videoList.firstWhere(
             (i) => i.codecs!.startsWith(secondDecodeFormats.code),
+            orElse: () => videoList.first,
           );
         } else if (flag == 0) {
           currentDecodeFormats =
@@ -312,11 +316,10 @@ class VideoDetailController extends GetxController
         defaultST = Duration.zero;
         // 实际为FLV/MP4格式，但已被淘汰，这里仅做兜底处理
         firstVideo = VideoItem(
-          id: data.quality!,
-          baseUrl: videoUrl,
-          codecs: 'avc1',
-          quality: VideoQualityCode.fromCode(data.quality!)!
-        );
+            id: data.quality!,
+            baseUrl: videoUrl,
+            codecs: 'avc1',
+            quality: VideoQualityCode.fromCode(data.quality!)!);
         currentDecodeFormats = VideoDecodeFormatsCode.fromString('avc1')!;
         currentVideoQa = VideoQualityCode.fromCode(data.quality!)!;
         if (autoPlay.value) {
@@ -390,7 +393,8 @@ class VideoDetailController extends GetxController
       late AudioItem? firstAudio;
       final List<AudioItem> audiosList = data.dash!.audio!;
 
-      if (data.dash!.dolby?.audio != null && data.dash!.dolby!.audio!.isNotEmpty) {
+      if (data.dash!.dolby?.audio != null &&
+          data.dash!.dolby!.audio!.isNotEmpty) {
         // 杜比
         audiosList.insert(0, data.dash!.dolby!.audio!.first);
       }

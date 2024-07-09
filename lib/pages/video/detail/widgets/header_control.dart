@@ -319,6 +319,7 @@ class _HeaderControlState extends State<HeaderControl> {
       -1,
       15,
       30,
+      45,
       60,
     ];
     showModalBottomSheet(
@@ -1206,7 +1207,7 @@ class _HeaderControlState extends State<HeaderControl> {
                   },
                 )),
             if (!isFullScreen ||
-                    MediaQuery.of(context).orientation != Orientation.portrait)
+                MediaQuery.of(context).orientation != Orientation.portrait)
               SizedBox(
                   width: 42,
                   height: 34,
@@ -1420,7 +1421,16 @@ class _HeaderControlState extends State<HeaderControl> {
                         widget.videoDetailCtr!.data.dash!.video!.first.width!,
                         widget.videoDetailCtr!.data.dash!.video!.first.height!,
                       );
-                      await widget.floating!.enable(aspectRatio: aspectRatio);
+                      if (!context.mounted) return;
+                      await widget.floating!.enable(EnableManual(
+                        aspectRatio: aspectRatio,
+                        sourceRectHint: Rectangle<int>(
+                          0,
+                          0,
+                          context.width.toInt(),
+                          context.height.toInt(),
+                        ),
+                      ));
                     } else {}
                   },
                   icon: const Icon(

@@ -178,6 +178,25 @@ class VideoItem {
     codecid = json['codecid'];
     quality = VideoQuality.values.firstWhere((i) => i.code == json['id']);
   }
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['baseUrl'] = baseUrl;
+    data['backupUrl'] = backupUrl;
+    data['bandWidth'] = bandWidth;
+    data['mime_type'] = mimeType;
+    data['codecs'] = codecs;
+    data['width'] = width;
+    data['height'] = height;
+    data['frameRate'] = frameRate;
+    data['sar'] = sar;
+    data['startWithSap'] = startWithSap;
+    data['segmentBase'] = segmentBase;
+    data['codecid'] = codecid;
+    data['quality'] = quality;
+    return data;
+  }
 }
 
 class AudioItem {

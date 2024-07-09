@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:PiliPalaX/pages/video/detail/introduction/controller.dart';
 import 'package:PiliPalaX/utils/id_utils.dart';
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -91,8 +92,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   // 用于记录上一次全屏切换手势触发时间，避免误触
   DateTime? lastFullScreenToggleTime;
-  // 记录上一次音量调整值作平均，避免音量调整抖动
-  double lastVolume = -1.0;
   // 是否在调整固定进度条
   RxBool draggingFixedProgressBar = false.obs;
   // 阅读器限制
@@ -839,14 +838,12 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 } else {
                   // 右边区域 👈
                   final double level = renderBox.size.height * 0.5;
-                  if (lastVolume < 0) {
-                    lastVolume = _volumeValue.value;
-                  }
-                  final double volume =
-                      (lastVolume + _volumeValue.value - delta / level) / 2;
-                  final double result = volume.clamp(0.0, 1.0);
-                  lastVolume = result;
-                  setVolume(result);
+                  EasyThrottle.throttle(
+                      'setVolume', const Duration(milliseconds: 20), () {
+                    final double volume = _volumeValue.value - delta / level;
+                    final double result = volume.clamp(0.0, 1.0);
+                    setVolume(result);
+                  });
                 }
               },
               onVerticalDragEnd: (DragEndDetails details) {},
@@ -986,7 +983,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               child: FractionalTranslation(
                 translation: const Offset(1, -0.4),
                 child: Visibility(
-                  visible: _.showControls.value,
+                  visible: _.showControls.value && _.isFullScreen.value,
                   child: ComBtn(
                     tooltip: _.controlsLock.value ? '解锁' : '锁定',
                     icon: Icon(
@@ -1019,20 +1016,58 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     size: 20,
                     color: Colors.white,
                   ),
-                  fuc: () => {
+                  fuc: () {
+                    SmartDialog.showToast('截图中');
                     _.videoPlayerController
                         ?.screenshot(format: 'image/png')
                         .then((value) {
                       if (value != null) {
-                        SmartDialog.showToast('截图成功');
-                        String _name = DateTime.now().toString();
-                        SaverGallery.saveImage(value,
-                            name: _name,
-                            androidRelativePath: "Pictures/Screenshots",
-                            androidExistNotSave: false);
-                        SmartDialog.showToast('$_name.png已保存到相册/截图');
+                        SmartDialog.showToast('点击弹窗保存截图');
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              // title: const Text('点击保存'),
+                              titlePadding: EdgeInsets.zero,
+                              contentPadding: const EdgeInsets.all(8),
+                              insetPadding:
+                                  EdgeInsets.only(left: context.width / 2),
+                              //移除圆角
+                              shape: const RoundedRectangleBorder(),
+                              content: GestureDetector(
+                                onTap: () async {
+                                  String name = DateTime.now().toString();
+                                  final SaveResult result =
+                                      await SaverGallery.saveImage(
+                                    value,
+                                    name: name,
+                                    androidRelativePath: "Pictures/Screenshots",
+                                    androidExistNotSave: false,
+                                  );
+
+                                  if (result.isSuccess) {
+                                    Get.back();
+                                    SmartDialog.showToast('$name.png已保存到相册/截图');
+                                  } else {
+                                    await SmartDialog.showToast(
+                                        '保存失败，${result.errorMessage}');
+                                  }
+                                },
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: context.width / 3,
+                                    maxHeight: context.height / 3,
+                                  ),
+                                  child: Image.memory(value),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      } else {
+                        SmartDialog.showToast('截图失败');
                       }
-                    })
+                    });
                   },
                 ),
               ),
@@ -1043,12 +1078,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         Obx(() {
           if (_.dataStatus.loading || _.isBuffering.value) {
             return Center(
-              child: GestureDetector(
-                onTap: () {
-                  _.refreshPlayer();
-                },
-                child:
-              Container(
+                child: GestureDetector(
+              onTap: () {
+                _.refreshPlayer();
+              },
+              child: Container(
                 padding: const EdgeInsets.all(30),
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,

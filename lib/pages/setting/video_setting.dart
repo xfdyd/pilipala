@@ -207,7 +207,7 @@ class _VideoSettingState extends State<VideoSetting> {
           const SetSwitchItem(
             title: '扩大缓冲区',
             leading: Icon(Icons.storage_outlined),
-            subTitle: '默认缓冲区为视频5MB/直播32MB，开启后为32MB/64MB，加载时间变长',
+            subTitle: '默认缓冲区为视频3MB/直播16MB，开启后为32MB/64MB，加载时间变长',
             setKey: SettingBoxKey.expandBuffer,
             defaultVal: false,
           ),

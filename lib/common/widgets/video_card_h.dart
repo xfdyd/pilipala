@@ -178,43 +178,49 @@ class VideoContent extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (videoItem.title is String) ...[
-              Text(
-                videoItem.title as String,
-                textAlign: TextAlign.start,
-                style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize,
-                  height: 1.4,
-                  letterSpacing: 0.3,
+              Expanded(
+                child: Text(
+                  videoItem.title as String,
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize,
+                    height: 1.36,
+                    letterSpacing: 0.3,
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
             ] else ...[
-              RichText(
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-                text: TextSpan(
-                  children: [
-                    for (final i in videoItem.title) ...[
-                      TextSpan(
-                        text: i['text'] as String,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize:
-                              Theme.of(context).textTheme.bodyMedium!.fontSize,
-                          letterSpacing: 0.3,
-                          color: i['type'] == 'em'
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.onSurface,
+              Expanded(
+                child: RichText(
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 3,
+                  text: TextSpan(
+                    children: [
+                      for (final i in videoItem.title) ...[
+                        TextSpan(
+                          text: i['text'] as String,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .fontSize,
+                            letterSpacing: 0.3,
+                            color: i['type'] == 'em'
+                                ? Theme.of(context).colorScheme.primary
+                                : Theme.of(context).colorScheme.onSurface,
+                          ),
                         ),
-                      ),
-                    ]
-                  ],
+                      ]
+                    ],
+                  ),
                 ),
               ),
             ],
-            const Spacer(),
+            // const Spacer(),
             // if (videoItem.rcmdReason != null &&
             //     videoItem.rcmdReason.content != '')
             //   Container(
@@ -239,14 +245,14 @@ class VideoContent extends StatelessWidget {
                   "${pubdate}${showOwner ? videoItem.owner.name : ''}",
                   maxLines: 1,
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
                     height: 1,
                     color: Theme.of(context).colorScheme.outline,
                     overflow: TextOverflow.clip,
                   ),
                 ),
               ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 3),
             Row(
               children: [
                 if (showView) ...[
@@ -265,7 +271,6 @@ class VideoContent extends StatelessWidget {
                 if (source == 'normal') const SizedBox(width: 24),
               ],
             ),
-            const SizedBox(height: 5),
           ],
         ),
       ),

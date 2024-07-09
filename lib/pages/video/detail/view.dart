@@ -117,7 +117,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     onUserLeaveHintListener = const MethodChannel("onUserLeaveHint");
     onUserLeaveHintListener.setMethodCallHandler((call) async {
       if (call.method == 'onUserLeaveHint') {
-        if (autoPiP) {
+        if (autoPiP &&
+            plPlayerController != null &&
+            playerStatus == PlayerStatus.playing) {
           autoEnterPip();
         }
       }
@@ -269,6 +271,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       plPlayerController!.dispose();
     }
     videoPlayerServiceHandler.onVideoDetailDispose();
+    VideoDetailPage.routeObserver.unsubscribe(this);
     // _lifecycleListener.dispose();
     showStatusBar();
     // _animationController.dispose();
@@ -364,10 +367,17 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     final String routePath = Get.currentRoute;
 
     if (autoPiP && routePath.startsWith('/video')) {
-      floating.enable(
-          aspectRatio: Rational(
-        videoDetailController.data.dash!.video!.first.width!,
-        videoDetailController.data.dash!.video!.first.height!,
+      floating.enable(EnableManual(
+        aspectRatio: Rational(
+          videoDetailController.data.dash!.video!.first.width!,
+          videoDetailController.data.dash!.video!.first.height!,
+        ),
+        sourceRectHint: Rectangle<int>(
+          0,
+          0,
+          context.width.toInt(),
+          context.height.toInt(),
+        ),
       ));
     }
   }

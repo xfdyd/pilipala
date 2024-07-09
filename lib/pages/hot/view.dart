@@ -96,7 +96,7 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
                             mainAxisSpacing: StyleString.safeSpace,
                             crossAxisSpacing: StyleString.safeSpace,
                             maxCrossAxisExtent: Grid.maxRowWidth * 2,
-                            childAspectRatio: StyleString.aspectRatio * 2.3,
+                            childAspectRatio: StyleString.aspectRatio * 2.4,
                             mainAxisExtent: 0),
                         delegate: SliverChildBuilderDelegate((context, index) {
                           return VideoCardH(
@@ -133,7 +133,7 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
                         mainAxisSpacing: StyleString.cardSpace,
                         crossAxisSpacing: StyleString.cardSpace,
                         maxCrossAxisExtent: Grid.maxRowWidth * 2,
-                        childAspectRatio: StyleString.aspectRatio * 2.3),
+                        childAspectRatio: StyleString.aspectRatio * 2.4),
                     delegate: SliverChildBuilderDelegate((context, index) {
                       return const VideoCardHSkeleton();
                     }, childCount: 10),

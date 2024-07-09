@@ -87,45 +87,8 @@ class _RecommendSettingState extends State<RecommendSetting> {
               );
               if (result != null) {
                 if (result == 'app') {
-                  // app端推荐需要access_key
                   if (accessKeyInfo == null) {
-                    if (!userLogin) {
-                      SmartDialog.showToast('请先登录');
-                      return;
-                    }
-                    // 显示一个确认框，告知用户可能会导致账号被风控
-                    if (!context.mounted) return;
-                    await showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text('提示'),
-                            content: const Text(
-                                '使用app端推荐需获取access_key，有小概率触发风控导致账号退出（在官方版本app重新登录即可解除），是否继续？'),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  result = null;
-                                  Get.back();
-                                },
-                                child: const Text('取消'),
-                              ),
-                              TextButton(
-                                onPressed: () async {
-                                  Get.back();
-                                  var res = await MemberHttp.cookieToKey();
-                                  if (res['status']) {
-                                    SmartDialog.showToast(res['msg']);
-                                  } else {
-                                    SmartDialog.showToast(
-                                        '获取access_key失败：${res['msg']}');
-                                  }
-                                },
-                                child: const Text('确定'),
-                              ),
-                            ],
-                          );
-                        });
+                    SmartDialog.showToast('尚未登录，无法收到个性化推荐');
                   }
                 }
                 if (result != null) {

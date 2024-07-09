@@ -18,7 +18,6 @@ import 'package:PiliPalaX/utils/feed_back.dart';
 import 'package:PiliPalaX/utils/id_utils.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:PiliPalaX/utils/utils.dart';
 import 'package:PiliPalaX/pages/member/controller.dart';
 
 import '../related/index.dart';

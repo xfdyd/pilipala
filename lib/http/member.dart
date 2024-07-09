@@ -1,6 +1,3 @@
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:hive/hive.dart';
-import '../common/constants.dart';
 import '../models/dynamics/result.dart';
 import '../models/follow/result.dart';
 import '../models/member/archive.dart';
@@ -8,7 +5,6 @@ import '../models/member/coin.dart';
 import '../models/member/info.dart';
 import '../models/member/seasons.dart';
 import '../models/member/tags.dart';
-import '../utils/storage.dart';
 import '../utils/utils.dart';
 import '../utils/wbi_sign.dart';
 import 'index.dart';
@@ -72,7 +68,7 @@ class MemberHttp {
 
   static Future memberArchive({
     int? mid,
-    int ps = 30,
+    int ps = 40,
     int tid = 0,
     int? pn,
     String? keyword,
@@ -366,125 +362,6 @@ class MemberHttp {
       } catch (err) {
         print(err);
       }
-    } else {
-      return {
-        'status': false,
-        'data': [],
-        'msg': res.data['message'],
-      };
-    }
-  }
-
-  // 获取TV authCode
-  static Future getTVCode() async {
-    SmartDialog.showLoading(msg: "正在申请HD版二维码...");
-    var params = {
-      'appkey': Constants.appKey,
-      // 'local_id': 'Y952A395BB157D305D8A8340FC2AAECECE17',
-      'local_id': '0',
-      'ts': DateTime.now().millisecondsSinceEpoch.toString(),
-      'platform': 'android',
-      'mobi_app': 'android_hd',
-    };
-    String sign = Utils.appSign(
-      params,
-      Constants.appKey,
-      Constants.appSec,
-    );
-    var res = await Request()
-        .post(Api.getTVCode, queryParameters: {...params, 'sign': sign});
-    SmartDialog.dismiss();
-    print(res.data);
-    if (res.data['code'] == 0) {
-      print("getTVCode");
-      return {
-        'status': true,
-        'data': res.data['data']['auth_code'],
-        'msg': '操作成功'
-      };
-    } else {
-      return {
-        'status': false,
-        'data': [],
-        'msg': res.data,
-      };
-    }
-  }
-
-  // 获取access_key
-  static Future cookieToKey() async {
-    var authCodeRes = await getTVCode();
-    if (authCodeRes['status']) {
-      SmartDialog.showLoading(msg: "正在确认登录...");
-      var confirmRes =
-          await Request().post(Api.qrcodeConfirm, queryParameters: {
-        'auth_code': authCodeRes['data'],
-        'local_id': '0',
-        'build': 1442100,
-        'scanning_type': 1,
-        'csrf': await Request.getCsrf(),
-      });
-      print("confirmRes");
-      print(confirmRes);
-      SmartDialog.dismiss();
-      if (confirmRes.data['code'] != 0) {
-        return {
-          'status': false,
-          'data': [],
-          'msg':
-              "确认登录失败：${confirmRes.data['message']}\n\n请在设置中退出账号，重启app，重新登录再试",
-        };
-      }
-      SmartDialog.showLoading(msg: "等待500毫秒...");
-      await Future.delayed(const Duration(milliseconds: 500));
-      SmartDialog.dismiss();
-      SmartDialog.showLoading(msg: "正在获取登录结果（含access_key）...");
-      var res = await qrcodePoll(authCodeRes['data']);
-      SmartDialog.dismiss();
-      if (res['status']) {
-        return {'status': true, 'data': [], 'msg': res['msg']};
-      } else {
-        return {
-          'status': false,
-          'data': [],
-          'msg': "登录结果获取失败：${res.data['msg']}",
-        };
-      }
-    } else {
-      return {
-        'status': false,
-        'data': [],
-        'msg': "TV版二维码申请失败：${authCodeRes['msg']}",
-      };
-    }
-  }
-
-  static Future qrcodePoll(authCode) async {
-    var params = {
-      'appkey': Constants.appKey,
-      'auth_code': authCode.toString(),
-      'local_id': '0',
-      'ts': (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString(),
-    };
-    String sign = Utils.appSign(
-      params,
-      Constants.appKey,
-      Constants.appSec,
-    );
-    var res = await Request()
-        .post(Api.qrcodePoll, queryParameters: {...params, 'sign': sign});
-    if (res.data['code'] == 0) {
-      String accessKey = res.data['data']['access_token'];
-      Box localCache = GStorage.localCache;
-      Box userInfoCache = GStorage.userInfo;
-      var userInfo = userInfoCache.get('userInfoCache');
-      localCache.put(
-          LocalCacheKey.accessKey, {'mid': userInfo.mid, 'value': accessKey});
-      return {
-        'status': true,
-        'data': [],
-        'msg': '操作成功，当前获取的access_key为：$accessKey'
-      };
     } else {
       return {
         'status': false,

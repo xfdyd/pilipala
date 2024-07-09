@@ -90,7 +90,7 @@ class _HistorySearchPageState extends State<HistorySearchPage> {
                           mainAxisSpacing: StyleString.cardSpace,
                           crossAxisSpacing: StyleString.safeSpace,
                           maxCrossAxisExtent: Grid.maxRowWidth * 2,
-                          childAspectRatio: StyleString.aspectRatio * 2.3,
+                          childAspectRatio: StyleString.aspectRatio * 2.4,
                           mainAxisExtent: 0),
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {

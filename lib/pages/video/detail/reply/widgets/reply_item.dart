@@ -575,7 +575,7 @@ InlineSpan buildContent(
     return e.replaceAllMapped(
         RegExp(r'[?+*]'), (match) => '\\${match.group(0)}');
   }).toList();
-
+  specialTokens.sort((a, b) => b.length.compareTo(a.length));
   String patternStr = specialTokens.map(RegExp.escape).join('|');
   if (patternStr.isNotEmpty) {
     patternStr += "|";
@@ -703,6 +703,13 @@ InlineSpan buildContent(
                           title,
                           '',
                         );
+                      } else if (RegExp(r'^[Cc][Vv][0-9]+$').hasMatch(matchStr)) {
+                        Get.toNamed('/htmlRender', parameters: {
+                          'url': 'https://www.bilibili.com/read/$matchStr',
+                          'title': title,
+                          'id': matchStr.substring(2),
+                          'dynamicType': 'read'
+                        });
                       } else {
                         final String redirectUrl =
                             await UrlUtils.parseRedirectUrl(matchStr);

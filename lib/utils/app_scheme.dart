@@ -258,8 +258,8 @@ class PiliScheme {
         case 'read':
           print('专栏');
           late String id;
-          if (query != null && query!['id'] != null) {
-            id = 'cv${matchNum(query!['id']!).first}';
+          if (query != null && query['id'] != null) {
+            id = 'cv${matchNum(query['id']!).first}';
           } else {
             id = 'cv${matchNum(path).first}';
           }

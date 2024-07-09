@@ -9,6 +9,60 @@ import 'package:PiliPalaX/models/common/theme_type.dart';
 import 'package:PiliPalaX/models/user/info.dart';
 import 'controller.dart';
 
+class LeftClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    Path path = Path();
+    path.moveTo(0, 0);
+    path.lineTo(0, size.height);
+    path.lineTo(size.width / 2 - 2, size.height);
+    path.lineTo(size.width / 2 - 2, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) {
+    return false;
+  }
+}
+
+class RightClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    Path path = Path();
+    path.moveTo(size.width, size.height);
+    path.lineTo(size.width / 2 + 2, size.height);
+    path.lineTo(size.width / 2 + 2, 0);
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) {
+    return false;
+  }
+}
+
+class VerticalLinePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.black.withOpacity(0.75)
+      ..strokeWidth = 1.2;
+
+    canvas.drawLine(
+      Offset(size.width / 2, size.height-2),
+      Offset(size.width / 2, 3),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
 class MinePage extends StatefulWidget {
   const MinePage({super.key});
 
@@ -74,18 +128,46 @@ class _MinePageState extends State<MinePage> {
             ),
           ),
           IconButton(
+            //system -> dark -> light -> system
             tooltip:
-                '切换至${mineController.themeType.value == ThemeType.dark ? '浅色' : '深色'}主题',
+                '切换至${mineController.themeType.value == ThemeType.system ? '深色' : (mineController.themeType.value == ThemeType.dark ? '浅色' : '跟随系统')}主题',
             onPressed: () {
               mineController.onChangeTheme();
               setState(() {});
             },
-            icon: Icon(
-              mineController.themeType.value == ThemeType.dark
-                  ? CupertinoIcons.moon
-                  : CupertinoIcons.sun_min,
-              size: 22,
-            ),
+            icon: mineController.themeType.value == ThemeType.system
+                ? SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        ClipPath(
+                          clipper: LeftClipper(),
+                          child: const Icon(
+                            CupertinoIcons.moon,
+                            size: 22,
+                          ),
+                        ),
+                        ClipPath(
+                          clipper: RightClipper(),
+                          child: const Icon(
+                            CupertinoIcons.sun_max,
+                            size: 22,
+                          ),
+                        ),
+                        CustomPaint(
+                          size: const Size(22, 22),
+                          painter: VerticalLinePainter(),
+                        ),
+                      ],
+                    ))
+                : Icon(
+                    mineController.themeType.value == ThemeType.dark
+                        ? CupertinoIcons.moon
+                        : CupertinoIcons.sun_max,
+                    size: 22,
+                  ),
           ),
           IconButton(
             tooltip: '设置',

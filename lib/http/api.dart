@@ -462,12 +462,19 @@ class Api {
   // web端验证码登录
 
   // web端密码登录
+  static const String logInByWebPwd =
+      '${HttpString.passBaseUrl}/x/passport-login/web/login';
+
+  // 获取guestID
+  // static const String getGuestId = '/x/passport-user/guest/reg';
 
   // app端短信验证码
   static const String appSmsCode =
       '${HttpString.passBaseUrl}/x/passport-login/sms/send';
 
   // app端验证码登录
+  static const String logInByAppSms =
+      '${HttpString.passBaseUrl}/x/passport-login/login/sms';
 
   // 获取短信验证码
   // static const String appSafeSmsCode =
@@ -477,8 +484,8 @@ class Api {
   /// username
   /// password
   /// key
-  /// rhash
-  static const String loginInByPwdApi =
+  /// salt
+  static const String loginByPwdApi =
       '${HttpString.passBaseUrl}/x/passport-login/oauth2/login';
 
   /// 密码加密密钥

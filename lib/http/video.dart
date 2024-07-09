@@ -46,8 +46,8 @@ class VideoHttp {
       );
       if (res.data['code'] == 0) {
         List<RecVideoItemModel> list = [];
-        List<int> blackMidsList = setting
-            .get(SettingBoxKey.blackMidsList, defaultValue: [-1])
+        List<int> blackMidsList = localCache
+            .get(LocalCacheKey.blackMidsList, defaultValue: [-1])
             .map<int>((e) => e as int)
             .toList();
         for (var i in res.data['data']['item']) {
@@ -94,8 +94,8 @@ class VideoHttp {
       );
       if (res.data['code'] == 0) {
         List<RecVideoItemAppModel> list = [];
-        List<int> blackMidsList = setting
-            .get(SettingBoxKey.blackMidsList, defaultValue: [-1])
+        List<int> blackMidsList = localCache
+            .get(LocalCacheKey.blackMidsList, defaultValue: [-1])
             .map<int>((e) => e as int)
             .toList();
         for (var i in res.data['data']['items']) {
@@ -128,8 +128,8 @@ class VideoHttp {
       );
       if (res.data['code'] == 0) {
         List<HotVideoItemModel> list = [];
-        List<int> blackMidsList = setting
-            .get(SettingBoxKey.blackMidsList, defaultValue: [-1])
+        List<int> blackMidsList = localCache
+            .get(LocalCacheKey.blackMidsList, defaultValue: [-1])
             .map<int>((e) => e as int)
             .toList();
         for (var i in res.data['data']['list']) {
@@ -325,7 +325,7 @@ class VideoHttp {
     String? accessKey = GStorage.localCache
         .get(LocalCacheKey.accessKey, defaultValue: {})['value'];
     if (accessKey == null || accessKey == "") {
-      return {'status': false, 'msg': "本操作使用app端接口，请前往【隐私设置】刷新access_key"};
+      return {'status': false, 'msg': "请退出账号后重新登录"};
     }
     var res = await Request().post(
       Api.dislikeVideo,
@@ -355,7 +355,7 @@ class VideoHttp {
     String? accessKey = GStorage.localCache
         .get(LocalCacheKey.accessKey, defaultValue: {})['value'];
     if (accessKey == null || accessKey == "") {
-      return {'status': false, 'msg': "本操作使用app端接口，请前往【隐私设置】刷新access_key"};
+      return {'status': false, 'msg': "请退出账号后重新登录"};
     }
     assert((reasonId != null) ^ (feedbackId != null));
     var res = await Request().get(Api.feedDislike, data: {
@@ -386,7 +386,7 @@ class VideoHttp {
     String? accessKey = GStorage.localCache
         .get(LocalCacheKey.accessKey, defaultValue: {})['value'];
     if (accessKey == null || accessKey == "") {
-      return {'status': false, 'msg': "本操作使用app端接口，请前往【隐私设置】刷新access_key"};
+      return {'status': false, 'msg': "请退出账号后重新登录"};
     }
     // assert ((reasonId != null) ^ (feedbackId != null));
     var res = await Request().get(Api.feedDislikeCancel, data: {
@@ -711,8 +711,8 @@ class VideoHttp {
       var res = await Request().get(rankApi);
       if (res.data['code'] == 0) {
         List<HotVideoItemModel> list = [];
-        List<int> blackMidsList = setting
-            .get(SettingBoxKey.blackMidsList, defaultValue: [-1])
+        List<int> blackMidsList = localCache
+            .get(LocalCacheKey.blackMidsList, defaultValue: [-1])
             .map<int>((e) => e as int)
             .toList();
         for (var i in res.data['data']['list']) {

@@ -98,8 +98,8 @@ class _ZonePageState extends State<ZonePage>
                             mainAxisSpacing: StyleString.safeSpace,
                             crossAxisSpacing: StyleString.safeSpace,
                             maxCrossAxisExtent: Grid.maxRowWidth * 2,
-                            childAspectRatio: StyleString.aspectRatio * 2.3,
-                            mainAxisExtent: 0),
+                            childAspectRatio: StyleString.aspectRatio * 2.4,
+                            mainAxisExtent: 13),
                         delegate: SliverChildBuilderDelegate((context, index) {
                           return VideoCardH(
                             videoItem: _zoneController.videoList[index],
@@ -135,7 +135,7 @@ class _ZonePageState extends State<ZonePage>
                         mainAxisSpacing: StyleString.safeSpace,
                         crossAxisSpacing: StyleString.safeSpace,
                         maxCrossAxisExtent: Grid.maxRowWidth * 2,
-                        childAspectRatio: StyleString.aspectRatio * 2.3,
+                        childAspectRatio: StyleString.aspectRatio * 2.4,
                         mainAxisExtent: 0),
                     delegate: SliverChildBuilderDelegate((context, index) {
                       return const VideoCardHSkeleton();
