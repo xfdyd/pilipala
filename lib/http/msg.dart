@@ -285,7 +285,7 @@ class MsgHttp {
       'msg[msg_status]': 0,
       'msg[dev_id]': getDevId(),
       'msg[timestamp]': DateTime.now().millisecondsSinceEpoch ~/ 1000,
-      'msg[new_face_version]': 0,
+      'msg[new_face_version]': 1,
       'msg[content]': content,
       'from_firework': 0,
       'build': 0,

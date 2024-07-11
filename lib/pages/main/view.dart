@@ -130,16 +130,16 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                           Theme.of(context)
                               .colorScheme
                               .primary
-                              .withOpacity(0.9),
+                              .withOpacity(0.6),
                           Theme.of(context)
                               .colorScheme
-                              .primary
-                              .withOpacity(0.5),
+                              .primaryContainer
+                              .withOpacity(0.6),
                           Theme.of(context).colorScheme.surface
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        stops: const [0, 0.0034, 0.34]),
+                        stops: const [0.1, 0.4 ,0.7]),
                   ),
                 ),
               ),
@@ -150,17 +150,17 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
             children: [
               if (useSideBar) ...[
                 SizedBox(
-                    width: 55 + MediaQuery.of(context).padding.left,
+                    width: context.width * 0.0387 +
+                        36.801 +
+                        MediaQuery.of(context).padding.left,
                     child: NavigationRail(
-                      groupAlignment: 0.0,
-                      minWidth: 40.0,
-                      backgroundColor: Theme.of(context)
-                          .colorScheme
-                          .surface
-                          .withOpacity(0.2),
+                      groupAlignment: 1,
+                      minWidth: context.width * 0.0286 + 28.56,
+                      backgroundColor: Colors.transparent,
                       selectedIndex: _mainController.selectedIndex,
                       onDestinationSelected: (value) => setIndex(value),
                       labelType: NavigationRailLabelType.none,
+                      leading: UserAndSearchVertical(ctr: _homeController),
                       destinations: _mainController.navigationBars
                           .map((e) => NavigationRailDestination(
                                 icon: Badge(
@@ -168,11 +168,8 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                                           DynamicBadgeMode.number
                                       ? Text(e['count'].toString())
                                       : null,
-                                  padding: EdgeInsets.fromLTRB(
-                                      2 + MediaQuery.of(context).padding.left,
-                                      0,
-                                      2,
-                                      0),
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 4),
                                   isLabelVisible:
                                       _mainController.dynamicBadgeType !=
                                               DynamicBadgeMode.hidden &&
@@ -186,12 +183,19 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                                 ),
                                 selectedIcon: e['selectIcon'],
                                 label: Text(e['label']),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 6),
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 0.01 * context.height),
                               ))
                           .toList(),
+                      trailing: SizedBox(height: 0.1 * context.height),
                     )),
               ],
+              VerticalDivider(
+                width: 1,
+                indent: MediaQuery.of(context).padding.top,
+                endIndent: MediaQuery.of(context).padding.bottom,
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.06),
+              ),
               Expanded(
                 child: PageView(
                   physics: const NeverScrollableScrollPhysics(),
@@ -203,6 +207,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                   children: _mainController.pages,
                 ),
               ),
+              if (useSideBar) SizedBox(width: context.width * 0.004),
             ],
           )
         ]),

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import '../../http/user.dart';
 import '../../http/video.dart';
@@ -45,11 +46,11 @@ class VideoPopupMenu extends StatelessWidget {
             },
             value: 'pause',
             height: menuItemHeight,
-            child: const Row(
+            child: Row(
               children: [
-                Icon(CupertinoIcons.clock, size: 16),
-                SizedBox(width: 6),
-                Text('稍后再看', style: TextStyle(fontSize: 13))
+                Icon(MdiIcons.clockTimeEightOutline, size: 16),
+                const SizedBox(width: 6),
+                const Text('稍后再看', style: TextStyle(fontSize: 13))
               ],
             ),
           ),
@@ -64,7 +65,7 @@ class VideoPopupMenu extends StatelessWidget {
             height: menuItemHeight,
             child: Row(
               children: [
-                const Icon(CupertinoIcons.person, size: 16),
+                Icon(MdiIcons.accountCircleOutline, size: 16),
                 const SizedBox(width: 6),
                 Text('访问：${videoItem.owner.name}',
                     style: const TextStyle(fontSize: 13))
@@ -195,9 +196,8 @@ class VideoPopupMenu extends StatelessWidget {
                                         bvid: videoItem.bvid as String,
                                         type: true);
                                     SmartDialog.dismiss();
-                                    SmartDialog.showToast(res['status']
-                                        ? "点踩成功"
-                                        : res['msg']);
+                                    SmartDialog.showToast(
+                                        res['status'] ? "点踩成功" : res['msg']);
                                     Get.back();
                                   },
                                   child: const Text("点踩"),
@@ -209,9 +209,8 @@ class VideoPopupMenu extends StatelessWidget {
                                         bvid: videoItem.bvid as String,
                                         type: false);
                                     SmartDialog.dismiss();
-                                    SmartDialog.showToast(res['status']
-                                        ? "取消踩"
-                                        : res['msg']);
+                                    SmartDialog.showToast(
+                                        res['status'] ? "取消踩" : res['msg']);
                                     Get.back();
                                   },
                                   child: const Text("撤销"),
@@ -228,11 +227,11 @@ class VideoPopupMenu extends StatelessWidget {
             },
             value: 'dislike',
             height: menuItemHeight,
-            child: const Row(
+            child: Row(
               children: [
-                Icon(CupertinoIcons.hand_thumbsdown, size: 16),
-                SizedBox(width: 6),
-                Text('不感兴趣', style: TextStyle(fontSize: 13))
+                Icon(MdiIcons.thumbDownOutline, size: 16),
+                const SizedBox(width: 6),
+                const Text('不感兴趣', style: TextStyle(fontSize: 13))
               ],
             ),
           ),
@@ -284,7 +283,7 @@ class VideoPopupMenu extends StatelessWidget {
             height: menuItemHeight,
             child: Row(
               children: [
-                const Icon(CupertinoIcons.nosign, size: 16),
+                Icon(MdiIcons.cancel, size: 16),
                 const SizedBox(width: 6),
                 Text('拉黑：${videoItem.owner.name}',
                     style: const TextStyle(fontSize: 13))
@@ -316,8 +315,8 @@ class VideoPopupMenu extends StatelessWidget {
               children: [
                 Icon(
                   MineController.anonymity
-                      ? CupertinoIcons.shield_slash
-                      : CupertinoIcons.checkmark_shield,
+                      ? MdiIcons.incognitoOff
+                      : MdiIcons.incognito,
                   size: 16,
                 ),
                 const SizedBox(width: 6),

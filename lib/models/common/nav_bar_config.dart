@@ -31,7 +31,7 @@ List defaultNavigationBars = [
     'id': 2,
     'icon': const Icon(
       Icons.video_collection_outlined,
-      size: 20,
+      size: 21,
     ),
     'selectIcon': const Icon(
       Icons.video_collection,

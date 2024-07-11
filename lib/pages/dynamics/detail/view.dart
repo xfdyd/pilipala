@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ import 'package:PiliPalaX/pages/video/detail/reply_reply/index.dart';
 import 'package:PiliPalaX/utils/feed_back.dart';
 import 'package:PiliPalaX/utils/id_utils.dart';
 
+import '../../../utils/grid.dart';
 import '../widgets/dynamic_panel.dart';
 
 class DynamicDetailPage extends StatefulWidget {
@@ -212,158 +214,67 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
         },
         child: Stack(
           children: [
-            CustomScrollView(
-              controller: scrollController,
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                if (action != 'comment')
-                  SliverToBoxAdapter(
-                    child: DynamicPanel(
-                      item: _dynamicDetailController.item,
-                      source: 'detail',
-                    ),
-                  ),
-                SliverPersistentHeader(
-                  delegate: _MySliverPersistentHeaderDelegate(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        border: Border(
-                          top: BorderSide(
-                            width: 0.6,
-                            color: Theme.of(context)
-                                .dividerColor
-                                .withOpacity(0.05),
-                          ),
+            OrientationBuilder(
+              builder: (context, orientation) {
+                double padding = max(context.width / 2 - Grid.maxRowWidth, 0);
+                if (orientation == Orientation.portrait) {
+                  return CustomScrollView(
+                    controller: scrollController,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: DynamicPanel(
+                          item: _dynamicDetailController.item,
+                          source: 'detail',
                         ),
                       ),
-                      height: 45,
-                      padding: const EdgeInsets.only(left: 12, right: 6),
-                      child: Row(
-                        children: [
-                          Obx(
-                            () => AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 400),
-                              transitionBuilder:
-                                  (Widget child, Animation<double> animation) {
-                                return ScaleTransition(
-                                    scale: animation, child: child);
-                              },
-                              child: Text(
-                                '${_dynamicDetailController.acount.value}条回复',
-                                key: ValueKey<int>(
-                                    _dynamicDetailController.acount.value),
-                              ),
-                            ),
-                          ),
-                          const Spacer(),
-                          SizedBox(
-                            height: 35,
-                            child: TextButton.icon(
-                              onPressed: () =>
-                                  _dynamicDetailController.queryBySort(),
-                              icon: const Icon(Icons.sort, size: 16),
-                              label: Obx(() => Text(
-                                    _dynamicDetailController
-                                        .sortTypeLabel.value,
-                                    style: const TextStyle(fontSize: 13),
+                      replyPersistentHeader(context),
+                      replyList(),
+                    ]
+                        .map<Widget>((e) => SliverPadding(
+                            padding: EdgeInsets.symmetric(horizontal: padding),
+                            sliver: e))
+                        .toList(),
+                  );
+                } else {
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: CustomScrollView(
+                            controller: ScrollController(),
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            slivers: [
+                              SliverPadding(
+                                  padding: EdgeInsets.only(left: padding / 2),
+                                  sliver: SliverToBoxAdapter(
+                                    child: DynamicPanel(
+                                      item: _dynamicDetailController.item,
+                                      source: 'detail',
+                                    ),
                                   )),
-                            ),
-                          )
-                        ],
+                            ]),
                       ),
-                    ),
-                  ),
-                  pinned: true,
-                ),
-                FutureBuilder(
-                  future: _futureBuilderFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      Map data = snapshot.data as Map;
-                      if (snapshot.data['status']) {
-                        // 请求成功
-                        return Obx(
-                          () => _dynamicDetailController.replyList.isEmpty &&
-                                  _dynamicDetailController.isLoadingMore
-                              ? SliverList(
-                                  delegate: SliverChildBuilderDelegate(
-                                      (context, index) {
-                                    return const VideoReplySkeleton();
-                                  }, childCount: 8),
-                                )
-                              : SliverList(
-                                  delegate: SliverChildBuilderDelegate(
-                                    (context, index) {
-                                      if (index ==
-                                          _dynamicDetailController
-                                              .replyList.length) {
-                                        return Container(
-                                          padding: EdgeInsets.only(
-                                              bottom: MediaQuery.of(context)
-                                                  .padding
-                                                  .bottom),
-                                          height: MediaQuery.of(context)
-                                                  .padding
-                                                  .bottom +
-                                              100,
-                                          child: Center(
-                                            child: Obx(
-                                              () => Text(
-                                                _dynamicDetailController
-                                                    .noMore.value,
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .outline,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      } else {
-                                        return ReplyItem(
-                                          replyItem: _dynamicDetailController
-                                              .replyList[index],
-                                          showReplyRow: true,
-                                          replyLevel: '1',
-                                          replyReply: (replyItem) =>
-                                              replyReply(replyItem),
-                                          replyType:
-                                              ReplyType.values[replyType],
-                                          addReply: (replyItem) {
-                                            _dynamicDetailController
-                                                .replyList[index].replies!
-                                                .add(replyItem);
-                                          },
-                                        );
-                                      }
-                                    },
-                                    childCount: _dynamicDetailController
-                                            .replyList.length +
-                                        1,
-                                  ),
-                                ),
-                        );
-                      } else {
-                        // 请求错误
-                        return HttpError(
-                          errMsg: data['msg'],
-                          fn: () => setState(() {}),
-                        );
-                      }
-                    } else {
-                      // 骨架屏
-                      return SliverList(
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                          return const VideoReplySkeleton();
-                        }, childCount: 8),
-                      );
-                    }
-                  },
-                )
-              ],
+                      Expanded(
+                        child: CustomScrollView(
+                            controller: scrollController,
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            slivers: [
+                              SliverPadding(
+                                  padding: EdgeInsets.only(right: padding / 2),
+                                  sliver: replyPersistentHeader(context)),
+                              SliverPadding(
+                                  padding: EdgeInsets.only(right: padding / 2),
+                                  sliver: replyList()),
+                            ]
+                            // .map<Widget>(
+                            //     (e) => SliverPadding(padding: padding, sliver: e))
+                            // .toList(),
+                            ),
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
             Positioned(
               bottom: MediaQuery.of(context).padding.bottom + 14,
@@ -413,6 +324,136 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
           ],
         ),
       ),
+    );
+  }
+
+  SliverPersistentHeader replyPersistentHeader(BuildContext context) {
+    return SliverPersistentHeader(
+      delegate: _MySliverPersistentHeaderDelegate(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            border: Border(
+              top: BorderSide(
+                width: 0.6,
+                color: Theme.of(context).dividerColor.withOpacity(0.05),
+              ),
+            ),
+          ),
+          height: 45,
+          padding: const EdgeInsets.only(left: 12, right: 6),
+          child: Row(
+            children: [
+              Obx(
+                () => AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 400),
+                  transitionBuilder:
+                      (Widget child, Animation<double> animation) {
+                    return ScaleTransition(scale: animation, child: child);
+                  },
+                  child: Text(
+                    '${_dynamicDetailController.acount.value}条回复',
+                    key: ValueKey<int>(_dynamicDetailController.acount.value),
+                  ),
+                ),
+              ),
+              const Spacer(),
+              SizedBox(
+                height: 35,
+                child: TextButton.icon(
+                  onPressed: () => _dynamicDetailController.queryBySort(),
+                  icon: const Icon(Icons.sort, size: 16),
+                  label: Obx(() => Text(
+                        _dynamicDetailController.sortTypeLabel.value,
+                        style: const TextStyle(fontSize: 13),
+                      )),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+      pinned: true,
+    );
+  }
+
+  FutureBuilder<dynamic> replyList() {
+    return FutureBuilder(
+      future: _futureBuilderFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          Map data = snapshot.data as Map;
+          if (snapshot.data['status']) {
+            // 请求成功
+            return Obx(
+              () => _dynamicDetailController.replyList.isEmpty &&
+                      _dynamicDetailController.isLoadingMore
+                  ? SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        return const VideoReplySkeleton();
+                      }, childCount: 8),
+                    )
+                  : SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          if (index ==
+                              _dynamicDetailController.replyList.length) {
+                            return Container(
+                              padding: EdgeInsets.only(
+                                  bottom:
+                                      MediaQuery.of(context).padding.bottom),
+                              height:
+                                  MediaQuery.of(context).padding.bottom + 100,
+                              child: Center(
+                                child: Obx(
+                                  () => Text(
+                                    _dynamicDetailController.noMore.value,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          } else {
+                            return ReplyItem(
+                              replyItem:
+                                  _dynamicDetailController.replyList[index],
+                              showReplyRow: true,
+                              replyLevel: '1',
+                              replyReply: (replyItem) => replyReply(replyItem),
+                              replyType: ReplyType.values[replyType],
+                              addReply: (replyItem) {
+                                _dynamicDetailController
+                                    .replyList[index].replies!
+                                    .add(replyItem);
+                              },
+                            );
+                          }
+                        },
+                        childCount:
+                            _dynamicDetailController.replyList.length + 1,
+                      ),
+                    ),
+            );
+          } else {
+            // 请求错误
+            return HttpError(
+              errMsg: data['msg'],
+              fn: () => setState(() {}),
+            );
+          }
+        } else {
+          // 骨架屏
+          return SliverList(
+            delegate: SliverChildBuilderDelegate((context, index) {
+              return const VideoReplySkeleton();
+            }, childCount: 8),
+          );
+        }
+      },
     );
   }
 }

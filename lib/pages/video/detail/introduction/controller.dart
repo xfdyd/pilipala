@@ -57,7 +57,6 @@ class VideoIntroController extends GetxController {
   List delMediaIdsNew = [];
   // 关注状态 默认未关注
   RxMap followStatus = {}.obs;
-  int _tempThemeValue = -1;
 
   RxInt lastPlayCid = 0.obs;
   var userInfo;
@@ -123,7 +122,8 @@ class VideoIntroController extends GetxController {
       // 获取到粉丝数再返回
       await queryUserStat();
     } else {
-      SmartDialog.showToast(result['msg']);
+      SmartDialog.showToast(
+          "${result['code']} ${result['msg']} ${result['data']}");
     }
     if (userLogin) {
       // 获取点赞状态
@@ -175,43 +175,26 @@ class VideoIntroController extends GetxController {
   }
 
   // 一键三连
-  Future actionOneThree(BuildContext context) async {
+  Future actionOneThree() async {
+    feedBack();
     if (userInfo == null) {
       SmartDialog.showToast('账号未登录');
       return;
     }
     if (hasLike.value && hasCoin.value && hasFav.value) {
       // 已点赞、投币、收藏
-      SmartDialog.showToast('🙏 UP已经收到了～');
+      SmartDialog.showToast('已三连');
       return false;
     }
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('提示'),
-          content: const Text('一键三连 给UP送温暖'),
-          actions: [
-            TextButton(onPressed: () => Get.back(), child: const Text('点错了')),
-            TextButton(
-              onPressed: () async {
-                Get.back();
-                var result = await VideoHttp.oneThree(bvid: bvid);
-                if (result['status']) {
-                  hasLike.value = result["data"]["like"];
-                  hasCoin.value = result["data"]["coin"];
-                  hasFav.value = result["data"]["fav"];
-                  SmartDialog.showToast('三连成功 🎉');
-                } else {
-                  SmartDialog.showToast(result['msg']);
-                }
-              },
-              child: const Text('确认'),
-            )
-          ],
-        );
-      },
-    );
+    var result = await VideoHttp.oneThree(bvid: bvid);
+    if (result['status']) {
+      hasLike.value = result["data"]["like"];
+      hasCoin.value = result["data"]["coin"];
+      hasFav.value = result["data"]["fav"];
+      SmartDialog.showToast('三连成功');
+    } else {
+      SmartDialog.showToast(result['msg']);
+    }
   }
 
   // （取消）点赞
@@ -224,7 +207,7 @@ class VideoIntroController extends GetxController {
     if (result['status']) {
       // hasLike.value = result["data"] == 1 ? true : false;
       if (!hasLike.value) {
-        SmartDialog.showToast('点赞成功');
+        SmartDialog.showToast(result['data']['toast']);
         hasLike.value = true;
         hasDislike.value = false;
         videoDetail.value.stat!.like = videoDetail.value.stat!.like! + 1;
@@ -268,54 +251,42 @@ class VideoIntroController extends GetxController {
       SmartDialog.showToast('账号未登录');
       return;
     }
+    void coinVideo(int coin) async {
+      var res = await VideoHttp.coinVideo(bvid: bvid, multiply: coin);
+      if (res['status']) {
+        print(res);
+        SmartDialog.showToast('投币成功');
+        hasCoin.value = true;
+        videoDetail.value.stat!.coin = videoDetail.value.stat!.coin! + coin;
+      } else {
+        SmartDialog.showToast(res['msg']);
+      }
+    }
+
     showDialog(
         context: Get.context!,
         builder: (context) {
           return AlertDialog(
             title: const Text('选择投币个数'),
             contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
-            content: StatefulBuilder(builder: (context, StateSetter setState) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  RadioListTile(
-                    value: 1,
-                    title: const Text('1枚'),
-                    groupValue: _tempThemeValue,
-                    onChanged: (value) {
-                      _tempThemeValue = value!;
-                      Get.appUpdate();
-                    },
-                  ),
-                  RadioListTile(
-                    value: 2,
-                    title: const Text('2枚'),
-                    groupValue: _tempThemeValue,
-                    onChanged: (value) {
-                      _tempThemeValue = value!;
-                      Get.appUpdate();
-                    },
-                  ),
-                ],
-              );
-            }),
             actions: [
-              TextButton(onPressed: () => Get.back(), child: const Text('取消')),
+              TextButton(
+                  onPressed: () => Get.back(),
+                  child: Text('取消',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.outline))),
               TextButton(
                   onPressed: () async {
-                    var res = await VideoHttp.coinVideo(
-                        bvid: bvid, multiply: _tempThemeValue);
-                    if (res['status']) {
-                      SmartDialog.showToast('投币成功');
-                      hasCoin.value = true;
-                      videoDetail.value.stat!.coin =
-                          videoDetail.value.stat!.coin! + _tempThemeValue;
-                    } else {
-                      SmartDialog.showToast(res['msg']);
-                    }
+                    coinVideo(1);
                     Get.back();
                   },
-                  child: const Text('确定'))
+                  child: const Text('投 1 枚')),
+              TextButton(
+                  onPressed: () async {
+                    coinVideo(1);
+                    Get.back();
+                  },
+                  child: const Text('投 2 枚'))
             ],
           );
         });
@@ -444,6 +415,10 @@ class VideoIntroController extends GetxController {
 
   // 关注/取关up
   Future actionRelationMod(BuildContext context) async {
+    if (userInfo == null) {
+      SmartDialog.showToast('账号未登录');
+      return;
+    }
     feedBack();
     int mid = videoDetail.value.owner!.mid!;
     MemberController _ = Get.put<MemberController>(MemberController(mid: mid),
@@ -511,6 +486,45 @@ class VideoIntroController extends GetxController {
     super.onClose();
   }
 
+  /// 播放上一个
+  bool prevPlay() {
+    final List episodes = [];
+    bool isPages = false;
+    if (videoDetail.value.ugcSeason != null) {
+      final UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
+      final List<SectionItem> sections = ugcSeason.sections!;
+      for (int i = 0; i < sections.length; i++) {
+        final List<EpisodeItem> episodesList = sections[i].episodes!;
+        episodes.addAll(episodesList);
+      }
+    } else if (videoDetail.value.pages != null) {
+      isPages = true;
+      final List<Part> pages = videoDetail.value.pages!;
+      episodes.addAll(pages);
+    }
+
+    final int currentIndex =
+        episodes.indexWhere((e) => e.cid == lastPlayCid.value);
+    int prevIndex = currentIndex - 1;
+    final VideoDetailController videoDetailCtr =
+        Get.find<VideoDetailController>(tag: heroTag);
+    final PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
+
+    // 列表循环
+    if (prevIndex < 0) {
+      if (platRepeat == PlayRepeat.listCycle) {
+        prevIndex = episodes.length - 1;
+      } else {
+        return false;
+      }
+    }
+    final int cid = episodes[prevIndex].cid!;
+    final String rBvid = isPages ? bvid : episodes[prevIndex].bvid;
+    final int rAid = isPages ? IdUtils.bv2av(bvid) : episodes[prevIndex].aid!;
+    changeSeasonOrbangu(rBvid, cid, rAid);
+    return true;
+  }
+
   /// 列表循环或者顺序播放时，自动播放下一个
   bool nextPlay() {
     final List episodes = [];
@@ -539,8 +553,7 @@ class VideoIntroController extends GetxController {
     if (nextIndex >= episodes.length) {
       if (platRepeat == PlayRepeat.listCycle) {
         nextIndex = 0;
-      }
-      if (platRepeat == PlayRepeat.listOrder) {
+      } else {
         return false;
       }
     }

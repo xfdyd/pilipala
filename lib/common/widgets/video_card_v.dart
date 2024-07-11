@@ -187,8 +187,8 @@ class VideoCardV extends StatelessWidget {
       ),
       if (videoItem.goto == 'av')
         Positioned(
-            right: 0,
-            bottom: 0,
+            right: -5,
+            bottom: -2,
             child: VideoPopupMenu(
               size: 29,
               iconSize: 17,
@@ -239,10 +239,9 @@ class VideoContent extends StatelessWidget {
                     fs: 9,
                   )
                 ],
-                if (videoItem.rcmdReason != null &&
-                    videoItem.rcmdReason.content != '') ...[
+                if (videoItem.rcmdReason != null) ...[
                   PBadge(
-                    text: videoItem.rcmdReason.content,
+                    text: videoItem.rcmdReason,
                     stack: 'normal',
                     size: 'small',
                     type: 'color',
@@ -280,7 +279,7 @@ class VideoContent extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (videoItem.goto == 'av') const SizedBox(width: 24)
+                if (videoItem.goto == 'av') const SizedBox(width: 10)
               ],
             ),
           ],
@@ -307,7 +306,7 @@ class VideoStat extends StatelessWidget {
           view: videoItem.stat.view,
           goto: videoItem.goto,
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 6),
         if (videoItem.goto != 'picture')
           StatDanMu(
             theme: 'gray',
@@ -315,16 +314,23 @@ class VideoStat extends StatelessWidget {
           ),
         if (videoItem is RecVideoItemModel) ...<Widget>[
           const Spacer(),
-          RichText(
-            maxLines: 1,
-            text: TextSpan(
-                style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
-                  color: Theme.of(context).colorScheme.outline.withOpacity(0.8),
-                ),
-                text: Utils.formatTimestampToRelativeTime(videoItem.pubdate)),
-          ),
-          const SizedBox(width: 4),
+          Expanded(
+              flex: 0,
+              child: RichText(
+                maxLines: 1,
+                text: TextSpan(
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelSmall!.fontSize,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .outline
+                          .withOpacity(0.8),
+                    ),
+                    text:
+                        Utils.formatTimestampToRelativeTime(videoItem.pubdate)),
+              )),
+          const SizedBox(width: 2),
         ]
       ],
     );

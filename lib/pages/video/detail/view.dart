@@ -592,24 +592,24 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                       color: Theme.of(context).colorScheme.background,
                       child: Column(
                         children: [
-                          Opacity(
-                            opacity: 0,
-                            child: SizedBox(
-                              width: context.width,
-                              height: 0,
-                              child: Obx(
-                                () => TabBar(
-                                  controller: videoDetailController.tabCtr,
-                                  dividerColor: Colors.transparent,
-                                  indicatorColor:
-                                      Theme.of(context).colorScheme.background,
-                                  tabs: videoDetailController.tabs
-                                      .map((String name) => Tab(text: name))
-                                      .toList(),
-                                ),
-                              ),
-                            ),
-                          ),
+                          // Opacity(
+                          //   opacity: 0,
+                          //   child: SizedBox(
+                          //     width: context.width,
+                          //     height: 0,
+                          //     child: Obx(
+                          //       () => TabBar(
+                          //         controller: videoDetailController.tabCtr,
+                          //         dividerColor: Colors.transparent,
+                          //         indicatorColor:
+                          //             Theme.of(context).colorScheme.background,
+                          //         tabs: videoDetailController.tabs
+                          //             .map((String name) => Tab(text: name))
+                          //             .toList(),
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
                           Expanded(
                             child: TabBarView(
                               physics: const BouncingScrollPhysics(),
@@ -848,6 +848,20 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         final double videoWidth = videoHeight * 9 / 16;
         return Row(
           children: [
+            Expanded(
+                child: CustomScrollView(
+              key: PageStorageKey<String>('简介${videoDetailController.bvid}'),
+              slivers: <Widget>[
+                if (videoDetailController.videoType == SearchType.video) ...[
+                  VideoIntroPanel(heroTag: heroTag),
+                  RelatedVideoPanel(heroTag: heroTag),
+                ] else if (videoDetailController.videoType ==
+                    SearchType.media_bangumi) ...[
+                  Obx(() => BangumiIntroPanel(
+                      heroTag: heroTag, cid: videoDetailController.cid.value)),
+                ]
+              ],
+            )),
             SizedBox(
               height: videoHeight,
               width: isFullScreen.value == true ? context.width : videoWidth,
@@ -897,32 +911,14 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               ),
             ),
             Expanded(
-                child: Row(children: [
-              Expanded(
-                  child: CustomScrollView(
-                key: PageStorageKey<String>('简介${videoDetailController.bvid}'),
-                slivers: <Widget>[
-                  if (videoDetailController.videoType == SearchType.video) ...[
-                    VideoIntroPanel(heroTag: heroTag),
-                    RelatedVideoPanel(heroTag: heroTag),
-                  ] else if (videoDetailController.videoType ==
-                      SearchType.media_bangumi) ...[
-                    Obx(() => BangumiIntroPanel(
-                        heroTag: heroTag,
-                        cid: videoDetailController.cid.value)),
-                  ]
-                ],
-              )),
-              Expanded(
-                child: Obx(
-                  () => VideoReplyPanel(
-                    bvid: videoDetailController.bvid,
-                    oid: videoDetailController.oid.value,
-                    heroTag: heroTag,
-                  ),
+              child: Obx(
+                () => VideoReplyPanel(
+                  bvid: videoDetailController.bvid,
+                  oid: videoDetailController.oid.value,
+                  heroTag: heroTag,
                 ),
-              )
-            ]))
+              ),
+            ),
             // Expanded(
             //   child: TabBarView(
             //     physics: const BouncingScrollPhysics(),
@@ -1019,16 +1015,13 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                           ]
                         ],
                       ))),
-              SizedBox(
-                  width:
-                      isFullScreen.value == true ? context.width : videoWidth,
-                  height: isFullScreen.value == true
-                      ? 0
-                      : context.height -
-                          videoHeight -
-                          (removeSafeArea
-                              ? 0
-                              : MediaQuery.of(context).padding.top),
+              Offstage(
+                offstage: isFullScreen.value == true,
+                child: SizedBox(
+                  width: videoWidth,
+                  height: context.height -
+                      videoHeight -
+                      (removeSafeArea ? 0 : MediaQuery.of(context).padding.top),
                   child: CustomScrollView(
                     key: PageStorageKey<String>(
                         '简介${videoDetailController.bvid}'),
@@ -1036,7 +1029,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                       if (videoDetailController.videoType ==
                           SearchType.video) ...[
                         VideoIntroPanel(heroTag: heroTag),
-                        RelatedVideoPanel(heroTag: heroTag),
+                        // RelatedVideoPanel(heroTag: heroTag),
                       ] else if (videoDetailController.videoType ==
                           SearchType.media_bangumi) ...[
                         Obx(() => BangumiIntroPanel(
@@ -1044,41 +1037,43 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                             cid: videoDetailController.cid.value)),
                       ]
                     ],
-                  ))
+                  ),
+                ),
+              ),
             ],
           ),
-          SizedBox(
-              width: isFullScreen.value == true
-                  ? 0
-                  : (context.width -
-                      videoWidth -
-                      (removeSafeArea
-                          ? 0
-                          : (MediaQuery.of(context).padding.left +
-                              MediaQuery.of(context).padding.right))),
+          Offstage(
+            offstage: isFullScreen.value == true,
+            child: SizedBox(
+              width: (context.width -
+                  videoWidth -
+                  (removeSafeArea
+                      ? 0
+                      : (MediaQuery.of(context).padding.left +
+                          MediaQuery.of(context).padding.right))),
               height: context.height -
                   (removeSafeArea ? 0 : MediaQuery.of(context).padding.top),
-              child:
-                  // TabBarView(
-                  //   physics: const BouncingScrollPhysics(),
-                  //   controller: videoDetailController.tabCtr,
-                  //   children: <Widget>[
-                  //     if (videoDetailController.videoType == SearchType.video)
-                  //       const CustomScrollView(
-                  //         slivers: [
-                  //           RelatedVideoPanel(),
-                  //         ],
-                  //       ),
+              child: TabBarView(
+                physics: const BouncingScrollPhysics(),
+                controller: videoDetailController.tabCtr,
+                children: <Widget>[
+                  if (videoDetailController.videoType == SearchType.video)
+                    CustomScrollView(
+                      slivers: [
+                        RelatedVideoPanel(heroTag: heroTag),
+                      ],
+                    ),
                   Obx(
-                () => VideoReplyPanel(
-                  bvid: videoDetailController.bvid,
-                  oid: videoDetailController.oid.value,
-                  heroTag: heroTag,
-                ),
-              )
-              //   ],
-              // ),
-              )
+                    () => VideoReplyPanel(
+                      bvid: videoDetailController.bvid,
+                      oid: videoDetailController.oid.value,
+                      heroTag: heroTag,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          )
         ],
       );
     });

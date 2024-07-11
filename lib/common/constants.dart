@@ -18,6 +18,13 @@ class Constants {
   static const String thirdApi =
       'https://www.mcbbs.net/template/mcbbs/image/special_photo_bg.png';
 
+  static const String traceId =
+      '11111111111111111111111111111111:1111111111111111:0:0';
+  static const String userAgent =
+  'Mozilla/5.0 BiliDroid/1.46.2 (bbcallen@gmail.com) os/android model/vivo mobi_app/android_hd build/1462100 channel/yingyongbao innerVer/1462100 osVer/14 network/2';
+  static const String statistics = '%7B%22appId%22%3A5%2C%22platform%22%3A3%2C%22version%22%3A%221.46.2%22%2C%22abtest%22%3A%22%22%7D';
+  //Uri.encodeComponent('{"appId": 5,"platform": 3,"version": "1.46.2","abtest": ""}');
+
   //内容来自 https://passport.bilibili.com/web/generic/country/list
   static const List<Map<String, dynamic>> internationalDialingPrefix = [
     {"id": 1, "cname": "中国大陆", "country_id": "86"},

@@ -89,9 +89,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   late int defaultBtmProgressBehavior;
   late bool enableQuickDouble;
   late bool fullScreenGestureReverse;
+  //播放器放缩
+  bool interacting = false;
 
-  // 用于记录上一次全屏切换手势触发时间，避免误触
-  DateTime? lastFullScreenToggleTime;
   // 是否在调整固定进度条
   RxBool draggingFixedProgressBar = false.obs;
   // 阅读器限制
@@ -214,16 +214,37 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   // 动态构建底部控制条
   List<Widget> buildBottomControl() {
     final PlPlayerController _ = widget.controller;
+    bool isSeason = videoIntroController?.videoDetail.value.ugcSeason != null;
+    bool isPage = videoIntroController?.videoDetail.value.pages != null &&
+        videoIntroController!.videoDetail.value.pages!.length > 1;
+    bool isBangumi = bangumiIntroController?.bangumiDetail.value != null;
+    bool anySeason = isSeason || isPage || isBangumi;
     Map<BottomControlType, Widget> videoProgressWidgets = {
       /// 上一集
-      BottomControlType.pre: ComBtn(
-        icon: const Icon(
-          Icons.skip_previous,
-          size: 15,
-          color: Colors.white,
+      BottomControlType.pre: Container(
+        width: 42,
+        height: 30,
+        alignment: Alignment.center,
+        child: ComBtn(
+          icon: const Icon(
+            Icons.skip_previous,
+            size: 22,
+            color: Colors.white,
+          ),
+          fuc: () {
+            bool? res;
+            if (videoIntroController != null) {
+              res = videoIntroController!.prevPlay();
+            }
+            if (bangumiIntroController != null) {
+              res = bangumiIntroController!.prevPlay();
+            }
+            if (res == false) {
+              SmartDialog.showToast('已经是第一集了');
+            }
+          },
+          tooltip: '上一集',
         ),
-        fuc: () {},
-        tooltip: '上一集',
       ),
 
       /// 播放暂停
@@ -232,14 +253,30 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       ),
 
       /// 下一集
-      BottomControlType.next: ComBtn(
-        icon: const Icon(
-          Icons.skip_next,
-          size: 15,
-          color: Colors.white,
+      BottomControlType.next: Container(
+        width: 42,
+        height: 30,
+        alignment: Alignment.center,
+        child: ComBtn(
+          icon: const Icon(
+            Icons.skip_next,
+            size: 22,
+            color: Colors.white,
+          ),
+          fuc: () {
+            bool? res;
+            if (videoIntroController != null) {
+              res = videoIntroController!.nextPlay();
+            }
+            if (bangumiIntroController != null) {
+              res = bangumiIntroController!.nextPlay();
+            }
+            if (res == false) {
+              SmartDialog.showToast('已经是最后一集了');
+            }
+          },
+          tooltip: '下一集',
         ),
-        fuc: () {},
-        tooltip: '下一集',
       ),
 
       /// 时间进度
@@ -260,14 +297,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                   '已播放${Utils.durationReadFormat(Utils.timeFormat(_.positionSeconds.value))}',
             );
           }),
-          // const SizedBox(width: 2),
-          // const ExcludeSemantics(
-          //   child: Text(
-          //     '/',
-          //     style: textStyle,
-          //   ),
-          // ),
-          // const SizedBox(width: 2),
           Obx(
             () => Text(
               Utils.timeFormat(_.durationSeconds.value),
@@ -288,65 +317,51 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       BottomControlType.space: const Spacer(),
 
       /// 选集
-      BottomControlType.episode: Obx(() {
-        bool isSeason =
-            videoIntroController?.videoDetail.value.ugcSeason != null;
-        bool isPage = videoIntroController?.videoDetail.value.pages != null &&
-            videoIntroController!.videoDetail.value.pages!.length > 1;
-        bool isBangumi = bangumiIntroController?.bangumiDetail.value != null;
-        if (!isSeason && !isPage && !isBangumi) {
-          return const SizedBox.shrink();
-        }
-        return SizedBox(
-            width: 42,
-            height: 30,
-            child: Container(
-                width: 42,
-                height: 30,
-                alignment: Alignment.center,
-                child: ComBtn(
-                  icon: const Icon(
-                    Icons.list,
-                    size: 22,
-                    color: Colors.white,
-                  ),
-                  tooltip: '选集',
-                  fuc: () {
-                    int currentCid = widget.controller.cid;
-                    String bvid = widget.controller.bvid;
-                    final List episodes = [];
-                    late Function changeFucCall;
-                    if (isSeason) {
-                      final List<SectionItem> sections = videoIntroController!
-                          .videoDetail.value.ugcSeason!.sections!;
-                      for (int i = 0; i < sections.length; i++) {
-                        final List<EpisodeItem> episodesList =
-                            sections[i].episodes!;
-                        episodes.addAll(episodesList);
-                      }
-                      changeFucCall = videoIntroController!.changeSeasonOrbangu;
-                    } else if (isPage) {
-                      final List<Part> pages =
-                          videoIntroController!.videoDetail.value.pages!;
-                      episodes.addAll(pages);
-                      changeFucCall = videoIntroController!.changeSeasonOrbangu;
-                    } else if (isBangumi) {
-                      episodes.addAll(bangumiIntroController!
-                          .bangumiDetail.value.episodes!);
-                      changeFucCall =
-                          bangumiIntroController!.changeSeasonOrbangu;
-                    }
-                    ListSheet(
-                      episodes: episodes,
-                      bvid: bvid,
-                      aid: IdUtils.bv2av(bvid),
-                      currentCid: currentCid,
-                      changeFucCall: changeFucCall,
-                      context: context,
-                    ).buildShowBottomSheet();
-                  },
-                )));
-      }),
+      BottomControlType.episode: Container(
+        width: 42,
+        height: 30,
+        alignment: Alignment.center,
+        child: ComBtn(
+          icon: const Icon(
+            Icons.list,
+            size: 22,
+            color: Colors.white,
+          ),
+          tooltip: '选集',
+          fuc: () {
+            int currentCid = widget.controller.cid;
+            String bvid = widget.controller.bvid;
+            final List episodes = [];
+            late Function changeFucCall;
+            if (isSeason) {
+              final List<SectionItem> sections =
+                  videoIntroController!.videoDetail.value.ugcSeason!.sections!;
+              for (int i = 0; i < sections.length; i++) {
+                final List<EpisodeItem> episodesList = sections[i].episodes!;
+                episodes.addAll(episodesList);
+              }
+              changeFucCall = videoIntroController!.changeSeasonOrbangu;
+            } else if (isPage) {
+              final List<Part> pages =
+                  videoIntroController!.videoDetail.value.pages!;
+              episodes.addAll(pages);
+              changeFucCall = videoIntroController!.changeSeasonOrbangu;
+            } else if (isBangumi) {
+              episodes.addAll(
+                  bangumiIntroController!.bangumiDetail.value.episodes!);
+              changeFucCall = bangumiIntroController!.changeSeasonOrbangu;
+            }
+            ListSheet(
+              episodes: episodes,
+              bvid: bvid,
+              aid: IdUtils.bv2av(bvid),
+              currentCid: currentCid,
+              changeFucCall: changeFucCall,
+              context: context,
+            ).buildShowBottomSheet();
+          },
+        ),
+      ),
 
       /// 画面比例
       BottomControlType.fit: SizedBox(
@@ -463,11 +478,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         [
           BottomControlType.playOrPause,
           BottomControlType.time,
-          // BottomControlType.pre,
-          // BottomControlType.next,
+          if (anySeason) BottomControlType.pre,
+          if (anySeason) BottomControlType.next,
           BottomControlType.space,
-          BottomControlType.episode,
-          BottomControlType.fit,
+          if (anySeason) BottomControlType.episode,
+          if (_.isFullScreen.value) BottomControlType.fit,
           BottomControlType.subtitle,
           BottomControlType.speed,
           BottomControlType.fullscreen,
@@ -500,18 +515,110 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       key: _playerKey,
       children: <Widget>[
         Obx(
-          () => Video(
-            key: ValueKey('${_.videoFit.value}'),
-            controller: videoController,
-            controls: NoVideoControls,
-            pauseUponEnteringBackgroundMode: !_.continuePlayInBackground.value,
-            resumeUponEnteringForegroundMode: true,
-            // 字幕尺寸调节
-            subtitleViewConfiguration: SubtitleViewConfiguration(
-                style: subTitleStyle,
-                padding: const EdgeInsets.all(24.0),
-                textScaleFactor: MediaQuery.textScaleFactorOf(context)),
-            fit: _.videoFit.value,
+          () => InteractiveViewer(
+            panEnabled: false, // 启用平移 //单指平移会与横竖手势冲突
+            scaleEnabled: true, // 启用缩放
+            minScale: 1.0,
+            maxScale: 2.0,
+            onInteractionStart: (ScaleStartDetails details) {
+              if (details.pointerCount == 2) {
+                interacting = true;
+              }
+            },
+            onInteractionUpdate: (ScaleUpdateDetails details) {
+              if (interacting) return;
+              if (details.pointerCount == 2) {
+                interacting = true;
+                return;
+              }
+
+              /// 锁定时禁用
+              if (_.controlsLock.value) return;
+              Offset delta = details.focalPointDelta;
+              if (delta.distance < 2) return;
+              RenderBox renderBox =
+                  _playerKey.currentContext!.findRenderObject() as RenderBox;
+              // if onHorizontalDragUpdate
+              if (delta.dx.abs() > 5 * delta.dy.abs()) {
+                // live模式下禁用
+                if (_.videoType.value == 'live') return;
+                final int curSliderPosition =
+                    _.sliderPosition.value.inMilliseconds;
+                final double scale = 90000 / renderBox.size.width;
+                final Duration pos = Duration(
+                    milliseconds:
+                        curSliderPosition + (delta.dx * scale).round());
+                final Duration result =
+                    pos.clamp(Duration.zero, _.duration.value);
+                _.onUpdatedSliderProgress(result);
+                _.onChangedSliderStart();
+              } else if (delta.dx.abs() * 5 < delta.dy.abs()) {
+                // 垂直方向 音量/亮度调节
+                final double totalWidth = renderBox.size.width;
+                final double tapPosition = details.localFocalPoint.dx;
+                final double sectionWidth = totalWidth / 4;
+                if (tapPosition < sectionWidth) {
+                  // 左边区域 👈
+                  final double level = renderBox.size.height * 3;
+                  final double brightness =
+                      _brightnessValue.value - delta.dy / level;
+                  final double result = brightness.clamp(0.0, 1.0);
+                  setBrightness(result);
+                } else if (tapPosition < sectionWidth * 3) {
+                  // 全屏
+                  const double threshold = 7.0; // 滑动阈值
+                  void fullScreenTrigger(bool status) async {
+                    EasyThrottle.throttle(
+                        'fullScreen', const Duration(milliseconds: 500), () {
+                      // widget.controller.triggerFullScreen(status: status);
+                      _.triggerFullScreen(status: status);
+                    });
+                  }
+
+                  if (delta.dy > threshold) {
+                    // 下滑
+                    if (_.isFullScreen.value ^ fullScreenGestureReverse) {
+                      fullScreenTrigger(fullScreenGestureReverse);
+                    }
+                  } else if (delta.dy < -threshold) {
+                    // 上划
+                    if (!_.isFullScreen.value ^ fullScreenGestureReverse) {
+                      fullScreenTrigger(!fullScreenGestureReverse);
+                    }
+                  }
+                } else {
+                  // 右边区域
+                  final double level = renderBox.size.height * 0.5;
+                  EasyThrottle.throttle(
+                      'setVolume', const Duration(milliseconds: 20), () {
+                    final double volume = _volumeValue.value - delta.dy / level;
+                    final double result = volume.clamp(0.0, 1.0);
+                    setVolume(result);
+                  });
+                }
+              }
+            },
+            onInteractionEnd: (details) {
+              if (_.isSliderMoving.value) {
+                _.onChangedSliderEnd();
+                _.seekTo(_.sliderPosition.value, type: 'slider');
+              }
+              interacting = false;
+            },
+            child: Video(
+              key: ValueKey('${_.videoFit.value}'),
+              controller: videoController,
+              controls: NoVideoControls,
+              pauseUponEnteringBackgroundMode:
+                  !_.continuePlayInBackground.value,
+              resumeUponEnteringForegroundMode: true,
+              // 字幕尺寸调节
+              subtitleViewConfiguration: SubtitleViewConfiguration(
+                  style: subTitleStyle,
+                  padding: const EdgeInsets.all(24.0),
+                  textScaleFactor: MediaQuery.textScaleFactorOf(context)),
+              fit: _.videoFit.value,
+            ),
           ),
         ),
 
@@ -758,95 +865,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               onLongPressEnd: (LongPressEndDetails details) {
                 _.setDoubleSpeedStatus(false);
               },
-
-              /// 水平位置 快进 live模式下禁用
-              onHorizontalDragUpdate: (DragUpdateDetails details) {
-                // live模式下禁用 锁定时🔒禁用
-                if (_.videoType.value == 'live' || _.controlsLock.value) {
-                  return;
-                }
-                // final double tapPosition = details.localPosition.dx;
-                final int curSliderPosition =
-                    _.sliderPosition.value.inMilliseconds;
-                RenderBox renderBox =
-                    _playerKey.currentContext!.findRenderObject() as RenderBox;
-                final double scale = 90000 / renderBox.size.width;
-                final Duration pos = Duration(
-                    milliseconds:
-                        curSliderPosition + (details.delta.dx * scale).round());
-                final Duration result =
-                    pos.clamp(Duration.zero, _.duration.value);
-                _.onUpdatedSliderProgress(result);
-                _.onChangedSliderStart();
-                // _initTapPositoin = tapPosition;
-              },
-              onHorizontalDragEnd: (DragEndDetails details) {
-                if (_.videoType.value == 'live' || _.controlsLock.value) {
-                  return;
-                }
-                _.onChangedSliderEnd();
-                _.seekTo(_.sliderPosition.value, type: 'slider');
-              },
-              // 垂直方向 音量/亮度调节
-              onVerticalDragUpdate: (DragUpdateDetails details) async {
-                RenderBox renderBox =
-                    _playerKey.currentContext!.findRenderObject() as RenderBox;
-
-                /// 锁定时禁用
-                if (_.controlsLock.value) {
-                  return;
-                }
-                final double totalWidth = renderBox.size.width;
-                final double tapPosition = details.localPosition.dx;
-                final double sectionWidth = totalWidth / 4;
-                final double delta = details.delta.dy;
-                if (lastFullScreenToggleTime != null &&
-                    DateTime.now().difference(lastFullScreenToggleTime!) <
-                        const Duration(milliseconds: 500)) {
-                  return;
-                }
-                if (tapPosition < sectionWidth) {
-                  // 左边区域 👈
-                  final double level = renderBox.size.height * 3;
-                  final double brightness =
-                      _brightnessValue.value - delta / level;
-                  final double result = brightness.clamp(0.0, 1.0);
-                  setBrightness(result);
-                } else if (tapPosition < sectionWidth * 3) {
-                  // 全屏
-                  final double dy = details.delta.dy;
-                  const double threshold = 7.0; // 滑动阈值
-                  void fullScreenTrigger(bool status) async {
-                    lastFullScreenToggleTime = DateTime.now();
-                    await widget.controller.triggerFullScreen(status: status);
-                  }
-
-                  if (dy > _distance.value && dy > threshold) {
-                    // 下滑退出全屏/进入全屏
-                    if (_.isFullScreen.value ^ fullScreenGestureReverse) {
-                      fullScreenTrigger(fullScreenGestureReverse);
-                    }
-                    _distance.value = 0.0;
-                  } else if (dy < _distance.value && dy < -threshold) {
-                    // 上划进入全屏/退出全屏
-                    if (!_.isFullScreen.value ^ fullScreenGestureReverse) {
-                      fullScreenTrigger(!fullScreenGestureReverse);
-                    }
-                    _distance.value = 0.0;
-                  }
-                  _distance.value = dy;
-                } else {
-                  // 右边区域 👈
-                  final double level = renderBox.size.height * 0.5;
-                  EasyThrottle.throttle(
-                      'setVolume', const Duration(milliseconds: 20), () {
-                    final double volume = _volumeValue.value - delta / level;
-                    final double result = volume.clamp(0.0, 1.0);
-                    setVolume(result);
-                  });
-                }
-              },
-              onVerticalDragEnd: (DragEndDetails details) {},
             ),
           ),
         ),
@@ -1079,24 +1097,39 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           if (_.dataStatus.loading || _.isBuffering.value) {
             return Center(
                 child: GestureDetector(
-              onTap: () {
-                _.refreshPlayer();
-              },
-              child: Container(
-                padding: const EdgeInsets.all(30),
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [Colors.black26, Colors.transparent],
-                  ),
-                ),
-                child: Image.asset(
-                  'assets/images/loading.gif',
-                  height: 25,
-                  semanticLabel: "加载中",
-                ),
-              ),
-            ));
+                    onTap: () {
+                      _.refreshPlayer();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(30),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [Colors.black26, Colors.transparent],
+                        ),
+                      ),
+                      child: Column(mainAxisSize: MainAxisSize.min, children: [
+                        Image.asset(
+                          'assets/images/loading.gif',
+                          height: 25,
+                          semanticLabel: "加载中",
+                        ),
+                        if (_.isBuffering.value)
+                          Obx(() {
+                            if (_.buffered.value == Duration.zero) {
+                              return const Text('Buffering...',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 12));
+                            }
+                            String bufferStr = _.buffered.toString();
+                            return Text(
+                              bufferStr.substring(0, bufferStr.length - 3),
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 12),
+                            );
+                          }),
+                      ]),
+                    )));
           } else {
             return const SizedBox();
           }

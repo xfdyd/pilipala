@@ -57,4 +57,41 @@ class LoginUtils {
     String uuid = getUUID() + getUUID();
     return 'XY${uuid.substring(0, 35).toUpperCase()}';
   }
+
+  static String genDeviceId() {
+    // https://github.com/bilive/bilive_client/blob/2873de0532c54832f5464a4c57325ad9af8b8698/bilive/lib/app_client.ts#L62
+    final String yyyyMMddHHmmss = DateTime.now()
+        .toIso8601String()
+        .replaceAll(RegExp(r'[-:TZ]'), '')
+        .substring(0, 14);
+
+    final Random random = Random(); // Random.secure();
+    final String randomHex32 =
+    List.generate(32, (index) => random.nextInt(16).toRadixString(16))
+        .join();
+    final String randomHex16 =
+    List.generate(16, (index) => random.nextInt(16).toRadixString(16))
+        .join();
+
+    final String deviceID = randomHex32 + yyyyMMddHHmmss + randomHex16;
+
+    final List<int> bytes = RegExp(r'\w{2}')
+        .allMatches(deviceID)
+        .map((match) => int.parse(match.group(0)!, radix: 16))
+        .toList();
+    final int checksumValue = bytes.reduce((a, b) => a + b);
+    final String check = checksumValue
+        .toRadixString(16)
+        .substring(checksumValue.toRadixString(16).length - 2);
+
+    return deviceID + check;
+  }
+
+  static String generateRandomString(int length) {
+    const chars =
+        '123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    final Random random = Random(); // Random.secure();
+    return List.generate(length, (index) => chars[random.nextInt(chars.length)])
+        .join();
+  }
 }

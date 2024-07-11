@@ -2,6 +2,7 @@ import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/constants.dart';
+import '../../utils/grid.dart';
 import 'controller.dart';
 import 'widgets/item.dart';
 
@@ -66,11 +67,12 @@ class _MemberSeasonsPageState extends State<MemberSeasonsPage> {
                               builder: (context, boxConstraints) {
                                 return GridView.builder(
                                   gridDelegate:
-                                      const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    crossAxisSpacing: StyleString.safeSpace,
-                                    mainAxisSpacing: StyleString.safeSpace,
+                                      SliverGridDelegateWithExtentAndRatio(
+                                    mainAxisSpacing: StyleString.cardSpace,
+                                    crossAxisSpacing: StyleString.cardSpace,
+                                    maxCrossAxisExtent: Grid.maxRowWidth,
                                     childAspectRatio: 0.94,
+                                    mainAxisExtent: 0,
                                   ),
                                   physics: const NeverScrollableScrollPhysics(),
                                   shrinkWrap: true,

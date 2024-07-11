@@ -29,7 +29,7 @@ class RecVideoItemModelAdapter extends TypeAdapter<RecVideoItemModel> {
       owner: fields[9] as Owner?,
       stat: fields[10] as Stat?,
       isFollowed: fields[11] as int?,
-      rcmdReason: fields[12] as RcmdReason?,
+      rcmdReason: fields[12] as String?,
     );
   }
 
@@ -115,40 +115,40 @@ class StatAdapter extends TypeAdapter<Stat> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
-
-class RcmdReasonAdapter extends TypeAdapter<RcmdReason> {
-  @override
-  final int typeId = 2;
-
-  @override
-  RcmdReason read(BinaryReader reader) {
-    final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
-    return RcmdReason(
-      reasonType: fields[0] as int?,
-      content: fields[1] as String?,
-    );
-  }
-
-  @override
-  void write(BinaryWriter writer, RcmdReason obj) {
-    writer
-      ..writeByte(2)
-      ..writeByte(0)
-      ..write(obj.reasonType)
-      ..writeByte(1)
-      ..write(obj.content);
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is RcmdReasonAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
+//
+// class RcmdReasonAdapter extends TypeAdapter<RcmdReason> {
+//   @override
+//   final int typeId = 2;
+//
+//   @override
+//   RcmdReason read(BinaryReader reader) {
+//     final numOfFields = reader.readByte();
+//     final fields = <int, dynamic>{
+//       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+//     };
+//     return RcmdReason(
+//       reasonType: fields[0] as int?,
+//       content: fields[1] as String?,
+//     );
+//   }
+//
+//   @override
+//   void write(BinaryWriter writer, RcmdReason obj) {
+//     writer
+//       ..writeByte(2)
+//       ..writeByte(0)
+//       ..write(obj.reasonType)
+//       ..writeByte(1)
+//       ..write(obj.content);
+//   }
+//
+//   @override
+//   int get hashCode => typeId.hashCode;
+//
+//   @override
+//   bool operator ==(Object other) =>
+//       identical(this, other) ||
+//       other is RcmdReasonAdapter &&
+//           runtimeType == other.runtimeType &&
+//           typeId == other.typeId;
+// }

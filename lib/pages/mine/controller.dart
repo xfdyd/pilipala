@@ -7,6 +7,7 @@ import 'package:PiliPalaX/models/common/theme_type.dart';
 import 'package:PiliPalaX/models/user/info.dart';
 import 'package:PiliPalaX/models/user/stat.dart';
 import 'package:PiliPalaX/utils/storage.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class MineController extends GetxController {
   // 用户信息 头像、昵称、lv
@@ -100,30 +101,29 @@ class MineController extends GetxController {
           alignment: Alignment.bottomCenter,
           builder: (context) {
             return ColoredBox(
-              color: Theme.of(context).colorScheme.secondaryContainer,
+              color: Theme.of(context).colorScheme.primaryContainer,
               child: Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                   child:
                       Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                    const Row(
+                    Row(
                       children: <Widget>[
                         Icon(
-                          Icons.check,
-                          color: Colors.green,
+                          MdiIcons.incognito,
                         ),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         Text('已进入无痕模式',
-                            style: TextStyle(fontSize: 15, height: 1.5))
+                            style: Theme.of(context).textTheme.titleMedium)
                       ],
                     ),
                     const SizedBox(height: 10),
-                    const Text(
-                        '搜索、观看视频/直播不携带Cookie与CSRF\n'
+                    Text(
+                        '搜索、观看视频/直播不携带身份信息（包含大会员）\n'
                         '不产生查询或播放记录\n'
                         '点赞等其它操作不受影响\n'
                         '（前往隐私设置了解详情）',
-                        style: TextStyle(fontSize: 12.5, height: 1.5)),
+                        style: Theme.of(context).textTheme.bodySmall),
                     Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -172,17 +172,17 @@ class MineController extends GetxController {
           builder: (context) {
             return ColoredBox(
                 color: Theme.of(context).colorScheme.secondaryContainer,
-                child: const Padding(
+                child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Icon(
-                          Icons.check,
-                          color: Colors.green,
+                          MdiIcons.incognitoOff,
                         ),
-                        SizedBox(width: 10),
-                        Text('已退出无痕模式'),
+                        const SizedBox(width: 10),
+                        Text('已退出无痕模式',
+                            style: Theme.of(context).textTheme.titleMedium),
                       ],
                     )));
           });

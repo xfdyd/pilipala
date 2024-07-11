@@ -257,7 +257,7 @@ class _ExtraSettingState extends State<ExtraSetting> {
                   return SelectDialog<int>(
                       title: '动态展示',
                       value: defaultDynamicType,
-                      values: DynamicsType.values.map((e) {
+                      values: DynamicsType.values.sublist(0, 4).map((e) {
                         return {'title': e.labels, 'value': e.index};
                       }).toList());
                 },

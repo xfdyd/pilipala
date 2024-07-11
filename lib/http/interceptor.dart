@@ -46,8 +46,8 @@ class ApiInterceptor extends Interceptor {
     // handler.next(err);
     String url = err.requestOptions.uri.toString();
     print('🌹🌹ApiInterceptor: $url');
-    // 屏蔽弹幕和心跳请求的错误提示
-    if (!url.contains('heartbeat') && !url.contains('seg.so')) {
+    // 屏蔽弹幕、心跳、人数请求的错误提示
+    if (!url.contains('heartbeat') && !url.contains('seg.so') && !url.contains('online/total')) {
       SmartDialog.showToast(
         await dioError(err) + url,
         displayType: SmartToastType.onlyRefresh,

@@ -4,6 +4,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 
+import '../../../utils/app_scheme.dart';
 import 'controller.dart';
 
 class AtMePage extends StatefulWidget {
@@ -65,7 +66,9 @@ class _AtMePageState extends State<AtMePage> {
                         String nativeUri = _atMeController
                                 .msgFeedAtMeList[i].item?.nativeUri ??
                             "";
-                        SmartDialog.showToast("跳转至：$nativeUri（暂未实现）");
+                        PiliScheme.routePush(
+                            PiliScheme.stringToSchemeEntity(nativeUri));
+                        // SmartDialog.showToast("跳转至：$nativeUri（暂未实现）");
                       },
                       leading: NetworkImgLayer(
                         width: 45,
@@ -82,25 +85,25 @@ class _AtMePageState extends State<AtMePage> {
                               .copyWith(
                                 color: Theme.of(context).colorScheme.primary,
                               )),
-                      subtitle:
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 4),
-                              Text(
-                                  _atMeController
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 4),
+                          Text(
+                              _atMeController
                                       .msgFeedAtMeList[i].item?.sourceContent ??
-                                      "",
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium!
-                                      .copyWith(
-                                      color:
-                                      Theme.of(context).colorScheme.outline))
-                            ],
-                          ),
+                                  "",
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .outline))
+                        ],
+                      ),
                       trailing: _atMeController
                                       .msgFeedAtMeList[i].item?.image !=
                                   null &&

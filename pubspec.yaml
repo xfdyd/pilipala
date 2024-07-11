@@ -78,8 +78,9 @@ dependencies:
   pull_to_refresh_notification: ^3.0.1
   # 图标
   font_awesome_flutter: ^10.4.0
+  material_design_icons_flutter: ^7.0.7296
   # toast
-  flutter_smart_dialog: ^4.9.4
+  flutter_smart_dialog: ^4.9.7+8
   # 下滑关闭
   dismissible_page: ^1.0.2
   custom_sliding_segmented_control: ^1.7.5

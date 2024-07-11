@@ -136,7 +136,7 @@ class BangumiIntroController extends GetxController {
   Future actionLikeVideo() async {
     var result = await VideoHttp.likeVideo(bvid: bvid, type: !hasLike.value);
     if (result['status']) {
-      SmartDialog.showToast(!hasLike.value ? '点赞成功' : '取消赞');
+      SmartDialog.showToast(!hasLike.value ? result['data']['toast'] : '取消赞');
       hasLike.value = !hasLike.value;
       bangumiDetail.value.stat!['likes'] =
           bangumiDetail.value.stat!['likes'] + (!hasLike.value ? 1 : -1);
@@ -315,6 +315,31 @@ class BangumiIntroController extends GetxController {
     return result;
   }
 
+  bool prevPlay() {
+    late List episodes;
+    if (bangumiDetail.value.episodes != null) {
+      episodes = bangumiDetail.value.episodes!;
+    }
+    VideoDetailController videoDetailCtr =
+        Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
+    int currentIndex =
+        episodes.indexWhere((e) => e.cid == videoDetailCtr.cid.value);
+    int prevIndex = currentIndex - 1;
+    PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
+    if (prevIndex < 0) {
+      if (platRepeat == PlayRepeat.listCycle) {
+        prevIndex = episodes.length - 1;
+      } else {
+        return false;
+      }
+    }
+    int cid = episodes[prevIndex].cid!;
+    String bvid = episodes[prevIndex].bvid!;
+    int aid = episodes[prevIndex].aid!;
+    changeSeasonOrbangu(bvid, cid, aid);
+    return true;
+  }
+
   /// 列表循环或者顺序播放时，自动播放下一个
   bool nextPlay() {
     late List episodes;
@@ -328,16 +353,13 @@ class BangumiIntroController extends GetxController {
     int nextIndex = currentIndex + 1;
     PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
     // 列表循环
-    if (platRepeat == PlayRepeat.listCycle) {
-      if (nextIndex == episodes.length - 1) {
+    if (nextIndex == episodes.length - 1) {
+      if (platRepeat == PlayRepeat.listCycle) {
         nextIndex = 0;
+      } else {
+        return false;
       }
     }
-    if (nextIndex == episodes.length - 1 &&
-        platRepeat == PlayRepeat.listOrder) {
-      return false;
-    }
-
     int cid = episodes[nextIndex].cid!;
     String bvid = episodes[nextIndex].bvid!;
     int aid = episodes[nextIndex].aid!;

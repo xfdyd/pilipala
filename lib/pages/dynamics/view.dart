@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:PiliPalaX/models/common/dynamics_type.dart';
 import 'package:PiliPalaX/models/common/up_panel_position.dart';
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -57,6 +58,17 @@ class _DynamicsPageState extends State<DynamicsPage>
         defaultValue: UpPanelPosition.leftFixed.code)];
     print('upPanelPosition: $upPanelPosition');
     scrollController = _dynamicsController.scrollController;
+    if (GStorage.setting
+        .get(SettingBoxKey.dynamicsShowAllFollowedUp, defaultValue: false)) {
+      scrollController.addListener(() {
+        if (scrollController.position.pixels >=
+            scrollController.position.maxScrollExtent - 300) {
+            EasyThrottle.throttle('following', const Duration(seconds: 1), () {
+              _dynamicsController.queryFollowing2();
+            });
+        }
+      });
+    }
   }
 
   @override
@@ -102,7 +114,6 @@ class _DynamicsPageState extends State<DynamicsPage>
 
   @override
   Widget build(BuildContext context) {
-    print('upPanelPosition1: $upPanelPosition');
     super.build(context);
     return Scaffold(
         backgroundColor: Colors.transparent,
@@ -145,11 +156,11 @@ class _DynamicsPageState extends State<DynamicsPage>
                   })),
         ),
         drawer: upPanelPosition == UpPanelPosition.leftDrawer
-            ? upPanelPart()
+            ? SafeArea(child: upPanelPart())
             : null,
         drawerEnableOpenDragGesture: true,
         endDrawer: upPanelPosition == UpPanelPosition.rightDrawer
-            ? upPanelPart()
+            ? SafeArea(child: upPanelPart())
             : null,
         endDrawerEnableOpenDragGesture: true,
         body: Row(children: [

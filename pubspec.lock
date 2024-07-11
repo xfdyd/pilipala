@@ -575,10 +575,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_smart_dialog
-      sha256: fe905154e101028e910e539ee5acb404f25cc36071ee824ebdcc7dd848c40700
+      sha256: a74869ad9b20e5c413c45484267619fd31ee0b4d02b976a6af15f0150e1b911b
       url: "https://mirrors.tuna.tsinghua.edu.cn/dart-pub/"
     source: hosted
-    version: "4.9.7+2"
+    version: "4.9.7+8"
   flutter_svg:
     dependency: "direct main"
     description:
@@ -853,6 +853,14 @@ packages:
       url: "https://mirrors.tuna.tsinghua.edu.cn/dart-pub/"
     source: hosted
     version: "0.5.0"
+  material_design_icons_flutter:
+    dependency: "direct main"
+    description:
+      name: material_design_icons_flutter
+      sha256: "6f986b7a51f3ad4c00e33c5c84e8de1bdd140489bbcdc8b66fc1283dad4dea5a"
+      url: "https://mirrors.tuna.tsinghua.edu.cn/dart-pub/"
+    source: hosted
+    version: "7.0.7296"
   media_kit:
     dependency: "direct main"
     description:

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
-import 'package:PiliPalaX/pages/mine/index.dart';
 import 'package:PiliPalaX/utils/feed_back.dart';
+import '../../utils/storage.dart';
 import './controller.dart';
 
 class HomePage extends StatefulWidget {
@@ -30,19 +30,6 @@ class _HomePageState extends State<HomePage>
     stream = _homeController.searchBarStream.stream;
   }
 
-  showUserBottomSheet() {
-    feedBack();
-    showModalBottomSheet(
-      context: context,
-      builder: (_) => const SizedBox(
-        height: 450,
-        child: MinePage(),
-      ),
-      clipBehavior: Clip.hardEdge,
-      isScrollControlled: true,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -57,7 +44,7 @@ class _HomePageState extends State<HomePage>
     // }
     return Scaffold(
       extendBody: true,
-      extendBodyBehindAppBar: true,
+      // extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         toolbarHeight: 0,
@@ -72,13 +59,13 @@ class _HomePageState extends State<HomePage>
       ),
       body: Column(
         children: [
-          CustomAppBar(
-            stream: _homeController.hideSearchBar
-                ? stream
-                : StreamController<bool>.broadcast().stream,
-            ctr: _homeController,
-            callback: showUserBottomSheet,
-          ),
+          if (!_homeController.useSideBar)
+            CustomAppBar(
+              stream: _homeController.hideSearchBar
+                  ? stream
+                  : StreamController<bool>.broadcast().stream,
+              ctr: _homeController,
+            ),
           if (_homeController.tabs.length > 1) ...[
             if (_homeController.enableGradientBg) ...[
               const CustomTabs(),
@@ -128,15 +115,13 @@ class _HomePageState extends State<HomePage>
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double height;
   final Stream<bool>? stream;
-  final HomeController? ctr;
-  final Function? callback;
+  final HomeController ctr;
 
   const CustomAppBar({
     super.key,
     this.height = kToolbarHeight,
     this.stream,
-    this.ctr,
-    this.callback,
+    required this.ctr,
   });
 
   @override
@@ -148,24 +133,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       stream: stream,
       initialData: true,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
-        final RxBool isUserLoggedIn = ctr!.userLogin;
-        final double top = MediaQuery.of(context).padding.top;
         return AnimatedOpacity(
           opacity: snapshot.data ? 1 : 0,
           duration: const Duration(milliseconds: 300),
           child: AnimatedContainer(
             curve: Curves.easeInOutCubicEmphasized,
             duration: const Duration(milliseconds: 500),
-            height: snapshot.data ? top + 52 : top,
-            padding: EdgeInsets.fromLTRB(14, top + 6, 14, 0),
-            child: Obx(
-              () => UserInfoWidget(
-                top: top,
-                ctr: ctr,
-                userLogin: isUserLoggedIn,
-                userFace: ctr?.userFace.value,
-                callback: () => callback!(),
-              ),
+            height: snapshot.data ? 52 : 0,
+            padding: const EdgeInsets.fromLTRB(14, 6, 14, 0),
+            child: SearchBarAndUser(
+              ctr: ctr,
             ),
           ),
         );
@@ -174,21 +151,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-class UserInfoWidget extends StatelessWidget {
-  const UserInfoWidget({
+class SearchBarAndUser extends StatelessWidget {
+  const SearchBarAndUser({
     Key? key,
-    required this.top,
-    required this.userLogin,
-    required this.userFace,
-    required this.callback,
     required this.ctr,
   }) : super(key: key);
 
-  final double top;
-  final RxBool userLogin;
-  final String? userFace;
-  final VoidCallback? callback;
-  final HomeController? ctr;
+  final HomeController ctr;
 
   @override
   Widget build(BuildContext context) {
@@ -196,7 +165,7 @@ class UserInfoWidget extends StatelessWidget {
       children: [
         SearchBar(ctr: ctr),
         const SizedBox(width: 4),
-        Obx(() => userLogin.value
+        Obx(() => ctr.userLogin.value
             ? ClipRect(
                 child: IconButton(
                   tooltip: '消息',
@@ -211,20 +180,20 @@ class UserInfoWidget extends StatelessWidget {
         Semantics(
             label: "我的",
             child: Obx(
-              () => userLogin.value
+              () => ctr.userLogin.value
                   ? Stack(
                       children: [
                         NetworkImgLayer(
                           type: 'avatar',
                           width: 34,
                           height: 34,
-                          src: userFace,
+                          src: ctr.userFace.value,
                         ),
                         Positioned.fill(
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
-                              onTap: () => callback?.call(),
+                              onTap: () => ctr.showUserInfoDialog(context),
                               splashColor: Theme.of(context)
                                   .colorScheme
                                   .primaryContainer
@@ -237,8 +206,75 @@ class UserInfoWidget extends StatelessWidget {
                         )
                       ],
                     )
-                  : DefaultUser(callback: () => callback!()),
+                  : DefaultUser(
+                      callback: () => ctr.showUserInfoDialog(context)),
             )),
+      ],
+    );
+  }
+}
+
+class UserAndSearchVertical extends StatelessWidget {
+  const UserAndSearchVertical({
+    Key? key,
+    required this.ctr,
+  }) : super(key: key);
+
+  final HomeController ctr;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Semantics(
+            label: "我的",
+            child: Obx(
+              () => ctr.userLogin.value
+                  ? Stack(
+                      children: [
+                        NetworkImgLayer(
+                          type: 'avatar',
+                          width: 34,
+                          height: 34,
+                          src: ctr.userFace.value,
+                        ),
+                        Positioned.fill(
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () => ctr.showUserInfoDialog(context),
+                              splashColor: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer
+                                  .withOpacity(0.3),
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(50),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    )
+                  : DefaultUser(
+                      callback: () => ctr.showUserInfoDialog(context)),
+            )),
+        const SizedBox(height: 8),
+        Obx(() => ctr.userLogin.value
+            ? IconButton(
+                tooltip: '消息',
+                onPressed: () => Get.toNamed('/whisper'),
+                icon: const Icon(
+                  Icons.notifications_none,
+                ),
+              )
+            : const SizedBox.shrink()),
+        IconButton(
+          icon: const Icon(
+            Icons.search_outlined,
+            semanticLabel: '搜索',
+          ),
+          onPressed: () => Get.toNamed('/search'),
+        ),
       ],
     );
   }
@@ -334,7 +370,6 @@ class CustomChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorTheme = Theme.of(context).colorScheme;
-    final Color secondaryContainer = colorTheme.secondaryContainer;
     final TextStyle chipTextStyle = selected
         ? const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)
         : const TextStyle(fontSize: 13);
@@ -342,16 +377,19 @@ class CustomChip extends StatelessWidget {
     const VisualDensity visualDensity =
         VisualDensity(horizontal: -4.0, vertical: -2.0);
     return InputChip(
-      side: BorderSide(
-        color: selected
-            ? colorScheme.onSecondaryContainer.withOpacity(0.2)
-            : Colors.transparent,
-      ),
-      backgroundColor: secondaryContainer,
-      selectedColor: secondaryContainer,
-      color: MaterialStateProperty.resolveWith<Color>(
-          (Set<MaterialState> states) => secondaryContainer.withAlpha(200)),
-      padding: const EdgeInsets.fromLTRB(7, 1, 7, 1),
+      side: selected
+          ? BorderSide(
+              color: colorScheme.secondary.withOpacity(0.2),
+              width: 2,
+            )
+          : BorderSide.none,
+      // backgroundColor: colorTheme.primaryContainer.withOpacity(0.1),
+      // selectedColor: colorTheme.secondaryContainer.withOpacity(0.8),
+      color:
+          MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+        return colorTheme.secondaryContainer.withOpacity(0.6);
+      }),
+      padding: const EdgeInsets.fromLTRB(6, 1, 6, 1),
       label: Text(label, style: chipTextStyle),
       onPressed: () => onTap(),
       selected: selected,

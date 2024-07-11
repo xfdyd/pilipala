@@ -91,7 +91,7 @@ class _LivePageState extends State<LivePage>
             SliverPadding(
               // 单列布局 EdgeInsets.zero
               padding:
-                  const EdgeInsets.fromLTRB(0, StyleString.safeSpace, 0, 0),
+                  const EdgeInsets.fromLTRB(0, StyleString.cardSpace, 0, 0),
               sliver: FutureBuilder(
                 future: _futureBuilderFuture,
                 builder: (context, snapshot) {

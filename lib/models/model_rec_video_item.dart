@@ -46,7 +46,7 @@ class RecVideoItemModel {
   @HiveField(11)
   int? isFollowed;
   @HiveField(12)
-  RcmdReason? rcmdReason;
+  String? rcmdReason;
 
   RecVideoItemModel.fromJson(Map<String, dynamic> json) {
     id = json["id"];
@@ -61,9 +61,10 @@ class RecVideoItemModel {
     owner = Owner.fromJson(json["owner"]);
     stat = Stat.fromJson(json["stat"]);
     isFollowed = json["is_followed"] ?? 0;
-    rcmdReason = json["rcmd_reason"] != null
-        ? RcmdReason.fromJson(json["rcmd_reason"])
-        : RcmdReason(content: '');
+    // rcmdReason = json["rcmd_reason"] != null
+    //     ? RcmdReason.fromJson(json["rcmd_reason"])
+    //     : RcmdReason(content: '');
+    rcmdReason = json["rcmd_reason"]?['content'];
   }
 }
 
@@ -89,19 +90,19 @@ class Stat {
   }
 }
 
-@HiveType(typeId: 2)
-class RcmdReason {
-  RcmdReason({
-    this.reasonType,
-    this.content,
-  });
-  @HiveField(0)
-  int? reasonType;
-  @HiveField(1)
-  String? content = '';
-
-  RcmdReason.fromJson(Map<String, dynamic> json) {
-    reasonType = json["reason_type"];
-    content = json["content"] ?? '';
-  }
-}
+// @HiveType(typeId: 2)
+// class RcmdReason {
+//   RcmdReason({
+//     this.reasonType,
+//     this.content,
+//   });
+//   @HiveField(0)
+//   int? reasonType;
+//   @HiveField(1)
+//   String? content = '';
+//
+//   RcmdReason.fromJson(Map<String, dynamic> json) {
+//     reasonType = json["reason_type"];
+//     content = json["content"] ?? '';
+//   }
+// }

@@ -32,6 +32,21 @@ class PiliScheme {
     });
   }
 
+  static SchemeEntity stringToSchemeEntity(String dataString) {
+    Uri uri = Uri.parse(dataString);
+    Map<String, String>? queryParams =
+        uri.query.isNotEmpty ? Uri.splitQueryString(uri.query) : null;
+    return SchemeEntity(
+      scheme: uri.scheme,
+      host: uri.host,
+      port: uri.hasPort ? uri.port : null,
+      path: uri.path,
+      query: queryParams,
+      source: dataString,
+      dataString: dataString,
+    );
+  }
+
   /// 路由跳转
   static void routePush(SchemeEntity value) async {
     final String scheme = value.scheme!;
@@ -94,6 +109,16 @@ class PiliScheme {
             'title': '',
             'id': 'cv$id',
             'dynamicType': 'read'
+          },
+        );
+      } else if (host == 'following' && path.startsWith("/detail/")) {
+        var opusId = path.split('/').last;
+        Get.toNamed(
+          '/webview',
+          parameters: {
+            'url': 'https://www.bilibili.com/opus/$opusId',
+            'type': 'url',
+            'pageTitle': '',
           },
         );
       } else {

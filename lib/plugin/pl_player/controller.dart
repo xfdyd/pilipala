@@ -24,6 +24,7 @@ import 'package:screen_brightness/screen_brightness.dart';
 import 'package:universal_platform/universal_platform.dart';
 
 import '../../models/video/play/subtitle.dart';
+import '../../pages/video/detail/controller.dart';
 // import 'package:wakelock_plus/wakelock_plus.dart';
 
 Box videoStorage = GStorage.video;
@@ -509,7 +510,7 @@ class PlPlayerController {
     Player player = _videoPlayerController ??
         Player(
           configuration: PlayerConfiguration(
-            // 默认缓冲 5M 大小
+            // 默认缓冲 3M 大小
             bufferSize: bufferSize,
           ),
         );
@@ -534,9 +535,8 @@ class PlPlayerController {
     await player.setAudioTrack(
       AudioTrack.auto(),
     );
-
     // 音轨
-    if (dataSource.audioSource != '' && dataSource.audioSource != null) {
+    if (dataSource.audioSource?.isNotEmpty ?? false) {
       await pp.setProperty(
         'audio-files',
         UniversalPlatform.isWindows
@@ -574,7 +574,6 @@ class PlPlayerController {
         );
 
     player.setPlaylistMode(looping);
-
     if (dataSource.type == DataSourceType.asset) {
       final assetUrl = dataSource.videoSource!.startsWith("asset://")
           ? dataSource.videoSource!
@@ -599,7 +598,25 @@ class PlPlayerController {
 
   Future refreshPlayer() async {
     Duration currentPos = _position.value;
-    await _videoPlayerController?.open(
+    if (_videoPlayerController == null) {
+      SmartDialog.showToast('视频播放器为空，请重新进入本页面');
+      return;
+    }
+    if (dataSource.videoSource?.isEmpty ?? true) {
+      SmartDialog.showToast('视频源为空，请重新进入本页面');
+      return;
+    }
+    if (dataSource.audioSource?.isEmpty ?? true) {
+      SmartDialog.showToast('音频源为空');
+    } else {
+      await (_videoPlayerController!.platform as NativePlayer).setProperty(
+        'audio-files',
+        UniversalPlatform.isWindows
+            ? dataSource.audioSource!.replaceAll(';', '\\;')
+            : dataSource.audioSource!.replaceAll(':', '\\:'),
+      );
+    }
+    await _videoPlayerController!.open(
       Media(
         dataSource.videoSource!,
         httpHeaders: dataSource.httpHeaders,
@@ -723,6 +740,29 @@ class PlPlayerController {
           isBuffering.value = event;
           videoPlayerServiceHandler.onStatusChange(
               playerStatus.status.value, event);
+        }),
+        // videoPlayerController!.stream.log.listen((event) {
+        //   print('videoPlayerController!.stream.log.listen');
+        //   print(event);
+        //   SmartDialog.showToast('视频加载日志： $event');
+        // }),
+        videoPlayerController!.stream.error.listen((event) {
+          if (event.startsWith("Failed to open https://")) {
+            EasyThrottle.throttle('videoPlayerController!.stream.error.listen',
+                const Duration(milliseconds: 1000), () {
+              SmartDialog.showToast('视频链接打开失败，重试中',
+                  displayTime: const Duration(milliseconds: 500));
+              refreshPlayer();
+            });
+            return;
+          }
+          print('videoPlayerController!.stream.error.listen');
+          print(event);
+          //tcp: ffurl_read returned 0xdfb9b0bb
+          //tcp: ffurl_read returned 0xffffff99
+          if (!event.startsWith('tcp: ffurl_read returned ')) {
+            SmartDialog.showToast('视频加载错误, $event');
+          }
         }),
         // videoPlayerController!.stream.volume.listen((event) {
         //   if (!mute.value && _volumeBeforeMute != event) {

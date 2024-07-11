@@ -8,7 +8,8 @@ class Api {
 
   // APP端不感兴趣、取消不感兴趣
   static const String feedDislike = '${HttpString.appBaseUrl}/x/feed/dislike';
-  static const String feedDislikeCancel = '${HttpString.appBaseUrl}/x/feed/dislike/cancel';
+  static const String feedDislikeCancel =
+      '${HttpString.appBaseUrl}/x/feed/dislike/cancel';
 
   // 热门视频
   static const String hotList = '/x/web-interface/popular';
@@ -35,8 +36,10 @@ class Api {
   /// like	num	操作方式	必要	1：点赞 2：取消赞
   // csrf	str	CSRF Token（位于cookie）	必要
   // https://api.bilibili.com/x/web-interface/archive/like
-  static const String likeVideo = '/x/web-interface/archive/like';
+  // static const String likeVideo = '/x/web-interface/archive/like';
 
+  // 改用app端点赞接口
+  static const String likeVideo = '${HttpString.appBaseUrl}/x/v2/view/like';
   //判断视频是否被点赞（双端）Get
   // access_key	str	APP登录Token	APP方式必要
   /// aid	num	稿件avid	必要（可选）	avid与bvid任选一个
@@ -50,7 +53,8 @@ class Api {
   /// access_key str	APP登录Token 必要
   /// aid num	稿件avid	必要
   ///
-  static const String dislikeVideo = '${HttpString.appBaseUrl}/x/v2/view/dislike';
+  static const String dislikeVideo =
+      '${HttpString.appBaseUrl}/x/v2/view/dislike';
 
   // 投币视频（web端）POST
   /// aid	num	稿件avid	必要（可选）	avid与bvid任选一个
@@ -59,7 +63,10 @@ class Api {
   /// select_like	num	是否附加点赞	非必要	0：不点赞 1：同时点赞 默认为0
   // csrf	str	CSRF Token（位于cookie）	必要
   // https://api.bilibili.com/x/web-interface/coin/add
-  static const String coinVideo = '/x/web-interface/coin/add';
+  // static const String coinVideo = '/x/web-interface/coin/add';
+
+  // 改用app端投币接口
+  static const String coinVideo = '${HttpString.appBaseUrl}/x/v2/view/coin/add';
 
   // 判断视频是否被投币（双端）GET
   // access_key	str	APP登录Token	APP方式必要
@@ -383,13 +390,16 @@ class Api {
   //https://api.bilibili.com/x/msgfeed/like?platform=web&build=0&mobi_app=web
   static const String msgFeedLike = '/x/msgfeed/like';
   //https://message.bilibili.com/x/sys-msg/query_user_notify?csrf=xxxx&csrf=xxxx&page_size=20&build=0&mobi_app=web
-  static const String msgSysUserNotify = '${HttpString.messageBaseUrl}/x/sys-msg/query_user_notify';
+  static const String msgSysUserNotify =
+      '${HttpString.messageBaseUrl}/x/sys-msg/query_user_notify';
   //https://message.bilibili.com/x/sys-msg/query_unified_notify?csrf=xxxx&csrf=xxxx&page_size=10&build=0&mobi_app=web
-  static const String msgSysUnifiedNotify = '${HttpString.messageBaseUrl}/x/sys-msg/query_unified_notify';
+  static const String msgSysUnifiedNotify =
+      '${HttpString.messageBaseUrl}/x/sys-msg/query_unified_notify';
 
   // 系统信息光标更新（已读标记）
   //https://message.bilibili.com/x/sys-msg/update_cursor?csrf=xxxx&csrf=xxxx&cursor=1705288500000000000&has_up=0&build=0&mobi_app=web
-  static const String msgSysUpdateCursor = '${HttpString.messageBaseUrl}/x/sys-msg/update_cursor';
+  static const String msgSysUpdateCursor =
+      '${HttpString.messageBaseUrl}/x/sys-msg/update_cursor';
 
   /// 私聊
   ///  'https://api.vc.bilibili.com/session_svr/v1/session_svr/get_sessions?

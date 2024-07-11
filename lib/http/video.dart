@@ -1,4 +1,6 @@
 import 'dart:developer';
+import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
 import '../common/constants.dart';
@@ -13,10 +15,12 @@ import '../models/video_detail_res.dart';
 import '../utils/id_utils.dart';
 import '../utils/recommend_filter.dart';
 import '../utils/storage.dart';
+import '../utils/utils.dart';
 import '../utils/wbi_sign.dart';
 import '../pages/mine/controller.dart';
 import 'api.dart';
 import 'init.dart';
+import 'login.dart';
 
 /// res.data['code'] == 0 请求正常返回结果
 /// res.data['data'] 为结果
@@ -31,91 +35,130 @@ class VideoHttp {
 
   // 首页推荐视频
   static Future rcmdVideoList({required int ps, required int freshIdx}) async {
-    try {
-      var res = await Request().get(
-        Api.recommendListWeb,
-        data: {
-          'version': 1,
-          'feed_version': 'V8',
-          'homepage_ver': 1,
-          'ps': ps,
-          'fresh_idx': freshIdx,
-          'brush': freshIdx,
-          'fresh_type': 4
-        },
-      );
-      if (res.data['code'] == 0) {
-        List<RecVideoItemModel> list = [];
-        List<int> blackMidsList = localCache
-            .get(LocalCacheKey.blackMidsList, defaultValue: [-1])
-            .map<int>((e) => e as int)
-            .toList();
-        for (var i in res.data['data']['item']) {
-          //过滤掉live与ad，以及拉黑用户
-          if (i['goto'] == 'av' &&
-              (i['owner'] != null &&
-                  !blackMidsList.contains(i['owner']['mid']))) {
-            RecVideoItemModel videoItem = RecVideoItemModel.fromJson(i);
-            if (!RecommendFilter.filter(videoItem)) {
-              list.add(videoItem);
-            }
+    var res = await Request().get(
+      Api.recommendListWeb,
+      data: {
+        'version': 1,
+        'feed_version': 'V8',
+        'homepage_ver': 1,
+        'ps': ps,
+        'fresh_idx': freshIdx,
+        'brush': freshIdx,
+        'fresh_type': 4
+      },
+    );
+    if (res.data['code'] == 0) {
+      List<RecVideoItemModel> list = [];
+      List<int> blackMidsList = localCache
+          .get(LocalCacheKey.blackMidsList, defaultValue: [-1])
+          .map<int>((e) => e as int)
+          .toList();
+      for (var i in res.data['data']['item']) {
+        //过滤掉live与ad，以及拉黑用户
+        if (i['goto'] == 'av' &&
+            (i['owner'] != null &&
+                !blackMidsList.contains(i['owner']['mid']))) {
+          RecVideoItemModel videoItem = RecVideoItemModel.fromJson(i);
+          if (!RecommendFilter.filter(videoItem)) {
+            list.add(videoItem);
           }
         }
-        return {'status': true, 'data': list};
-      } else {
-        return {'status': false, 'data': [], 'msg': res.data['message']};
       }
-    } catch (err) {
-      return {'status': false, 'data': [], 'msg': err.toString()};
+      return {'status': true, 'data': list};
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 
   // 添加额外的loginState变量模拟未登录状态
   static Future rcmdVideoListApp(
       {bool loginStatus = true, required int freshIdx}) async {
-    try {
-      var res = await Request().get(
-        Api.recommendListApp,
-        data: {
-          'idx': freshIdx,
-          'flush': '5',
-          'column': '4',
-          'device': 'pad',
-          'device_type': 0,
-          'device_name': 'vivo',
-          'pull': freshIdx == 0 ? 'true' : 'false',
-          'appkey': Constants.appKey,
-          'access_key': loginStatus
-              ? (localCache.get(LocalCacheKey.accessKey,
-                      defaultValue: {})['value'] ??
-                  '')
-              : ''
-        },
-      );
-      if (res.data['code'] == 0) {
-        List<RecVideoItemAppModel> list = [];
-        List<int> blackMidsList = localCache
-            .get(LocalCacheKey.blackMidsList, defaultValue: [-1])
-            .map<int>((e) => e as int)
-            .toList();
-        for (var i in res.data['data']['items']) {
-          // 屏蔽推广和拉黑用户
-          if (i['card_goto'] != 'ad_av' &&
-              (!enableRcmdDynamic ? i['card_goto'] != 'picture' : true) &&
-              (i['args'] != null &&
-                  !blackMidsList.contains(i['args']['up_mid']))) {
-            RecVideoItemAppModel videoItem = RecVideoItemAppModel.fromJson(i);
-            if (!RecommendFilter.filter(videoItem)) {
-              list.add(videoItem);
-            }
+    var data = {
+      'access_key': loginStatus
+          ? (localCache
+                  .get(LocalCacheKey.accessKey, defaultValue: {})['value'] ??
+              '')
+          : '',
+      'appkey': Constants.appKey,
+      'build': '1462100',
+      'c_locale': 'zh_CN',
+      'channel': 'yingyongbao',
+      'column': '4',
+      'device': 'pad',
+      'device_name': 'vivo',
+      'device_type': '0',
+      'disable_rcmd': '0',
+      'flush': '5',
+      'fnval': '976',
+      'fnver': '0',
+      'force_host': '2', //使用https
+      'fourk': '1',
+      'guidance': '0',
+      'https_url_req': '0',
+      'idx': freshIdx.toString(),
+      'mobi_app': 'android_hd',
+      'network': 'wifi',
+      'platform': 'android',
+      'player_net': '1',
+      'pull': freshIdx == 0 ? 'true' : 'false',
+      'qn': '32',
+      'recsys_mode': '0',
+      's_locale': 'zh_CN',
+      'splash_id': '',
+      'statistics': Constants.statistics,
+      'ts': (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString(),
+      'voice_balance': '0'
+    };
+    String sign = Utils.appSign(
+      data,
+      Constants.appKey,
+      Constants.appSec,
+    );
+    data['sign'] = sign;
+
+    var res = await Request().get(
+      Api.recommendListApp,
+      data: data,
+      options: Options(headers: {
+        'Host': 'app.bilibili.com',
+        'buvid': LoginHttp.buvid,
+        'fp_local':
+            '1111111111111111111111111111111111111111111111111111111111111111',
+        'fp_remote':
+            '1111111111111111111111111111111111111111111111111111111111111111',
+        'session_id': '11111111',
+        'env': 'prod',
+        'app-key': 'android_hd',
+        'User-Agent': Constants.userAgent,
+        'x-bili-trace-id': Constants.traceId,
+        'x-bili-aurora-eid': '',
+        'x-bili-aurora-zone': '',
+        'bili-http-engine': 'cronet',
+      }),
+    );
+    if (res.data['code'] == 0) {
+      List<RecVideoItemAppModel> list = [];
+      List<int> blackMidsList = localCache
+          .get(LocalCacheKey.blackMidsList, defaultValue: [-1])
+          .map<int>((e) => e as int)
+          .toList();
+      for (var i in res.data['data']['items']) {
+        // 屏蔽推广和拉黑用户
+        if (i['card_goto'] != 'ad_av' &&
+            i['card_goto'] != 'ad_web_s' &&
+            i['ad_info'] == null &&
+            (!enableRcmdDynamic ? i['card_goto'] != 'picture' : true) &&
+            (i['args'] != null &&
+                !blackMidsList.contains(i['args']['up_id']))) {
+          RecVideoItemAppModel videoItem = RecVideoItemAppModel.fromJson(i);
+          if (!RecommendFilter.filter(videoItem)) {
+            list.add(videoItem);
           }
         }
-        return {'status': true, 'data': list};
-      } else {
-        return {'status': false, 'data': [], 'msg': res.data['message']};
       }
-    } catch (err) {
-      return {'status': false, 'data': [], 'msg': err.toString()};
+      return {'status': true, 'data': list};
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 
@@ -213,7 +256,7 @@ class VideoHttp {
       // };
       return {
         'status': false,
-        'data': null,
+        'data': result.data,
         'code': result.code,
         'msg': result.message,
         // 'msg': errMap[result.code] ?? '请求异常',
@@ -264,12 +307,16 @@ class VideoHttp {
     var res = await Request().post(
       Api.coinVideo,
       queryParameters: {
-        'bvid': bvid,
+        'aid': IdUtils.bv2av(bvid),
+        // 'bvid': bvid,
         'multiply': multiply,
         'select_like': 0,
-        'csrf': await Request.getCsrf(),
+        'access_key': GStorage.localCache
+            .get(LocalCacheKey.accessKey, defaultValue: {})['value'],
+        // 'csrf': await Request.getCsrf(),
       },
     );
+    print(res);
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {
@@ -308,10 +355,16 @@ class VideoHttp {
     var res = await Request().post(
       Api.likeVideo,
       queryParameters: {
-        'bvid': bvid,
-        'like': type ? 1 : 2,
-        'csrf': await Request.getCsrf(),
-      },
+        'aid': IdUtils.bv2av(bvid),
+        'like': type ? 0 : 1,
+        'access_key': GStorage.localCache
+            .get(LocalCacheKey.accessKey, defaultValue: {})['value'],
+      }
+      // queryParameters: {
+      //   'bvid': bvid,
+      //   'like': type ? 1 : 2,
+      //   'csrf': await Request.getCsrf(),
+      // },
     );
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};

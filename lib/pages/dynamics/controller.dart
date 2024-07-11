@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'package:PiliPalaX/http/follow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -16,6 +17,8 @@ import 'package:PiliPalaX/utils/feed_back.dart';
 import 'package:PiliPalaX/utils/id_utils.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 import 'package:PiliPalaX/utils/utils.dart';
+
+import '../../models/follow/result.dart';
 
 class DynamicsController extends GetxController
     with GetTickerProviderStateMixin {
@@ -35,6 +38,10 @@ class DynamicsController extends GetxController
   var userInfo;
   RxBool isLoadingDynamic = false.obs;
   Box setting = GStorage.setting;
+  List<UpItem> hasUpdatedUps = <UpItem>[];
+  List<UpItem> allFollowedUps = <UpItem>[];
+  int allFollowedUpsPage = 1;
+  int allFollowedUpsTotal = 0;
 
   @override
   void onInit() {
@@ -205,6 +212,34 @@ class DynamicsController extends GetxController
     }
   }
 
+  Future queryFollowing2() async {
+    if (allFollowedUps.length >= allFollowedUpsTotal) {
+      SmartDialog.showToast('没有更多了');
+      return;
+    }
+    var res = await FollowHttp.followings(
+      vmid: userInfo.mid,
+      pn: allFollowedUpsPage,
+      ps: 50,
+      orderType: 'attention',
+    );
+    if (res['status']) {
+      allFollowedUps.addAll(res['data'].list.map<UpItem>((FollowItemModel e) =>
+          UpItem(
+              face: e.face,
+              mid: e.mid,
+              uname: e.uname,
+              hasUpdate:
+                  hasUpdatedUps.any((element) => element.mid == e.mid))));
+      allFollowedUpsPage += 1;
+      allFollowedUpsTotal = res['data'].total;
+      upData.value.upList = allFollowedUps;
+      upData.refresh();
+    } else {
+      SmartDialog.showToast(res['msg']);
+    }
+  }
+
   Future queryFollowUp({type = 'init'}) async {
     if (!userLogin.value) {
       return {'status': false, 'msg': '账号未登录'};
@@ -212,6 +247,41 @@ class DynamicsController extends GetxController
     if (type == 'init') {
       upData.value.upList = [];
       upData.value.liveUsers = LiveUsers();
+    }
+    if (setting.get(SettingBoxKey.dynamicsShowAllFollowedUp,
+        defaultValue: false)) {
+      allFollowedUpsPage = 1;
+      Future f1 = DynamicsHttp.followUp();
+      Future f2 = FollowHttp.followings(
+          vmid: userInfo.mid,
+          pn: allFollowedUpsPage,
+          ps: 50,
+          orderType: 'attention');
+      List<dynamic> ress = await Future.wait([f1, f2]);
+      if (!ress[0]['status']) {
+        SmartDialog.showToast("获取关注动态失败：${ress[0]['msg']}");
+      } else {
+        upData.value.liveUsers = ress[0]['data'].liveUsers;
+        hasUpdatedUps = ress[0]['data'].upList!;
+      }
+      if (!ress[1]['status']) {
+        SmartDialog.showToast("获取关注列表失败：${ress[1]['msg']}");
+      } else {
+        allFollowedUps = ress[1]['data']
+            .list
+            .map<UpItem>((FollowItemModel e) => UpItem(
+                face: e.face,
+                mid: e.mid,
+                uname: e.uname,
+                hasUpdate:
+                    hasUpdatedUps.any((element) => element.mid == e.mid)))
+            .toList();
+        allFollowedUpsPage += 1;
+        allFollowedUpsTotal = ress[1]['data'].total;
+      }
+      upData.value.upList =
+          allFollowedUpsTotal > 0 ? allFollowedUps : hasUpdatedUps;
+      return ress[0];
     }
     var res = await DynamicsHttp.followUp();
     if (res['status']) {

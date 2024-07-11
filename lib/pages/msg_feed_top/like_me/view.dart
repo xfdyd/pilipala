@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 
 import '../../../models/msg/msgfeed_like_me.dart';
+import '../../../utils/app_scheme.dart';
 import 'controller.dart';
 
 class LikeMePage extends StatefulWidget {
@@ -113,7 +114,8 @@ class LikeMeList extends StatelessWidget {
         return ListTile(
           onTap: () {
             String nativeUri = msgFeedLikeMeList[i].item?.nativeUri ?? "";
-            SmartDialog.showToast("跳转至：$nativeUri（暂未实现）");
+            PiliScheme.routePush(PiliScheme.stringToSchemeEntity(nativeUri));
+            // SmartDialog.showToast("跳转至：$nativeUri（暂未实现）");
           },
           leading: Column(
             children: [

@@ -69,14 +69,14 @@ class _StyleSettingState extends State<StyleSetting> {
         children: [
           SetSwitchItem(
               title: '横屏适配',
-              subTitle: '启用横屏布局与逻辑，适用于平板等设备',
+              subTitle: '启用横屏布局与逻辑，适用于平板等设备；推荐全屏方向设为【不改变当前方向】',
               leading: const Icon(Icons.phonelink_outlined),
               setKey: SettingBoxKey.horizontalScreen,
               defaultVal: false,
               callFn: (value) {
                 if (value) {
                   autoScreen();
-                  SmartDialog.showToast('已开启横屏适配，推荐将全屏方式设为【不改变当前方向】');
+                  SmartDialog.showToast('已开启横屏适配');
                 } else {
                   AutoOrientation.portraitUpMode();
                   SmartDialog.showToast('已关闭横屏适配');
@@ -84,7 +84,7 @@ class _StyleSettingState extends State<StyleSetting> {
               }),
           const SetSwitchItem(
             title: '改用侧边栏',
-            subTitle: '开启后底栏被替换，且底栏相关设置失效',
+            subTitle: '开启后底栏与顶栏被替换，且相关设置失效',
             leading: Icon(Icons.chrome_reader_mode_outlined),
             setKey: SettingBoxKey.useSideBar,
             defaultVal: false,
@@ -184,6 +184,13 @@ class _StyleSettingState extends State<StyleSetting> {
                 setState(() {});
               }
             },
+          ),
+          const SetSwitchItem(
+            title: '动态页显示所有已关注Up主',
+            subTitle: '并以最常访问排序Up',
+            leading: Icon(Icons.people_alt_outlined),
+            setKey: SettingBoxKey.dynamicsShowAllFollowedUp,
+            defaultVal: false,
           ),
           ListTile(
             dense: false,

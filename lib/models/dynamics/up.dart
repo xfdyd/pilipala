@@ -73,14 +73,14 @@ class UpItem {
   UpItem({
     this.face,
     this.hasUpdate,
-    this.isReserveRecall,
+    // this.isReserveRecall,
     this.mid,
     this.uname,
   });
 
   String? face;
   bool? hasUpdate;
-  bool? isReserveRecall;
+  // bool? isReserveRecall;
   int? mid;
   String? uname;
   String type = 'up';
@@ -88,7 +88,7 @@ class UpItem {
   UpItem.fromJson(Map<String, dynamic> json) {
     face = json['face'];
     hasUpdate = json['has_update'];
-    isReserveRecall = json['is_reserve_recall'];
+    // isReserveRecall = json['is_reserve_recall'];
     mid = json['mid'];
     uname = json['uname'];
   }

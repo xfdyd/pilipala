@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -6,6 +7,8 @@ import 'package:hive/hive.dart';
 import 'package:PiliPalaX/models/common/tab_type.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 import '../../http/index.dart';
+import '../../utils/feed_back.dart';
+import '../mine/view.dart';
 
 class HomeController extends GetxController with GetTickerProviderStateMixin {
   bool flag = false;
@@ -27,6 +30,7 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
   late List<String> tabbarSort;
   RxString defaultSearch = ''.obs;
   late bool enableGradientBg;
+  late bool useSideBar;
 
   @override
   void onInit() {
@@ -41,6 +45,7 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     }
     enableGradientBg =
         setting.get(SettingBoxKey.enableGradientBg, defaultValue: true);
+    useSideBar = setting.get(SettingBoxKey.useSideBar, defaultValue: false);
     // 进行tabs配置
     setTabConfig();
   }
@@ -116,5 +121,15 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     if (res.data['code'] == 0) {
       defaultSearch.value = res.data['data']['name'];
     }
+  }
+
+  showUserInfoDialog(context) {
+    feedBack();
+    showDialog(
+        context: context,
+        useSafeArea: true,
+        builder: (_) => const Dialog(
+              child: MinePage(),
+            ));
   }
 }

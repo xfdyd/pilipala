@@ -155,6 +155,9 @@ class VideoDetailController extends GetxController
   showReplyReplyPanel() {
     replyReplyBottomSheetCtr =
         scaffoldKey.currentState?.showBottomSheet((BuildContext context) {
+      // SmartDialog.show(
+      //     alignment: Alignment.bottomRight,
+      //     builder: (context) {
       return VideoReplyReplyPanel(
         oid: oid.value,
         rpid: fRpid,
@@ -391,8 +394,7 @@ class VideoDetailController extends GetxController
 
       /// 优先顺序 设置中指定质量 -> 当前可选的最高质量
       late AudioItem? firstAudio;
-      final List<AudioItem> audiosList = data.dash!.audio!;
-
+      final List<AudioItem> audiosList = data.dash!.audio ?? <AudioItem>[];
       if (data.dash!.dolby?.audio != null &&
           data.dash!.dolby!.audio!.isNotEmpty) {
         // 杜比
@@ -413,17 +415,17 @@ class VideoDetailController extends GetxController
         }
         firstAudio = audiosList.firstWhere((e) => e.id == closestNumber,
             orElse: () => audiosList.first);
+        audioUrl = enableCDN
+            ? VideoUtils.getCdnUrl(firstAudio)
+            : (firstAudio.backupUrl ?? firstAudio.baseUrl!);
+        if (firstAudio.id != null) {
+          currentAudioQa = AudioQualityCode.fromCode(firstAudio.id!)!;
+        }
       } else {
         firstAudio = AudioItem();
+        audioUrl = '';
       }
-
-      audioUrl = enableCDN
-          ? VideoUtils.getCdnUrl(firstAudio)
-          : (firstAudio.backupUrl ?? firstAudio.baseUrl!);
       //
-      if (firstAudio.id != null) {
-        currentAudioQa = AudioQualityCode.fromCode(firstAudio.id!)!;
-      }
       defaultST = Duration(milliseconds: data.lastPlayTime!);
       if (autoPlay.value) {
         isShowCover.value = false;

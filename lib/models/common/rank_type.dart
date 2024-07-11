@@ -20,8 +20,9 @@ enum RandType {
   fashion,
   entertainment,
   film,
-  origin,
-  rookie
+  documentary,
+  movie,
+  teleplay
 }
 
 extension RankTypeDesc on RandType {
@@ -42,7 +43,10 @@ extension RankTypeDesc on RandType {
         '鬼畜',
         '时尚',
         '娱乐',
-        '影视'
+        '影视',
+        '纪录',
+        '电影',
+        '剧集'
       ][index];
 
   String get id => [
@@ -62,7 +66,10 @@ extension RankTypeDesc on RandType {
         'madness',
         'fashion',
         'entertainment',
-        'film'
+        'film',
+        'documentary',
+        'movie',
+        'teleplay'
       ][index];
 }
 
@@ -236,5 +243,35 @@ List tabsConfig = [
     'type': RandType.film,
     'ctr': Get.put<ZoneController>(ZoneController(), tag: '181'),
     'page': const ZonePage(rid: 181),
+  },
+  {
+    'icon': const Icon(
+      Icons.live_tv_outlined,
+      size: 15,
+    ),
+    'label': '纪录',
+    'type': RandType.documentary,
+    'ctr': Get.put<ZoneController>(ZoneController(), tag: '177'),
+    'page': const ZonePage(rid: 177),
+  },
+  {
+    'icon': const Icon(
+      Icons.live_tv_outlined,
+      size: 15,
+    ),
+    'label': '电影',
+    'type': RandType.movie,
+    'ctr': Get.put<ZoneController>(ZoneController(), tag: '23'),
+    'page': const ZonePage(rid: 23),
+  },
+  {
+    'icon': const Icon(
+      Icons.live_tv_outlined,
+      size: 15,
+    ),
+    'label': '剧集',
+    'type': RandType.teleplay,
+    'ctr': Get.put<ZoneController>(ZoneController(), tag: '11'),
+    'page': const ZonePage(rid: 11),
   }
 ];

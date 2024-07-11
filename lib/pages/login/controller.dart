@@ -46,7 +46,6 @@ class LoginPageController extends GetxController
   Timer? qrCodeTimer;
   Timer? smsSendCooldownTimer;
 
-
   @override
   void onInit() {
     super.onInit();
@@ -113,40 +112,40 @@ class LoginPageController extends GetxController
   }
 
   Future afterLoginByApp(Map<String, dynamic> token_info, cookie_info) async {
-    Box localCache = GStorage.localCache;
-    localCache.put(LocalCacheKey.accessKey, {
-      'mid': token_info['mid'],
-      'value': token_info['access_token'],
-      'refresh': token_info['refresh_token']
-    });
-    List<dynamic> cookieInfo = cookie_info['cookies'];
-    print("cookieInfo");
-    print(cookieInfo);
-    List<Cookie> cookies = [];
-    String cookieStrings = cookieInfo.map((cookie) {
-      String cstr =
-          '${cookie['name']}=${cookie['value']};Domain=.bilibili.com;Path=/;';
-      cookies.add(Cookie.fromSetCookieValue(cstr));
-      return cstr;
-    }).join('');
-    List<String> Urls = [
-      HttpString.baseUrl,
-      HttpString.apiBaseUrl,
-      HttpString.tUrl
-    ];
-    for (var url in Urls) {
-      await Request.cookieManager.cookieJar
-          .saveFromResponse(Uri.parse(url), cookies);
-    }
-    print(cookieStrings);
-    print(Request.cookieManager.cookieJar
-        .loadForRequest(Uri.parse(HttpString.apiBaseUrl)));
-    Request.dio.options.headers['cookie'] = cookieStrings;
-    print(Request.dio.options);
     try {
+      Box localCache = GStorage.localCache;
+      localCache.put(LocalCacheKey.accessKey, {
+        'mid': token_info['mid'],
+        'value': token_info['access_token'],
+        'refresh': token_info['refresh_token']
+      });
+      List<dynamic> cookieInfo = cookie_info['cookies'];
+      print("cookieInfo");
+      print(cookieInfo);
+      List<Cookie> cookies = [];
+      String cookieStrings = cookieInfo.map((cookie) {
+        String cstr =
+            '${cookie['name']}=${cookie['value']};Domain=.bilibili.com;Path=/;';
+        cookies.add(Cookie.fromSetCookieValue(cstr));
+        return cstr;
+      }).join('');
+      List<String> Urls = [
+        HttpString.baseUrl,
+        HttpString.apiBaseUrl,
+        HttpString.tUrl
+      ];
+      for (var url in Urls) {
+        await Request.cookieManager.cookieJar
+            .saveFromResponse(Uri.parse(url), cookies);
+      }
+      print(cookieStrings);
+      print(Request.cookieManager.cookieJar
+          .loadForRequest(Uri.parse(HttpString.apiBaseUrl)));
+      Request.dio.options.headers['cookie'] = cookieStrings;
+      print(Request.dio.options);
       await WebviewCookieManager().setCookies(cookies);
     } catch (e) {
-      SmartDialog.showToast('webview设置cookie失败，$e');
+      SmartDialog.showToast('设置登录态失败，$e');
     }
     final result = await UserHttp.userInfo();
     if (result['status'] && result['data'].isLogin) {
@@ -294,11 +293,23 @@ class LoginPageController extends GetxController
     );
     print(res);
     if (res['status']) {
-      SmartDialog.showToast('登录成功');
       var data = res['data'];
       for (var key in data.keys) {
         print('$key: ${data[key]}');
       }
+      if (data == null) {
+        SmartDialog.showToast('登录异常，接口未返回数据：${res["msg"]}');
+        return;
+      }
+      if (data['token_info'] == null) {
+        SmartDialog.showToast('登录异常，接口未返回token信息，${res["msg"]}，\n $data');
+        return;
+      }
+      if (data['cookie_info'] == null) {
+        SmartDialog.showToast('登录异常，接口未返回cookie信息，${res["msg"]}，\n $data');
+        return;
+      }
+      SmartDialog.showToast('正在保存身份信息');
       await afterLoginByApp(data['token_info'], data['cookie_info']);
       Get.back();
     } else {

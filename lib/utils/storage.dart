@@ -183,6 +183,7 @@ class SettingBoxKey {
           'videoPlayerShowStatusBarBackgroundColor', // 播放页状态栏显示为背景色
       dynamicsWaterfallFlow = 'dynamicsWaterfallFlow', // 动态瀑布流
       upPanelPosition = 'upPanelPosition', // up主面板位置
+      dynamicsShowAllFollowedUp = 'dynamicsShowAllFollowedUp', // 动态显示全部关注up
       useSideBar = 'useSideBar',
       enableMYBar = 'enableMYBar',
       hideSearchBar = 'hideSearchBar', // 收起顶栏

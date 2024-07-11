@@ -100,8 +100,8 @@ class Utils {
     if (!emptyStatCheck(videoItem.stat.danmu)) {
       semanticsLabel += ',${Utils.numFormat(videoItem.stat.danmu)}弹幕';
     }
-    if (videoItem.rcmdReason != null && videoItem.rcmdReason.content != '') {
-      semanticsLabel += ',${videoItem.rcmdReason.content}';
+    if (videoItem.rcmdReason != null) {
+      semanticsLabel += ',${videoItem.rcmdReason}';
     }
     if (!emptyStatCheck(videoItem.duration) &&
         (videoItem.duration is! int || videoItem.duration > 0)) {

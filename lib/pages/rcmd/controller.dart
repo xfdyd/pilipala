@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:PiliPalaX/http/video.dart';
@@ -11,7 +12,6 @@ class RcmdController extends GetxController {
   int _currentPage = 0;
   // RxList<RecVideoItemAppModel> appVideoList = <RecVideoItemAppModel>[].obs;
   // RxList<RecVideoItemModel> webVideoList = <RecVideoItemModel>[].obs;
-  bool isLoadingMore = true;
   OverlayEntry? popupDialog;
   Box setting = GStorage.setting;
   RxInt crossAxisCount = 2.obs;
@@ -35,9 +35,6 @@ class RcmdController extends GetxController {
 
   // 获取推荐
   Future queryRcmdFeed(type) async {
-    if (isLoadingMore == false) {
-      return;
-    }
     if (type == 'onRefresh') {
       _currentPage = 0;
     }
@@ -75,17 +72,22 @@ class RcmdController extends GetxController {
       _currentPage += 1;
       // 若videoList数量太小，可能会影响翻页，此时再次请求
       // 为避免请求到的数据太少时还在反复请求，要求本次返回数据大于1条才触发
-      if (res['data'].length > 1 && videoList.length < 22) {
-        queryRcmdFeed('onLoad');
+      if (res['data'].length > 1 && videoList.length < 24) {
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (videoList.length < 24) queryRcmdFeed('onLoad');
+        });
       }
+      if (res['data'].length < 5) {
+        SmartDialog.showToast("仅请求到${res['data'].length}条");
+      }
+    } else {
+      SmartDialog.showToast("${res['msg']}，请尝试(重新)登录");
     }
-    isLoadingMore = false;
     return res;
   }
 
   // 下拉刷新
   Future onRefresh() async {
-    isLoadingMore = true;
     queryRcmdFeed('onRefresh');
   }
 

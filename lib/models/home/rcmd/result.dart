@@ -35,7 +35,7 @@ class RecVideoItemAppModel {
   String? title;
   int? isFollowed;
   RcmdOwner? owner;
-  RcmdReason? rcmdReason;
+  String? rcmdReason;
   String? goto;
   int? param;
   String? uri;
@@ -66,14 +66,10 @@ class RecVideoItemAppModel {
     //duration = json['cover_right_text'];
     title = json['title'];
     owner = RcmdOwner.fromJson(json);
-    rcmdReason = json['rcmd_reason_style'] != null
-        ? RcmdReason.fromJson(json['rcmd_reason_style'])
-        : null;
+    rcmdReason = json['bottom_rcmd_reason'] ?? json['top_rcmd_reason'];
     // 由于app端api并不会直接返回与owner的关注状态
     // 所以借用推荐原因是否为“已关注”、“新关注”判别关注状态，从而与web端接口等效
-    String rcmdReasonContent = rcmdReason?.content ?? '';
-    isFollowed =
-        (rcmdReasonContent == '已关注') || (rcmdReasonContent == '新关注') ? 1 : 0;
+    isFollowed = (rcmdReason == '已关注') || (rcmdReason == '新关注') ? 1 : 0;
     // 如果是，就无需再显示推荐原因，交由view统一处理即可
     if (isFollowed == 1) {
       rcmdReason = null;
@@ -86,7 +82,7 @@ class RecVideoItemAppModel {
     if (json['goto'] == 'bangumi') {
       bangumiView = json['cover_left_text_1'];
       bangumiFollow = json['cover_left_text_2'];
-      bangumiBadge = json['badge'];
+      bangumiBadge = json['cover_right_text'];
     }
 
     cardType = json['card_type'];
@@ -126,18 +122,6 @@ class RcmdOwner {
             ? json['desc_button']['text']
             : '';
     mid = json['args']['up_id'] ?? -1;
-  }
-}
-
-class RcmdReason {
-  RcmdReason({
-    this.content,
-  });
-
-  String? content;
-
-  RcmdReason.fromJson(Map<String, dynamic> json) {
-    content = json["text"] ?? '';
   }
 }
 
