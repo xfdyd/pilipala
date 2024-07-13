@@ -587,7 +587,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                   setBrightness(result);
                 } else if (tapPosition < sectionWidth * 3) {
                   // 全屏
-                  const double threshold = 10; // 滑动阈值
+                  const double threshold = 7.0; // 滑动阈值
                   void fullScreenTrigger(bool status) async {
                     EasyThrottle.throttle(
                         'fullScreen', const Duration(milliseconds: 1000), () {
