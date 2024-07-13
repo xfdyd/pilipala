@@ -15,6 +15,7 @@ import 'package:PiliPalaX/utils/feed_back.dart';
 import 'package:PiliPalaX/utils/id_utils.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BangumiIntroController extends GetxController {
   // 视频bvid
@@ -237,7 +238,7 @@ class BangumiIntroController extends GetxController {
         builder: (context) {
           String videoUrl = '${HttpString.baseUrl}/video/$bvid';
           return AlertDialog(
-            title: const Text('分享方式'),
+            title: const Text('请选择'),
             actions: [
               TextButton(
                   onPressed: () {
@@ -245,6 +246,11 @@ class BangumiIntroController extends GetxController {
                     SmartDialog.showToast('已复制');
                   },
                   child: const Text('复制链接到剪贴板')),
+              TextButton(
+                  onPressed: () {
+                    launchUrl(Uri.parse(videoUrl));
+                  },
+                  child: const Text('其它app打开')),
               TextButton(
                   onPressed: () async {
                     var result =
@@ -340,22 +346,29 @@ class BangumiIntroController extends GetxController {
     return true;
   }
 
-  /// 列表循环或者顺序播放时，自动播放下一个
+  /// 列表循环或者顺序播放时，自动播放下一个；自动连播时，播放相关视频
   bool nextPlay() {
     late List episodes;
-    if (bangumiDetail.value.episodes != null) {
-      episodes = bangumiDetail.value.episodes!;
-    }
     VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
+    PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
+
+    if (bangumiDetail.value.episodes != null) {
+      episodes = bangumiDetail.value.episodes!;
+    } else {
+      if (platRepeat == PlayRepeat.autoPlayRelated) {
+        return playRelated();
+      }
+    }
     int currentIndex =
         episodes.indexWhere((e) => e.cid == videoDetailCtr.cid.value);
     int nextIndex = currentIndex + 1;
-    PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
     // 列表循环
     if (nextIndex == episodes.length - 1) {
       if (platRepeat == PlayRepeat.listCycle) {
         nextIndex = 0;
+      } else if (platRepeat == PlayRepeat.autoPlayRelated) {
+        return playRelated();
       } else {
         return false;
       }
@@ -365,5 +378,10 @@ class BangumiIntroController extends GetxController {
     int aid = episodes[nextIndex].aid!;
     changeSeasonOrbangu(bvid, cid, aid);
     return true;
+  }
+
+  bool playRelated() {
+    SmartDialog.showToast('番剧暂无相关视频');
+    return false;
   }
 }

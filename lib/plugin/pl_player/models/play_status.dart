@@ -1,9 +1,13 @@
 import 'package:get/get.dart';
 
-enum PlayerStatus { completed, playing, paused }
+enum PlayerStatus { completed, playing, paused, none }
 
 class PlPlayerStatus {
-  Rx<PlayerStatus> status = Rx(PlayerStatus.paused);
+  Rx<PlayerStatus> status = Rx(PlayerStatus.none);
+
+  bool get none {
+    return status.value == PlayerStatus.none;
+  }
 
   bool get playing {
     return status.value == PlayerStatus.playing;

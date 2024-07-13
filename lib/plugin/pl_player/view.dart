@@ -89,6 +89,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   late int defaultBtmProgressBehavior;
   late bool enableQuickDouble;
   late bool fullScreenGestureReverse;
+
+  Offset _initialFocalPoint = Offset.zero;
+  String? _gestureDirection; // 'horizontal' or 'vertical'
   //播放器放缩
   bool interacting = false;
 
@@ -524,22 +527,40 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               if (details.pointerCount == 2) {
                 interacting = true;
               }
+              _initialFocalPoint = details.localFocalPoint;
+              _gestureDirection = null;
             },
+
             onInteractionUpdate: (ScaleUpdateDetails details) {
               if (interacting) return;
               if (details.pointerCount == 2) {
                 interacting = true;
+                _gestureDirection = null;
                 return;
               }
 
               /// 锁定时禁用
               if (_.controlsLock.value) return;
-              Offset delta = details.focalPointDelta;
-              if (delta.distance < 2) return;
               RenderBox renderBox =
                   _playerKey.currentContext!.findRenderObject() as RenderBox;
-              // if onHorizontalDragUpdate
-              if (delta.dx.abs() > 5 * delta.dy.abs()) {
+
+              if (_gestureDirection == null) {
+                Offset cumulativeDelta =
+                    details.localFocalPoint - _initialFocalPoint;
+                if (cumulativeDelta.distance < 1.5) return;
+                if (cumulativeDelta.dx.abs() > 4 * cumulativeDelta.dy.abs()) {
+                  _gestureDirection = 'horizontal';
+                } else if (cumulativeDelta.dy.abs() >
+                    4 * cumulativeDelta.dx.abs()) {
+                  _gestureDirection = 'vertical';
+                } else {
+                  return;
+                }
+              }
+
+              Offset delta = details.focalPointDelta;
+
+              if (_gestureDirection == 'horizontal') {
                 // live模式下禁用
                 if (_.videoType.value == 'live') return;
                 final int curSliderPosition =
@@ -552,7 +573,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     pos.clamp(Duration.zero, _.duration.value);
                 _.onUpdatedSliderProgress(result);
                 _.onChangedSliderStart();
-              } else if (delta.dx.abs() * 5 < delta.dy.abs()) {
+              } else if (_gestureDirection == 'vertical') {
                 // 垂直方向 音量/亮度调节
                 final double totalWidth = renderBox.size.width;
                 final double tapPosition = details.localFocalPoint.dx;
@@ -566,21 +587,21 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                   setBrightness(result);
                 } else if (tapPosition < sectionWidth * 3) {
                   // 全屏
-                  const double threshold = 7.0; // 滑动阈值
+                  const double threshold = 10; // 滑动阈值
                   void fullScreenTrigger(bool status) async {
                     EasyThrottle.throttle(
-                        'fullScreen', const Duration(milliseconds: 500), () {
-                      // widget.controller.triggerFullScreen(status: status);
+                        'fullScreen', const Duration(milliseconds: 1000), () {
                       _.triggerFullScreen(status: status);
                     });
                   }
-
-                  if (delta.dy > threshold) {
+                  double cumulativeDy =
+                      details.localFocalPoint.dy - _initialFocalPoint.dy;
+                  if (cumulativeDy > threshold) {
                     // 下滑
                     if (_.isFullScreen.value ^ fullScreenGestureReverse) {
                       fullScreenTrigger(fullScreenGestureReverse);
                     }
-                  } else if (delta.dy < -threshold) {
+                  } else if (cumulativeDy < -threshold) {
                     // 上划
                     if (!_.isFullScreen.value ^ fullScreenGestureReverse) {
                       fullScreenTrigger(!fullScreenGestureReverse);
@@ -604,6 +625,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 _.seekTo(_.sliderPosition.value, type: 'slider');
               }
               interacting = false;
+              _initialFocalPoint = Offset.zero;
+              _gestureDirection = null;
             },
             child: Video(
               key: ValueKey('${_.videoFit.value}'),

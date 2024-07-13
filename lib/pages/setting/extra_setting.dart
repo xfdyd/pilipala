@@ -300,7 +300,7 @@ class _ExtraSettingState extends State<ExtraSetting> {
           ),
           const SetSwitchItem(
             title: '自动清除缓存',
-            subTitle: '每次启动时清除缓存',
+            subTitle: '每次启动时清除缓存（iOS不支持）',
             leading: Icon(Icons.auto_delete_outlined),
             setKey: SettingBoxKey.autoClearCache,
             defaultVal: false,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../utils/storage.dart';
@@ -21,6 +22,7 @@ class ListSheet {
     required this.changeFucCall,
     required this.context,
   });
+  bool reverse = false;
 
   Widget buildEpisodeListItem(
     dynamic episode,
@@ -114,11 +116,40 @@ class ListSheet {
                   height: 45,
                   padding: const EdgeInsets.only(left: 14, right: 14),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         '合集（${episodes!.length}）',
                         style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      IconButton(
+                        tooltip: '跳至顶部',
+                        icon: const Icon(Icons.vertical_align_top),
+                        onPressed: () {
+                          itemScrollController.jumpTo(
+                            index: !reverse ? 0 : episodes!.length - 1,
+                          );
+                        },
+                      ),
+                      IconButton(
+                        tooltip: '跳至底部',
+                        icon: const Icon(Icons.vertical_align_bottom),
+                        onPressed: () {
+                          itemScrollController.jumpTo(
+                            index: !reverse ? episodes!.length - 1 : 0,
+                          );
+                        },
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        tooltip: '反序',
+                        icon: Icon(!reverse
+                            ? MdiIcons.sortAscending
+                            : MdiIcons.sortDescending),
+                        onPressed: () {
+                          setState(() {
+                            reverse = !reverse;
+                          });
+                        },
                       ),
                       IconButton(
                         tooltip: '关闭',
@@ -135,21 +166,17 @@ class ListSheet {
                 Expanded(
                   child: Material(
                     child: ScrollablePositionedList.builder(
-                      itemCount: episodes!.length + 1,
+                      padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).padding.bottom + 20),
+                      reverse: reverse,
+                      itemCount: episodes!.length,
                       itemBuilder: (BuildContext context, int index) {
-                        bool isLastItem = index == episodes!.length;
-                        bool isCurrentIndex = currentIndex == index;
-                        return isLastItem
-                            ? SizedBox(
-                                height:
-                                    MediaQuery.of(context).padding.bottom + 20,
-                              )
-                            : buildEpisodeListItem(
-                                episodes![index],
-                                index,
-                                isCurrentIndex,
-                                bottomSheetController!,
-                              );
+                        return buildEpisodeListItem(
+                          episodes![index],
+                          index,
+                          currentIndex == index,
+                          bottomSheetController!,
+                        );
                       },
                       itemScrollController: itemScrollController,
                     ),

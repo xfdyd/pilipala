@@ -46,7 +46,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late BangumiIntroController bangumiIntroController;
   late String heroTag;
 
-  PlayerStatus playerStatus = PlayerStatus.playing;
+  Rx<PlayerStatus> playerStatus = PlayerStatus.none.obs;
   double doubleOffset = 0;
 
   final Box<dynamic> localCache = GStorage.localCache;
@@ -157,7 +157,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   // 播放器状态监听
   void playerListener(PlayerStatus? status) async {
-    playerStatus = status!;
+    playerStatus.value = status!;
     if (status == PlayerStatus.completed) {
       shutdownTimerService.handleWaitingFinished();
       bool notExitFlag = false;
@@ -387,12 +387,13 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     Widget plPlayer = FutureBuilder(
         future: _futureBuilderFuture,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.hasData && snapshot.data['status']) {
+          if (snapshot.connectionState == ConnectionState.done) {
             return Obx(
               () => !videoDetailController.autoPlay.value ||
                       plPlayerController == null ||
-                      plPlayerController!.videoController == null
-                  ? nil
+                      plPlayerController!.videoController == null ||
+                      playerStatus.value == PlayerStatus.none
+                  ? Text(playerStatus.value.toString())
                   : PLVideoPlayer(
                       controller: plPlayerController!,
                       videoIntroController:

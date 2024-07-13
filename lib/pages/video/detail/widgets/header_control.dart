@@ -1110,7 +1110,7 @@ class _HeaderControlState extends State<HeaderControl> {
       builder: (BuildContext context) {
         return Container(
           width: double.infinity,
-          height: 250,
+          height: 300,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.background,

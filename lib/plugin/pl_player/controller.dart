@@ -806,6 +806,7 @@ class PlPlayerController {
         /// 拖动进度条调节时，不等待第一帧，防止抖动
         await _videoPlayerController?.stream.buffer.first;
       }
+      danmakuController?.clear();
       await _videoPlayerController?.seek(position);
       // if (playerStatus.stopped) {
       //   play();
@@ -818,6 +819,7 @@ class PlPlayerController {
         //_timerForSeek = null;
         if (duration.value.inSeconds != 0) {
           await _videoPlayerController?.stream.buffer.first;
+          danmakuController?.clear();
           await _videoPlayerController?.seek(position);
           // if (playerStatus.status.value == PlayerStatus.paused) {
           //   play();

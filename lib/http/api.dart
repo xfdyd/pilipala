@@ -18,6 +18,10 @@ class Api {
   // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/videostream_url.md
   static const String videoUrl = '/x/player/wbi/playurl';
 
+  // 番剧视频流
+  // https://api.bilibili.com/pgc/player/web/playurl?cid=104236640&bvid=BV13t411n7ex
+  static const String bangumiVideoUrl = '/pgc/player/web/playurl';
+
   // 字幕
   // aid, cid
   static const String subtitleUrl = '/x/player/wbi/v2';

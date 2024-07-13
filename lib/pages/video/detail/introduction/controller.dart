@@ -19,7 +19,10 @@ import 'package:PiliPalaX/utils/id_utils.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:PiliPalaX/pages/member/controller.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../http/search.dart';
+import '../../../../models/model_hot_video_item.dart';
 import '../related/index.dart';
 import 'widgets/group_panel.dart';
 
@@ -352,7 +355,7 @@ class VideoIntroController extends GetxController {
         builder: (context) {
           String videoUrl = '${HttpString.baseUrl}/video/$bvid';
           return AlertDialog(
-            title: const Text('分享方式'),
+            title: const Text('请选择'),
             actions: [
               TextButton(
                   onPressed: () {
@@ -361,6 +364,11 @@ class VideoIntroController extends GetxController {
                     Get.back();
                   },
                   child: const Text('复制链接')),
+              TextButton(
+                  onPressed: () {
+                    launchUrl(Uri.parse(videoUrl));
+                  },
+                  child: const Text('其它app打开')),
               TextButton(
                   onPressed: () async {
                     var result = await Share.share('${videoDetail.value.title} '
@@ -541,18 +549,27 @@ class VideoIntroController extends GetxController {
       final List<Part> pages = videoDetail.value.pages!;
       episodes.addAll(pages);
     }
+    final VideoDetailController videoDetailCtr =
+        Get.find<VideoDetailController>(tag: heroTag);
+    final PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
+
+    if (episodes.isEmpty) {
+      if (platRepeat == PlayRepeat.autoPlayRelated) {
+        return playRelated();
+      }
+      return false;
+    }
 
     final int currentIndex =
         episodes.indexWhere((e) => e.cid == lastPlayCid.value);
     int nextIndex = currentIndex + 1;
-    final VideoDetailController videoDetailCtr =
-        Get.find<VideoDetailController>(tag: heroTag);
-    final PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
 
     // 列表循环
     if (nextIndex >= episodes.length) {
       if (platRepeat == PlayRepeat.listCycle) {
         nextIndex = 0;
+      } else if (platRepeat == PlayRepeat.autoPlayRelated) {
+        return playRelated();
       } else {
         return false;
       }
@@ -561,6 +578,30 @@ class VideoIntroController extends GetxController {
     final String rBvid = isPages ? bvid : episodes[nextIndex].bvid;
     final int rAid = isPages ? IdUtils.bv2av(bvid) : episodes[nextIndex].aid!;
     changeSeasonOrbangu(rBvid, cid, rAid);
+    return true;
+  }
+
+  bool playRelated() {
+    final RelatedController relatedCtr =
+        Get.find<RelatedController>(tag: heroTag);
+    if (relatedCtr.relatedVideoList.isEmpty) {
+      return false;
+    }
+
+    final HotVideoItemModel videoItem = relatedCtr.relatedVideoList[0];
+    try {
+      if (videoItem.cid != null) {
+        Get.offNamed('/video?bvid=${videoItem.bvid}&cid=${videoItem.cid}',
+            arguments: {'videoItem': videoItem, 'heroTag': heroTag});
+        // changeSeasonOrbangu(videoItem.bvid, videoItem.cid, videoItem.aid);
+      } else {
+        SearchHttp.ab2c(aid: videoItem.aid, bvid: videoItem.bvid).then((cid) =>
+            Get.offNamed('/video?bvid=${videoItem.bvid}&cid=${videoItem.cid}',
+                arguments: {'videoItem': videoItem, 'heroTag': heroTag}));
+      }
+    } catch (err) {
+      SmartDialog.showToast(err.toString());
+    }
     return true;
   }
 
