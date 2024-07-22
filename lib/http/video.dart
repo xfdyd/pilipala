@@ -277,7 +277,7 @@ class VideoHttp {
       }
       return {'status': true, 'data': list};
     } else {
-      return {'status': false, 'data': []};
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 

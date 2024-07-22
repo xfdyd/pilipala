@@ -15,7 +15,7 @@ class VideoUtils {
     String? backupUrl;
     String? videoUrl;
     String defaultCDNService = GStorage.setting
-        .get(SettingBoxKey.CDNService, defaultValue: CDNService.ali.code);
+        .get(SettingBoxKey.CDNService, defaultValue: CDNService.backupUrl.code);
     if (item is AudioItem) {
       if (GStorage.setting
           .get(SettingBoxKey.disableAudioCDN, defaultValue: true)) {

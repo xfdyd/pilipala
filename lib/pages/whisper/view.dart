@@ -201,7 +201,7 @@ class _WhisperPageState extends State<WhisperPage> {
                                         width: 45,
                                         height: 45,
                                         type: 'avatar',
-                                        src: sessionList[i].accountInfo?.face,
+                                        src: sessionList[i].accountInfo?.face ?? "",
                                       ),
                                     ),
                                     title: Text(

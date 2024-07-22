@@ -43,7 +43,7 @@ class _VideoSettingState extends State<VideoSetting> {
     videoSync =
         setting.get(SettingBoxKey.videoSync, defaultValue: 'display-resample');
     defaultCDNService = setting.get(SettingBoxKey.CDNService,
-        defaultValue: CDNService.ali.code);
+        defaultValue: CDNService.backupUrl.code);
   }
 
   @override

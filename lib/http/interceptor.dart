@@ -47,7 +47,9 @@ class ApiInterceptor extends Interceptor {
     String url = err.requestOptions.uri.toString();
     print('🌹🌹ApiInterceptor: $url');
     // 屏蔽弹幕、心跳、人数请求的错误提示
-    if (!url.contains('heartbeat') && !url.contains('seg.so') && !url.contains('online/total')) {
+    if (!url.contains('heartbeat') &&
+        !url.contains('seg.so') &&
+        !url.contains('online/total')) {
       SmartDialog.showToast(
         await dioError(err) + url,
         displayType: SmartToastType.onlyRefresh,
@@ -75,7 +77,7 @@ class ApiInterceptor extends Interceptor {
         return '发送请求超时，请检查网络设置';
       case DioExceptionType.unknown:
         final String res = await checkConnect();
-        return '$res，${error.error} ${error.message} 网络异常！';
+        return '$res网络异常 ${error.error}';
     }
   }
 
@@ -84,17 +86,17 @@ class ApiInterceptor extends Interceptor {
         await Connectivity().checkConnectivity();
     switch (connectivityResult) {
       case ConnectivityResult.mobile:
-        return '正在使用移动流量';
+        return '流量';
       case ConnectivityResult.wifi:
-        return '正在使用wifi';
+        return 'Wi-Fi';
       case ConnectivityResult.ethernet:
-        return '正在使用局域网';
+        return '局域';
       case ConnectivityResult.vpn:
-        return '正在使用代理网络';
+        return '代理';
       case ConnectivityResult.other:
-        return '正在使用其他网络';
+        return '其他';
       case ConnectivityResult.none:
-        return '未连接到任何网络';
+        return '无';
       default:
         return '';
     }

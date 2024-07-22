@@ -339,7 +339,7 @@ class PlPlayerController {
         setting.get(SettingBoxKey.danmakuFontScale, defaultValue: 1.0);
     // 弹幕时间
     danmakuDurationVal =
-        setting.get(SettingBoxKey.danmakuDuration, defaultValue: 4.0);
+        setting.get(SettingBoxKey.danmakuDuration, defaultValue: 7.29);
     // 描边粗细
     strokeWidth = setting.get(SettingBoxKey.strokeWidth, defaultValue: 1.5);
     // 弹幕字体粗细

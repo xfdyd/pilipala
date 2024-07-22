@@ -301,12 +301,9 @@ class LoginPageController extends GetxController
         SmartDialog.showToast('登录异常，接口未返回数据：${res["msg"]}');
         return;
       }
-      if (data['token_info'] == null) {
-        SmartDialog.showToast('登录异常，接口未返回token信息，${res["msg"]}，\n $data');
-        return;
-      }
-      if (data['cookie_info'] == null) {
-        SmartDialog.showToast('登录异常，接口未返回cookie信息，${res["msg"]}，\n $data');
+      if (data['token_info'] == null || data['cookie_info'] == null) {
+        SmartDialog.showToast(
+            '登录异常，接口未返回身份信息，可能是因为账号风控，请尝试其它登录方式。\n${res["msg"]}，\n $data');
         return;
       }
       SmartDialog.showToast('正在保存身份信息');
@@ -419,7 +416,8 @@ class LoginPageController extends GetxController
       smsSendTimestamp = DateTime.now().millisecondsSinceEpoch;
       smsSendCooldown.value = 60;
       captchaKey = res['data']['captcha_key'];
-      smsSendCooldownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      smsSendCooldownTimer =
+          Timer.periodic(const Duration(seconds: 1), (timer) {
         smsSendCooldown.value = 60 - timer.tick;
         if (smsSendCooldown <= 0) {
           smsSendCooldownTimer?.cancel();
@@ -431,7 +429,11 @@ class LoginPageController extends GetxController
       switch (res['code']) {
         case 0:
         case -105:
-          String captureUrl = res['data']['recaptcha_url'];
+          String captureUrl = res['data']?['recaptcha_url'] ?? "";
+          if (captureUrl == "") {
+            SmartDialog.showToast('验证信息错误：${res["msg"]}\n返回内容：${res["data"]}');
+            return;
+          }
           Uri captureUri = Uri.parse(captureUrl);
           captchaData.token = captureUri.queryParameters['recaptcha_token']!;
           String geeGt = captureUri.queryParameters['gee_gt']!;

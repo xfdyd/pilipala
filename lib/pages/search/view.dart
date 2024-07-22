@@ -222,7 +222,8 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
     return Obx(
       () => Container(
         width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(10, 25, 6, 0),
+        padding: EdgeInsets.fromLTRB(
+            10, 25, 6, MediaQuery.of(context).padding.bottom + 50),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

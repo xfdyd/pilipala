@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/http/video.dart';
 import '../../../../models/model_hot_video_item.dart';
@@ -15,6 +16,8 @@ class RelatedController extends GetxController {
     return VideoHttp.relatedVideoList(bvid: bvid).then((value) {
       if (value['status']) {
         relatedVideoList.value = value['data'];
+      } else {
+        SmartDialog.showToast(value['msg']);
       }
       return value;
     });

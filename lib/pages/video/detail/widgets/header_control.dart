@@ -8,6 +8,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:ns_danmaku/ns_danmaku.dart';
 import 'package:PiliPalaX/http/user.dart';
 import 'package:PiliPalaX/models/video/play/quality.dart';
@@ -19,7 +20,9 @@ import 'package:PiliPalaX/plugin/pl_player/models/play_repeat.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 import 'package:PiliPalaX/http/danmaku.dart';
 import 'package:PiliPalaX/services/shutdown_timer_service.dart';
+import '../../../../models/video/play/CDN.dart';
 import '../../../../models/video_detail_res.dart';
+import '../../../setting/widgets/select_dialog.dart';
 import '../introduction/index.dart';
 import 'package:marquee/marquee.dart';
 
@@ -60,6 +63,7 @@ class _HeaderControlState extends State<HeaderControl> {
   late bool horizontalScreen;
   RxString now = ''.obs;
   late Timer clock;
+  late String defaultCDNService;
 
   @override
   void initState() {
@@ -73,6 +77,8 @@ class _HeaderControlState extends State<HeaderControl> {
     videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
     horizontalScreen =
         setting.get(SettingBoxKey.horizontalScreen, defaultValue: false);
+    defaultCDNService = setting.get(SettingBoxKey.CDNService,
+        defaultValue: CDNService.backupUrl.code);
     startClock();
   }
 
@@ -106,7 +112,7 @@ class _HeaderControlState extends State<HeaderControl> {
       builder: (_) {
         return Container(
           width: double.infinity,
-          height: 460,
+          height: 500,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.background,
@@ -175,7 +181,47 @@ class _HeaderControlState extends State<HeaderControl> {
                       dense: true,
                       leading:
                           const Icon(Icons.hourglass_top_outlined, size: 20),
-                      title: const Text('定时关闭（测试）', style: titleStyle),
+                      title: const Text('定时关闭', style: titleStyle),
+                    ),
+                    ListTile(
+                      onTap: () =>
+                          {Get.back(), widget.videoDetailCtr!.queryVideoUrl()},
+                      dense: true,
+                      leading: const Icon(Icons.refresh_outlined, size: 20),
+                      title: const Text('重载视频', style: titleStyle),
+                    ),
+                    ListTile(
+                      title: const Text('CDN 设置', style: titleStyle),
+                      leading: Icon(MdiIcons.cloudPlusOutline, size: 20),
+                      subtitle: Text(
+                        '当前：${CDNServiceCode.fromCode(defaultCDNService)!.description}，无法播放请切换',
+                        style: subTitleStyle,
+                      ),
+                      onTap: () async {
+                        Get.back();
+                        String? result = await showDialog(
+                          context: context,
+                          builder: (context) {
+                            return SelectDialog<String>(
+                                title: 'CDN 设置',
+                                value: defaultCDNService,
+                                values: CDNService.values.map((e) {
+                                  return {
+                                    'title': e.description,
+                                    'value': e.code
+                                  };
+                                }).toList());
+                          },
+                        );
+                        if (result != null) {
+                          defaultCDNService = result;
+                          setting.put(SettingBoxKey.CDNService, result);
+                          SmartDialog.showToast(
+                              '已设置为 ${CDNServiceCode.fromCode(result)!.description}，正在重载视频');
+                          setState(() {});
+                          widget.videoDetailCtr!.queryVideoUrl();
+                        }
+                      },
                     ),
                     ListTile(
                       onTap: () => {Get.back(), showSetVideoQa()},
@@ -484,7 +530,8 @@ class _HeaderControlState extends State<HeaderControl> {
                 height: 45,
                 child: GestureDetector(
                   onTap: () {
-                    SmartDialog.showToast('标灰画质可能需要bilibili会员');
+                    SmartDialog.showToast(
+                        '标灰画质需要bilibili会员（已是会员？请关闭无痕模式）；4k和杜比视界播放效果可能不佳');
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,

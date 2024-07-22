@@ -43,7 +43,8 @@ class VideoIntroController extends GetxController {
   Rx<VideoDetailData> videoDetail = VideoDetailData().obs;
 
   // up主粉丝数
-  Map userStat = {'follower': '-'};
+  Rx<Map<String, dynamic>> userStat =
+      Rx<Map<String, dynamic>>({'follower': '-'});
 
   // 是否点赞
   RxBool hasLike = false.obs;
@@ -71,6 +72,8 @@ class VideoIntroController extends GetxController {
   bool isPaused = false;
   String heroTag = '';
   late ModelResult modelResult;
+  Rx<Map<String, dynamic>> queryVideoIntroData =
+      Rx<Map<String, dynamic>>({"status": true});
 
   @override
   void onInit() {
@@ -95,9 +98,9 @@ class VideoIntroController extends GetxController {
           }
           videoItem!['title'] = str;
         }
-        videoItem!['stat'] = keys.contains('stat') && args.stat;
-        videoItem!['pubdate'] = keys.contains('pubdate') && args.pubdate;
-        videoItem!['owner'] = keys.contains('owner') && args.owner;
+        videoItem!['stat'] = keys.contains('stat') ? args.stat : null;
+        videoItem!['pubdate'] = keys.contains('pubdate') ? args.pubdate : null;
+        videoItem!['owner'] = keys.contains('owner') ? args.owner : null;
       }
     }
     userLogin = userInfo != null;
@@ -108,10 +111,11 @@ class VideoIntroController extends GetxController {
       queryOnlineTotal();
       startTimer(); // 在页面加载时启动定时器
     }
+    queryVideoIntro();
   }
 
   // 获取视频简介&分p
-  Future queryVideoIntro() async {
+  void queryVideoIntro() async {
     var result = await VideoHttp.videoIntro(bvid: bvid);
     if (result['status']) {
       videoDetail.value = result['data']!;
@@ -128,6 +132,7 @@ class VideoIntroController extends GetxController {
       SmartDialog.showToast(
           "${result['code']} ${result['msg']} ${result['data']}");
     }
+    queryVideoIntroData.value = result;
     if (userLogin) {
       // 获取点赞状态
       queryHasLikeVideo();
@@ -138,14 +143,15 @@ class VideoIntroController extends GetxController {
       //
       queryFollowStatus();
     }
-    return result;
   }
 
   // 获取up主粉丝数
   Future queryUserStat() async {
     var result = await UserHttp.userStat(mid: videoDetail.value.owner!.mid!);
     if (result['status']) {
-      userStat = result['data'];
+      print(result['data']);
+      userStat.value = result['data'];
+      userStat.refresh();
     }
   }
 
@@ -449,18 +455,22 @@ class VideoIntroController extends GetxController {
     videoDetailCtr.danmakuCid.value = cid;
     videoDetailCtr.queryVideoUrl();
     // 重新请求相关视频
-    final RelatedController? relatedCtr =
-        Get.find<RelatedController?>(tag: heroTag);
-    relatedCtr?.bvid = bvid;
-    relatedCtr?.queryRelatedVideo();
+    try {
+      final RelatedController relatedCtr =
+          Get.find<RelatedController>(tag: heroTag);
+      relatedCtr.bvid = bvid;
+      relatedCtr.queryRelatedVideo();
+    } catch (_) {}
     // 重新请求评论
-    final VideoReplyController? videoReplyCtr =
-        Get.find<VideoReplyController?>(tag: heroTag);
-    videoReplyCtr?.aid = aid;
-    videoReplyCtr?.queryReplyList(type: 'init');
+    try {
+      final VideoReplyController videoReplyCtr =
+          Get.find<VideoReplyController>(tag: heroTag);
+      videoReplyCtr.aid = aid;
+      videoReplyCtr.queryReplyList(type: 'init');
+    } catch (_) {}
     this.bvid = bvid;
     lastPlayCid.value = cid;
-    await queryVideoIntro();
+    queryVideoIntro();
   }
 
   void startTimer() {
@@ -580,9 +590,20 @@ class VideoIntroController extends GetxController {
   }
 
   bool playRelated() {
-    final RelatedController relatedCtr =
-        Get.find<RelatedController>(tag: heroTag);
-    if (relatedCtr.relatedVideoList.isEmpty) {
+    late RelatedController relatedCtr;
+    try {
+      relatedCtr = Get.find<RelatedController>(tag: heroTag);
+      if (relatedCtr.relatedVideoList.isEmpty) {
+        SmartDialog.showToast('暂无相关视频，停止连播');
+        return false;
+      }
+    } catch (_) {
+      relatedCtr = Get.put(RelatedController(), tag: heroTag);
+      relatedCtr.queryRelatedVideo().then((value) {
+        if (value['status']) {
+          playRelated();
+        }
+      });
       return false;
     }
 

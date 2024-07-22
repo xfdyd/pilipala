@@ -97,7 +97,7 @@ class _MinePageState extends State<MinePage> {
                 icon: Icon(
                   mineController.themeType.value == ThemeType.system
                       ? MdiIcons.themeLightDark
-                      : mineController.themeType.value == ThemeType.dark
+                      : mineController.themeType.value == ThemeType.light
                           ? MdiIcons.weatherSunny
                           : MdiIcons.weatherNight,
                   size: 24,
