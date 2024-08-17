@@ -229,8 +229,8 @@ class DynamicsController extends GetxController
               face: e.face,
               mid: e.mid,
               uname: e.uname,
-              hasUpdate:
-                  hasUpdatedUps.any((element) => element.mid == e.mid))));
+              hasUpdate: hasUpdatedUps.any((element) =>
+                  (element.mid == e.mid) && (element.hasUpdate == true)))));
       allFollowedUpsPage += 1;
       allFollowedUpsTotal = res['data'].total;
       upData.value.upList = allFollowedUps;
@@ -273,8 +273,8 @@ class DynamicsController extends GetxController
                 face: e.face,
                 mid: e.mid,
                 uname: e.uname,
-                hasUpdate:
-                    hasUpdatedUps.any((element) => element.mid == e.mid)))
+                hasUpdate: hasUpdatedUps.any((element) =>
+                    (element.mid == e.mid) && (element.hasUpdate == true))))
             .toList();
         allFollowedUpsPage += 1;
         allFollowedUpsTotal = ress[1]['data'].total;

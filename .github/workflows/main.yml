@@ -156,7 +156,7 @@ jobs:
       - name: Upload Release
         uses: ncipollo/release-action@v1
         with:
-          name: v${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }}
           token: ${{ secrets.GIT_TOKEN }}
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true

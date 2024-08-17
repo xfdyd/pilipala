@@ -15,7 +15,7 @@ class HtmlRenderController extends GetxController {
   RxInt oid = (-1).obs;
   late Map response;
   int? floor;
-  int currentPage = 0;
+  String nextOffset = "";
   bool isLoadingMore = false;
   RxString noMore = ''.obs;
   RxList<ReplyItemModel> replyList = <ReplyItemModel>[].obs;
@@ -34,7 +34,7 @@ class HtmlRenderController extends GetxController {
     dynamicType = Get.parameters['dynamicType']!;
     type = dynamicType == 'picture' ? 11 : 12;
     int defaultReplySortIndex =
-    setting.get(SettingBoxKey.replySortType, defaultValue: 0) as int;
+        setting.get(SettingBoxKey.replySortType, defaultValue: 0) as int;
     if (defaultReplySortIndex == 2) {
       setting.put(SettingBoxKey.replySortType, 0);
       defaultReplySortIndex = 0;
@@ -61,25 +61,25 @@ class HtmlRenderController extends GetxController {
   // 请求评论
   Future queryReplyList({reqType = 'init'}) async {
     if (reqType == 'init') {
-      currentPage = 0;
+      nextOffset = "";
     }
     var res = await ReplyHttp.replyList(
       oid: oid.value,
-      pageNum: currentPage + 1,
+      nextOffset: nextOffset,
       type: type,
       sort: _sortType.index,
     );
     if (res['status']) {
       List<ReplyItemModel> replies = res['data'].replies;
-      acount.value = res['data'].page.acount;
+      acount.value = res['data'].cursor.allCount;
+      nextOffset = res['data'].cursor.paginationReply.nextOffset ?? "";
       if (replies.isNotEmpty) {
-        currentPage++;
         noMore.value = '加载中...';
-        if (replies.length < 20) {
+        if (res['data'].cursor.isEnd == true) {
           noMore.value = '没有更多了';
         }
       } else {
-        noMore.value = currentPage == 0 ? '还没有评论' : '没有更多了';
+        noMore.value = nextOffset == "" ? '还没有评论' : '没有更多了';
       }
       if (reqType == 'init') {
         // 添加置顶回复
@@ -115,7 +115,7 @@ class HtmlRenderController extends GetxController {
     }
     sortTypeTitle.value = _sortType.titles;
     sortTypeLabel.value = _sortType.labels;
-    currentPage = 0;
+    nextOffset = "";
     replyList.clear();
     queryReplyList(reqType: 'init');
   }

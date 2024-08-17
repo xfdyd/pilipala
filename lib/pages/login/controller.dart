@@ -301,6 +301,50 @@ class LoginPageController extends GetxController
         SmartDialog.showToast('登录异常，接口未返回数据：${res["msg"]}');
         return;
       }
+      if (data['status'] == 2) {
+        SmartDialog.showToast(data['message']);
+        return;
+        //{"code":0,"message":"0","ttl":1,"data":{"status":2,"message":"本次登录环境存在风险, 需使用手机号进行验证或绑定","url":"https://passport.bilibili.com/h5-app/passport/risk/verify?tmp_token=9e785433940891dfa78f033fb7928181&request_id=e5a6d6480df04097870be56c6e60f7ef&source=risk","token_info":null,"cookie_info":null,"sso":null,"is_new":false,"is_tourist":false}}
+        //todo: 后续登录流程：https://ivan.hanloth.cn/archives/530/
+        String Url = data['url']!;
+        Uri currentUri = Uri.parse(Url);
+        var safeCenterRes = await LoginHttp.safeCenterGetInfo(
+            tmpCode: currentUri.queryParameters['tmp_token']!);
+        if (!safeCenterRes['status']) {
+          SmartDialog.showToast("获取安全验证信息失败，请尝试其它登录方式\n"
+              "(${safeCenterRes['code']}) ${safeCenterRes['msg']}");
+          return;
+        }
+        Map<String, String> accountInfo = {
+          "telVerify": safeCenterRes['data']['account_info']!['tel_verify']!,
+          "hide_tel": safeCenterRes['data']['account_info']!["hide_tel"]!,
+        };
+        SmartDialog.showNotify(
+            msg: "将给你的手机号：${accountInfo['hide_tel']}发送短信验证码",
+            notifyType: NotifyType.alert,
+            alignment: Alignment.topCenter);
+
+        var preCaptureRes = await LoginHttp.preCapture();
+        if (!preCaptureRes['status']) {
+          SmartDialog.showToast("获取验证码失败，请尝试其它登录方式\n"
+              "(${preCaptureRes['code']}) ${preCaptureRes['msg']}");
+          return;
+        }
+        String geeGt = preCaptureRes['data']['gee_gt']!;
+        String geeChallenge = preCaptureRes['data']['gee_challenge'];
+        captchaData.token = preCaptureRes['data']['recaptcha_token']!;
+
+        getCaptcha(geeGt, geeChallenge, () {
+          LoginHttp.safeCenterSmsCode(
+              tmpCode: currentUri.queryParameters['tmp_token']!,
+              geeChallenge: geeChallenge,
+              geeSeccode: captchaData.seccode!,
+              geeValidate: captchaData.validate!,
+              recaptchaToken: captchaData.token!);
+        });
+
+        return;
+      }
       if (data['token_info'] == null || data['cookie_info'] == null) {
         SmartDialog.showToast(
             '登录异常，接口未返回身份信息，可能是因为账号风控，请尝试其它登录方式。\n${res["msg"]}，\n $data');

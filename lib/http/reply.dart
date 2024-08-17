@@ -6,17 +6,15 @@ import 'init.dart';
 class ReplyHttp {
   static Future replyList({
     required int oid,
-    required int pageNum,
+    required String nextOffset,
     required int type,
-    int? ps,
     int sort = 1,
   }) async {
     var res = await Request().get(Api.replyList, data: {
       'oid': oid,
-      'pn': pageNum,
       'type': type,
-      'sort': sort,
-      'ps': ps ?? 20
+      'pagination_str': '{"offset":"${nextOffset.replaceAll('"', '\\"')}"}',
+      'mode': sort + 2, //2:按时间排序；3：按热度排序
     });
     if (res.data['code'] == 0) {
       return {
@@ -50,7 +48,7 @@ class ReplyHttp {
     if (res.data['code'] == 0) {
       return {
         'status': true,
-        'data': ReplyData.fromJson(res.data['data']),
+        'data': ReplyReplyData.fromJson(res.data['data']),
       };
     } else {
       return {

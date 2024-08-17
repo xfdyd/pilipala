@@ -349,4 +349,70 @@ class LoginHttp {
       };
     }
   }
+
+  // 密码登录时风控验证手机
+  static Future safeCenterGetInfo({
+    required String tmpCode,
+  }) async {
+    var res = await Request().get(Api.safeCenterGetInfo, data: {
+      tmpCode: tmpCode,
+    });
+    print(res);
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {
+        'status': false,
+        'code': res.data['code'],
+        'msg': res.data['message'],
+        'data': res.data['data']
+      };
+    }
+  }
+
+  // 风控验证手机前的验证码
+  static Future preCapture() async {
+    var res = await Request().post(Api.preCapture);
+    print(res);
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {
+        'status': false,
+        'code': res.data['code'],
+        'msg': res.data['message'],
+        'data': res.data['data']
+      };
+    }
+  }
+
+  // 风控验证手机
+  static Future safeCenterSmsCode({
+    String? smsType,
+    required String tmpCode,
+    required String geeChallenge,
+    required String geeSeccode,
+    required String geeValidate,
+    required String recaptchaToken,
+  }) async {
+    var res = await Request().post(Api.safeCenterSmsCode, data: {
+      'sms_type': smsType ?? 'loginTelCheck',
+      'tmp_code': tmpCode,
+      'gee_challenge': geeChallenge,
+      'gee_seccode': geeSeccode,
+      'gee_validate': geeValidate,
+      'recaptcha_token': recaptchaToken,
+    });
+    print(res);
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {
+        'status': false,
+        'code': res.data['code'],
+        'msg': res.data['message'],
+        'data': res.data['data']
+      };
+    }
+  }
 }
