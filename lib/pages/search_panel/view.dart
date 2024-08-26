@@ -110,7 +110,8 @@ class _SearchPanelState extends State<SearchPanel>
                       errMsg: data['msg'],
                       fn: () {
                         setState(() {
-                          _searchPanelController.onSearch();
+                          _futureBuilderFuture =
+                              _searchPanelController.onSearch();
                         });
                       },
                     ),
