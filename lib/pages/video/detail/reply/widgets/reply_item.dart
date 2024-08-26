@@ -120,7 +120,7 @@ class ReplyItem extends StatelessWidget {
               decoration: BoxDecoration(
                 // borderRadius: BorderRadius.circular(8),
                 shape: BoxShape.circle,
-                color: Theme.of(context).colorScheme.background,
+                color: Theme.of(context).colorScheme.surface,
               ),
               child: const Icon(
                 Icons.offline_bolt,
@@ -139,7 +139,7 @@ class ReplyItem extends StatelessWidget {
               decoration: BoxDecoration(
                 // borderRadius: BorderRadius.circular(8),
                 shape: BoxShape.circle,
-                color: Theme.of(context).colorScheme.background,
+                color: Theme.of(context).colorScheme.surface,
               ),
               child: const Icon(
                 Icons.offline_bolt,
@@ -386,7 +386,7 @@ class ReplyItemRow extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(left: 42, right: 4, top: 0),
       child: Material(
-        color: Theme.of(context).colorScheme.inverseSurface.withOpacity(0.02),
+        color: Theme.of(context).colorScheme.onInverseSurface,
         borderRadius: BorderRadius.circular(6),
         clipBehavior: Clip.hardEdge,
         animationDuration: Duration.zero,
@@ -437,7 +437,7 @@ class ReplyItemRow extends StatelessWidget {
                           TextSpan(
                             children: [
                               TextSpan(
-                                text: '${replies![i].member!.uname} ',
+                                text: '${replies![i].member!.uname}',
                                 style: TextStyle(
                                   color: Theme.of(context)
                                       .colorScheme
@@ -457,7 +457,8 @@ class ReplyItemRow extends StatelessWidget {
                                         });
                                   },
                               ),
-                              if (replies![i].isUp!)
+                              if (replies![i].isUp!) ...[
+                                const TextSpan(text: ' '),
                                 const WidgetSpan(
                                   alignment: PlaceholderAlignment.top,
                                   child: PBadge(
@@ -466,7 +467,13 @@ class ReplyItemRow extends StatelessWidget {
                                     stack: 'normal',
                                     fs: 9,
                                   ),
-                                ),
+                                )
+                              ],
+                              TextSpan(
+                                  text: replies![i].content?.members?.isEmpty ==
+                                          true
+                                      ? ': '
+                                      : ' '),
                               buildContent(
                                   context, replies![i], replyReply, replyItem),
                             ],
