@@ -249,9 +249,9 @@ class ReplyItem extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 TextSpan(
                   children: [
-                    if (replyItem!.isTop!)
+                    if (replyItem!.isTop!) ...[
                       const WidgetSpan(
-                        alignment: PlaceholderAlignment.top,
+                        alignment: PlaceholderAlignment.middle,
                         child: PBadge(
                           text: 'TOP',
                           size: 'small',
@@ -261,6 +261,8 @@ class ReplyItem extends StatelessWidget {
                           semanticsLabel: '置顶',
                         ),
                       ),
+                      const TextSpan(text: ' '),
+                    ],
                     buildContent(context, replyItem!, replyReply, null),
                   ],
                 ),
@@ -460,21 +462,28 @@ class ReplyItemRow extends StatelessWidget {
                               if (replies![i].isUp!) ...[
                                 const TextSpan(text: ' '),
                                 const WidgetSpan(
-                                  alignment: PlaceholderAlignment.top,
+                                  alignment: PlaceholderAlignment.middle,
                                   child: PBadge(
                                     text: 'UP',
                                     size: 'small',
                                     stack: 'normal',
                                     fs: 9,
                                   ),
-                                )
+                                ),
+                                const TextSpan(text: ' '),
                               ],
                               TextSpan(
                                   text: replies![i].root == replies![i].parent
                                       ? ': '
-                                      : ' '),
+                                      : replies![i].isUp!
+                                          ? ''
+                                          : ' '),
                               buildContent(
-                                  context, replies![i], replyReply, replyItem),
+                                context,
+                                replies![i],
+                                replyReply,
+                                replyItem,
+                              ),
                             ],
                           ),
                         )),

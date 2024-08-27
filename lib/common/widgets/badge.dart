@@ -55,7 +55,7 @@ class PBadge extends StatelessWidget {
     BorderRadius br = BorderRadius.circular(4);
 
     if (size == 'small') {
-      paddingStyle = const EdgeInsets.symmetric(vertical: 0, horizontal: 3);
+      paddingStyle = const EdgeInsets.symmetric(vertical: 1, horizontal: 3);
       fontSize = 11;
       br = BorderRadius.circular(3);
     }
@@ -69,7 +69,18 @@ class PBadge extends StatelessWidget {
       ),
       child: Text(
         text ?? "",
-        style: TextStyle(fontSize: fs ?? fontSize, color: color),
+        style: TextStyle(
+          height: 1,
+          fontSize: fs ?? fontSize,
+          color: color,
+          fontWeight: FontWeight.bold,
+        ),
+        strutStyle: StrutStyle(
+          leading: 0,
+          height: 1,
+          fontSize: fs ?? fontSize,
+          fontWeight: FontWeight.bold,
+        ),
         semanticsLabel: semanticsLabel,
       ),
     );
@@ -82,10 +93,7 @@ class PBadge extends StatelessWidget {
         child: content,
       );
     } else {
-      return Padding(
-        padding: const EdgeInsets.only(right: 5),
-        child: content,
-      );
+      return content;
     }
   }
 }
