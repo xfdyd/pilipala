@@ -165,7 +165,7 @@ class ListSheet {
                 ),
                 Expanded(
                   child: Material(
-                    child: ScrollablePositionedList.builder(
+                    child: ScrollablePositionedList.separated(
                       padding: EdgeInsets.only(
                           bottom: MediaQuery.of(context).padding.bottom + 20),
                       reverse: reverse,
@@ -179,6 +179,10 @@ class ListSheet {
                         );
                       },
                       itemScrollController: itemScrollController,
+                      separatorBuilder: (_, index) => Divider(
+                        height: 1,
+                        color: Theme.of(context).dividerColor.withOpacity(0.1),
+                      ),
                     ),
                   ),
                 ),
