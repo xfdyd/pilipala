@@ -190,11 +190,15 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                       );
                     } else {
                       return CustomScrollView(
+                        shrinkWrap: true,
                         slivers: [
                           HttpError(
                             errMsg: data['msg'],
-                            fn: () => setState(() {}),
-                          )
+                            fn: () => setState(() {
+                              _futureBuilderFuture =
+                                  _searchController.queryHotSearchList();
+                            }),
+                          ),
                         ],
                       );
                     }
