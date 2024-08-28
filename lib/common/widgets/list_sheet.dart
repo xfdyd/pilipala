@@ -7,13 +7,6 @@ import '../../utils/storage.dart';
 import '../../utils/utils.dart';
 
 class ListSheet {
-  final dynamic episodes;
-  final String? bvid;
-  final int? aid;
-  final int currentCid;
-  final Function changeFucCall;
-  final BuildContext context;
-  PersistentBottomSheetController? bottomSheetController;
   ListSheet({
     required this.episodes,
     this.bvid,
@@ -22,13 +15,71 @@ class ListSheet {
     required this.changeFucCall,
     required this.context,
   });
+
+  final dynamic episodes;
+  final String? bvid;
+  final int? aid;
+  final int currentCid;
+  final Function changeFucCall;
+  final BuildContext context;
+
+  late PersistentBottomSheetController bottomSheetController;
+
+  void buildShowBottomSheet() {
+    bottomSheetController = showBottomSheet(
+        context: context,
+        builder: (context) => ListSheetContent(
+              episodes: episodes,
+              bvid: bvid,
+              aid: aid,
+              currentCid: currentCid,
+              changeFucCall: changeFucCall,
+              onClose: bottomSheetController.close,
+            ));
+  }
+}
+
+class ListSheetContent extends StatefulWidget {
+  const ListSheetContent({
+    super.key,
+    required this.episodes,
+    this.bvid,
+    this.aid,
+    required this.currentCid,
+    required this.changeFucCall,
+    required this.onClose,
+  });
+
+  final dynamic episodes;
+  final String? bvid;
+  final int? aid;
+  final int currentCid;
+  final Function changeFucCall;
+  final Function() onClose;
+
+  @override
+  State<ListSheetContent> createState() => _ListSheetContentState();
+}
+
+class _ListSheetContentState extends State<ListSheetContent> {
+  final ItemScrollController itemScrollController = ItemScrollController();
+  late final int currentIndex =
+      widget.episodes!.indexWhere((dynamic e) => e.cid == widget.currentCid) ??
+          0;
   bool reverse = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      itemScrollController.jumpTo(index: currentIndex);
+    });
+  }
 
   Widget buildEpisodeListItem(
     dynamic episode,
     int index,
     bool isCurrentIndex,
-    PersistentBottomSheetController bottomSheetController,
   ) {
     Color primary = Theme.of(context).colorScheme.primary;
     late String title;
@@ -58,11 +109,11 @@ class ListSheet {
           }
         }
         SmartDialog.showToast('切换到：$title');
-        bottomSheetController.close();
+        widget.onClose();
         if (episode.runtimeType.toString() == "EpisodeItem") {
-          changeFucCall(episode.bvid, episode.cid, episode.aid);
+          widget.changeFucCall(episode.bvid, episode.cid, episode.aid);
         } else {
-          changeFucCall(bvid!, episode.cid, aid!);
+          widget.changeFucCall(widget.bvid!, episode.cid, widget.aid!);
         }
       },
       dense: false,
@@ -95,102 +146,90 @@ class ListSheet {
     );
   }
 
-  void buildShowBottomSheet() {
-    int currentIndex =
-        episodes!.indexWhere((dynamic e) => e.cid == currentCid) ?? 0;
-    final ItemScrollController itemScrollController = ItemScrollController();
-    bottomSheetController = showBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
-          WidgetsBinding.instance.addPostFrameCallback((_) async {
-            itemScrollController.jumpTo(index: currentIndex);
-          });
-          return Container(
-            height: Utils.getSheetHeight(context),
-            color: Theme.of(context).colorScheme.background,
-            child: Column(
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: Utils.getSheetHeight(context),
+      color: Theme.of(context).colorScheme.surface,
+      child: Column(
+        children: [
+          Container(
+            height: 45,
+            padding: const EdgeInsets.only(left: 14, right: 14),
+            child: Row(
               children: [
-                Container(
-                  height: 45,
-                  padding: const EdgeInsets.only(left: 14, right: 14),
-                  child: Row(
-                    children: [
-                      Text(
-                        '合集（${episodes!.length}）',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      IconButton(
-                        tooltip: '跳至顶部',
-                        icon: const Icon(Icons.vertical_align_top),
-                        onPressed: () {
-                          itemScrollController.jumpTo(
-                            index: !reverse ? 0 : episodes!.length - 1,
-                          );
-                        },
-                      ),
-                      IconButton(
-                        tooltip: '跳至底部',
-                        icon: const Icon(Icons.vertical_align_bottom),
-                        onPressed: () {
-                          itemScrollController.jumpTo(
-                            index: !reverse ? episodes!.length - 1 : 0,
-                          );
-                        },
-                      ),
-                      const Spacer(),
-                      IconButton(
-                        tooltip: '反序',
-                        icon: Icon(!reverse
-                            ? MdiIcons.sortAscending
-                            : MdiIcons.sortDescending),
-                        onPressed: () {
-                          setState(() {
-                            reverse = !reverse;
-                          });
-                        },
-                      ),
-                      IconButton(
-                        tooltip: '关闭',
-                        icon: const Icon(Icons.close),
-                        onPressed: () => bottomSheetController!.close(),
-                      ),
-                    ],
-                  ),
+                Text(
+                  '合集（${widget.episodes!.length}）',
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-                Divider(
-                  height: 1,
-                  color: Theme.of(context).dividerColor.withOpacity(0.1),
+                IconButton(
+                  tooltip: '跳至顶部',
+                  icon: const Icon(Icons.vertical_align_top),
+                  onPressed: () {
+                    itemScrollController.scrollTo(
+                      index: !reverse ? 0 : widget.episodes!.length - 1,
+                      duration: const Duration(milliseconds: 200),
+                    );
+                  },
                 ),
-                Expanded(
-                  child: Material(
-                    child: ScrollablePositionedList.separated(
-                      padding: EdgeInsets.only(
-                          bottom: MediaQuery.of(context).padding.bottom + 20),
-                      reverse: reverse,
-                      itemCount: episodes!.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return buildEpisodeListItem(
-                          episodes![index],
-                          index,
-                          currentIndex == index,
-                          bottomSheetController!,
-                        );
-                      },
-                      itemScrollController: itemScrollController,
-                      separatorBuilder: (_, index) => Divider(
-                        height: 1,
-                        color: Theme.of(context).dividerColor.withOpacity(0.1),
-                      ),
-                    ),
-                  ),
+                IconButton(
+                  tooltip: '跳至底部',
+                  icon: const Icon(Icons.vertical_align_bottom),
+                  onPressed: () {
+                    itemScrollController.scrollTo(
+                      index: !reverse ? widget.episodes!.length - 1 : 0,
+                      duration: const Duration(milliseconds: 200),
+                    );
+                  },
+                ),
+                const Spacer(),
+                IconButton(
+                  tooltip: '反序',
+                  icon: Icon(!reverse
+                      ? MdiIcons.sortAscending
+                      : MdiIcons.sortDescending),
+                  onPressed: () {
+                    setState(() {
+                      reverse = !reverse;
+                    });
+                  },
+                ),
+                IconButton(
+                  tooltip: '关闭',
+                  icon: const Icon(Icons.close),
+                  onPressed: widget.onClose,
                 ),
               ],
             ),
-          );
-        });
-      },
+          ),
+          Divider(
+            height: 1,
+            color: Theme.of(context).dividerColor.withOpacity(0.1),
+          ),
+          Expanded(
+            child: Material(
+              child: ScrollablePositionedList.separated(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).padding.bottom + 20),
+                reverse: reverse,
+                itemCount: widget.episodes!.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return buildEpisodeListItem(
+                    widget.episodes![index],
+                    index,
+                    currentIndex == index,
+                  );
+                },
+                itemScrollController: itemScrollController,
+                separatorBuilder: (_, index) => Divider(
+                  height: 1,
+                  color: Theme.of(context).dividerColor.withOpacity(0.1),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
