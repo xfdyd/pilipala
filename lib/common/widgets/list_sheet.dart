@@ -134,15 +134,24 @@ class _ListSheetContentState extends State<ListSheetContent> {
               : Theme.of(context).colorScheme.onSurface,
         ),
       ),
-      trailing: episode.badge == null
-          ? null
-          : (episode.badge == '会员'
-              ? Image.asset(
-                  'assets/images/big-vip.png',
-                  height: 20,
-                  semanticLabel: "大会员",
-                )
-              : Text(episode.badge)),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (episode.badge != null) ...[
+            if (episode.badge == '会员')
+              Image.asset(
+                'assets/images/big-vip.png',
+                height: 20,
+                semanticLabel: "大会员",
+              ),
+            if (episode.badge != '会员') Text(episode.badge),
+            const SizedBox(width: 10),
+          ],
+          if (!(episode.runtimeType.toString() == 'EpisodeItem' &&
+              (episode.longTitle != null && episode.longTitle != '')))
+            Text('${index + 1}/${widget.episodes!.length}'),
+        ],
+      ),
     );
   }
 
