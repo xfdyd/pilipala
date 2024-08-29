@@ -352,20 +352,18 @@ class VideoHttp {
 
   // （取消）点赞
   static Future likeVideo({required String bvid, required bool type}) async {
-    var res = await Request().post(
-      Api.likeVideo,
-      queryParameters: {
-        'aid': IdUtils.bv2av(bvid),
-        'like': type ? 0 : 1,
-        'access_key': GStorage.localCache
-            .get(LocalCacheKey.accessKey, defaultValue: {})['value'],
-      }
-      // queryParameters: {
-      //   'bvid': bvid,
-      //   'like': type ? 1 : 2,
-      //   'csrf': await Request.getCsrf(),
-      // },
-    );
+    var res = await Request().post(Api.likeVideo, queryParameters: {
+      'aid': IdUtils.bv2av(bvid),
+      'like': type ? 0 : 1,
+      'access_key': GStorage.localCache
+          .get(LocalCacheKey.accessKey, defaultValue: {})['value'],
+    }
+        // queryParameters: {
+        //   'bvid': bvid,
+        //   'like': type ? 1 : 2,
+        //   'csrf': await Request.getCsrf(),
+        // },
+        );
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {
@@ -594,9 +592,17 @@ class VideoHttp {
       'csrf': await Request.getCsrf(),
     });
     if (res.data['code'] == 0) {
-      return {'status': true, 'msg': res.data['result']['toast']};
+      return {
+        'status': true,
+        'msg':
+            res.data['result'] == null ? 'failed' : res.data['result']['toast']
+      };
     } else {
-      return {'status': false, 'msg': res.data['result']['toast']};
+      return {
+        'status': false,
+        'msg':
+            res.data['result'] == null ? 'failed' : res.data['result']['toast']
+      };
     }
   }
 
@@ -607,9 +613,17 @@ class VideoHttp {
       'csrf': await Request.getCsrf(),
     });
     if (res.data['code'] == 0) {
-      return {'status': true, 'msg': res.data['result']['toast']};
+      return {
+        'status': true,
+        'msg':
+            res.data['result'] == null ? 'failed' : res.data['result']['toast']
+      };
     } else {
-      return {'status': false, 'msg': res.data['result']['toast']};
+      return {
+        'status': false,
+        'msg':
+            res.data['result'] == null ? 'failed' : res.data['result']['toast']
+      };
     }
   }
 
