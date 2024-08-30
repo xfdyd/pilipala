@@ -61,6 +61,7 @@ class _HistorySearchPageState extends State<HistorySearchPage> {
             controller: _historySearchCtr.controller.value,
             textInputAction: TextInputAction.search,
             onChanged: (value) => _historySearchCtr.onChange(value),
+            textAlignVertical: TextAlignVertical.center,
             decoration: InputDecoration(
               hintText: _historySearchCtr.hintText,
               border: InputBorder.none,

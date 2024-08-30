@@ -62,6 +62,7 @@ class _FavSearchPageState extends State<FavSearchPage> {
             controller: _favSearchCtr.controller.value,
             textInputAction: TextInputAction.search,
             onChanged: (value) => _favSearchCtr.onChange(value),
+            textAlignVertical: TextAlignVertical.center,
             decoration: InputDecoration(
               hintText: _favSearchCtr.hintText,
               border: InputBorder.none,

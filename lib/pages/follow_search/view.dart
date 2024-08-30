@@ -62,6 +62,7 @@ class _FollowSearchPageState extends State<FollowSearchPage> {
           controller: _followSearchController.controller.value,
           textInputAction: TextInputAction.search,
           onChanged: (value) => _followSearchController.onChange(value),
+          textAlignVertical: TextAlignVertical.center,
           decoration: InputDecoration(
             hintText: _followSearchController.hintText,
             border: InputBorder.none,

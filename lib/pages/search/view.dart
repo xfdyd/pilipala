@@ -66,6 +66,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
             controller: _searchController.controller.value,
             textInputAction: TextInputAction.search,
             onChanged: (value) => _searchController.onChange(value),
+            textAlignVertical: TextAlignVertical.center,
             decoration: InputDecoration(
               hintText: _searchController.hintText,
               border: InputBorder.none,
