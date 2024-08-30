@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:PiliPalaX/http/follow.dart';
+import 'package:PiliPalaX/utils/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -314,13 +315,6 @@ class DynamicsController extends GetxController
   // 返回顶部并刷新
   void animateToTop() async {
     tabsConfig[tabController.index]['ctr'].animateToTop();
-    if (!scrollController.hasClients) return;
-    if (scrollController.offset >=
-        MediaQuery.of(Get.context!).size.height * 5) {
-      scrollController.jumpTo(0);
-    } else {
-      await scrollController.animateTo(0,
-          duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
-    }
+    scrollController.animToTop();
   }
 }
