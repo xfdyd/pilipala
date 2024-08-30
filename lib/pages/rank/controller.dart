@@ -28,7 +28,7 @@ class RankController extends GetxController with GetTickerProviderStateMixin {
   void onRefresh() {
     int index = tabController.index;
     var ctr = tabsCtrList[index];
-    ctr().onRefresh();
+    ctr.onRefresh();
   }
 
   void animateToTop() {
