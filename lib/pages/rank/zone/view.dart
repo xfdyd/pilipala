@@ -105,14 +105,13 @@ class _ZonePageState extends State<ZonePage>
                             videoItem: _zoneController.videoList[index],
                             showPubdate: true,
                             longPress: () {
-                              _zoneController.popupDialog = _createPopupDialog(
-                                  _zoneController.videoList[index]);
+                              _zoneController.popupDialog.add(
+                                  _createPopupDialog(
+                                      _zoneController.videoList[index]));
                               Overlay.of(context)
-                                  .insert(_zoneController.popupDialog!);
+                                  .insert(_zoneController.popupDialog.last!);
                             },
-                            longPressEnd: () {
-                              _zoneController.popupDialog?.remove();
-                            },
+                            longPressEnd: _removePopupDialog,
                           );
                         }, childCount: _zoneController.videoList.length),
                       ),
@@ -155,12 +154,19 @@ class _ZonePageState extends State<ZonePage>
     );
   }
 
+  void _removePopupDialog() {
+    _zoneController.popupDialog.last?.remove();
+    _zoneController.popupDialog.removeLast();
+  }
+
   OverlayEntry _createPopupDialog(videoItem) {
     return OverlayEntry(
       builder: (context) => AnimatedDialog(
-        closeFn: _zoneController.popupDialog?.remove,
+        closeFn: _removePopupDialog,
         child: OverlayPop(
-            videoItem: videoItem, closeFn: _zoneController.popupDialog?.remove),
+          videoItem: videoItem,
+          closeFn: _removePopupDialog,
+        ),
       ),
     );
   }

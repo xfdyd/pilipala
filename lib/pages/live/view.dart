@@ -129,12 +129,19 @@ class _LivePageState extends State<LivePage>
     );
   }
 
+  void _removePopupDialog() {
+    _liveController.popupDialog.last?.remove();
+    _liveController.popupDialog.removeLast();
+  }
+
   OverlayEntry _createPopupDialog(liveItem) {
     return OverlayEntry(
       builder: (context) => AnimatedDialog(
-        closeFn: _liveController.popupDialog?.remove,
+        closeFn: _removePopupDialog,
         child: OverlayPop(
-            videoItem: liveItem, closeFn: _liveController.popupDialog?.remove),
+          videoItem: liveItem,
+          closeFn: _removePopupDialog,
+        ),
       ),
     );
   }
@@ -154,13 +161,12 @@ class _LivePageState extends State<LivePage>
               ? LiveCardV(
                   liveItem: liveList[index],
                   longPress: () {
-                    _liveController.popupDialog =
-                        _createPopupDialog(liveList[index]);
-                    Overlay.of(context).insert(_liveController.popupDialog!);
+                    _liveController.popupDialog
+                        .add(_createPopupDialog(liveList[index]));
+                    Overlay.of(context)
+                        .insert(_liveController.popupDialog.last!);
                   },
-                  longPressEnd: () {
-                    _liveController.popupDialog?.remove();
-                  },
+                  longPressEnd: _removePopupDialog,
                 )
               : const VideoCardVSkeleton();
         },

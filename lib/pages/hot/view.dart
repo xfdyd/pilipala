@@ -103,14 +103,12 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
                             videoItem: _hotController.videoList[index],
                             showPubdate: true,
                             longPress: () {
-                              _hotController.popupDialog = _createPopupDialog(
-                                  _hotController.videoList[index]);
+                              _hotController.popupDialog
+                                  .add(_createPopupDialog(videoList[index]));
                               Overlay.of(context)
-                                  .insert(_hotController.popupDialog!);
+                                  .insert(_hotController.popupDialog.last!);
                             },
-                            longPressEnd: () {
-                              _hotController.popupDialog?.remove();
-                            },
+                            longPressEnd: _removePopupDialog,
                           );
                         }, childCount: _hotController.videoList.length),
                       ),
@@ -152,12 +150,19 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
     );
   }
 
+  void _removePopupDialog() {
+    _hotController.popupDialog.last?.remove();
+    _hotController.popupDialog.removeLast();
+  }
+
   OverlayEntry _createPopupDialog(videoItem) {
     return OverlayEntry(
       builder: (context) => AnimatedDialog(
-        closeFn: _hotController.popupDialog?.remove,
+        closeFn: _removePopupDialog,
         child: OverlayPop(
-            videoItem: videoItem, closeFn: _hotController.popupDialog?.remove),
+          videoItem: videoItem,
+          closeFn: _removePopupDialog,
+        ),
       ),
     );
   }

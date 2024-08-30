@@ -8,7 +8,7 @@ class ZoneController extends GetxController {
   RxList<HotVideoItemModel> videoList = <HotVideoItemModel>[].obs;
   bool isLoadingMore = false;
   bool flag = false;
-  OverlayEntry? popupDialog;
+  List<OverlayEntry?> popupDialog = <OverlayEntry?>[];
   int zoneID = 0;
 
   // 获取推荐

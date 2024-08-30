@@ -10,7 +10,7 @@ class HotController extends GetxController {
   RxList<HotVideoItemModel> videoList = <HotVideoItemModel>[].obs;
   bool isLoadingMore = false;
   bool flag = false;
-  OverlayEntry? popupDialog;
+  List<OverlayEntry?> popupDialog = <OverlayEntry?>[];
 
   // 获取推荐
   Future queryHotFeed(type) async {

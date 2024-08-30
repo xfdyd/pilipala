@@ -10,7 +10,7 @@ class RelatedController extends GetxController {
   // 推荐视频列表
   RxList relatedVideoList = <HotVideoItemModel>[].obs;
 
-  OverlayEntry? popupDialog;
+  List<OverlayEntry?> popupDialog = <OverlayEntry?>[];
 
   Future<dynamic> queryRelatedVideo() async {
     return VideoHttp.relatedVideoList(bvid: bvid).then((value) {

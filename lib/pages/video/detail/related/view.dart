@@ -65,18 +65,16 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel>
                             showPubdate: true,
                             longPress: () {
                               try {
-                                _relatedController.popupDialog =
+                                _relatedController.popupDialog.add(
                                     _createPopupDialog(_relatedController
-                                        .relatedVideoList[index]);
-                                Overlay.of(context)
-                                    .insert(_relatedController.popupDialog!);
+                                        .relatedVideoList[index]));
+                                Overlay.of(context).insert(
+                                    _relatedController.popupDialog.last!);
                               } catch (err) {
                                 return {};
                               }
                             },
-                            longPressEnd: () {
-                              _relatedController.popupDialog?.remove();
-                            },
+                            longPressEnd: _removePopupDialog,
                           ),
                         );
                       }
@@ -108,13 +106,19 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel>
         ));
   }
 
+  void _removePopupDialog() {
+    _relatedController.popupDialog.last?.remove();
+    _relatedController.popupDialog.removeLast();
+  }
+
   OverlayEntry _createPopupDialog(videoItem) {
     return OverlayEntry(
       builder: (BuildContext context) => AnimatedDialog(
-        closeFn: _relatedController.popupDialog?.remove,
+        closeFn: _removePopupDialog,
         child: OverlayPop(
-            videoItem: videoItem,
-            closeFn: _relatedController.popupDialog?.remove),
+          videoItem: videoItem,
+          closeFn: _removePopupDialog,
+        ),
       ),
     );
   }

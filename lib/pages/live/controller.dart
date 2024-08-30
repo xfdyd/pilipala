@@ -12,7 +12,7 @@ class LiveController extends GetxController {
   RxInt crossAxisCount = 2.obs;
   RxList<LiveItemModel> liveList = <LiveItemModel>[].obs;
   bool flag = false;
-  OverlayEntry? popupDialog;
+  List<OverlayEntry?> popupDialog = <OverlayEntry?>[];
   Box setting = GStorage.setting;
 
   @override
