@@ -92,7 +92,6 @@
 					</dict>
 				</array>
 			</dict>
-
 			<!-- 当其他应用程序或系统通过 bilibili -->
 			<dict>
 				<key>CFBundleURLName</key>
@@ -107,5 +106,7 @@
 		<array>
 			<string>audio</string>
 		</array>
+		<key>UIStatusBarHidden</key>
+		<false/>
 	</dict>
 </plist>
