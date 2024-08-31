@@ -183,7 +183,7 @@ class VideoContent extends StatelessWidget {
                   videoItem.title as String,
                   textAlign: TextAlign.start,
                   style: TextStyle(
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                     fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize,
                     height: 1.42,
                     letterSpacing: 0.3,
@@ -203,7 +203,7 @@ class VideoContent extends StatelessWidget {
                         TextSpan(
                           text: i['text'] as String,
                           style: TextStyle(
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w500,
                             fontSize: Theme.of(context)
                                 .textTheme
                                 .bodyMedium!
@@ -245,7 +245,6 @@ class VideoContent extends StatelessWidget {
                   "${pubdate} ${showOwner ? videoItem.owner.name : ''}",
                   maxLines: 1,
                   style: TextStyle(
-                    fontWeight: FontWeight.w400,
                     fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
                     height: 1,
                     color: Theme.of(context).colorScheme.outline,

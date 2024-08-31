@@ -50,7 +50,7 @@ class IntroDetail extends StatelessWidget {
                     bangumiDetail!.title,
                     style: const TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   const SizedBox(height: 4),
