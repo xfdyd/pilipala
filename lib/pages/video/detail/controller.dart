@@ -266,7 +266,8 @@ class VideoDetailController extends GetxController
     /// 设置/恢复 屏幕亮度
     if (brightness != null) {
       ScreenBrightness().setScreenBrightness(brightness!);
-    } else {
+    } else if (setting.get(SettingBoxKey.enableAutoBrightness,
+        defaultValue: false) as bool) {
       ScreenBrightness().resetScreenBrightness();
     }
     await plPlayerController.setDataSource(
