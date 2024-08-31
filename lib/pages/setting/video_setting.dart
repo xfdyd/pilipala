@@ -254,7 +254,7 @@ class _VideoSettingState extends State<VideoSetting> {
               title: '优先使用 OpenSL ES 输出音频',
               leading: Icon(Icons.speaker_outlined),
               subTitle:
-                  '关闭则优先使用AudioTrack输出音频（此项即mpv的--ao），若遇系统音效丢失、无声等问题请尝试关闭。',
+                  '关闭则优先使用AudioTrack输出音频（此项即mpv的--ao），若遇系统音效丢失、无声、音画不同步等问题请尝试关闭。',
               setKey: SettingBoxKey.useOpenSLES,
               defaultVal: true,
             ),
