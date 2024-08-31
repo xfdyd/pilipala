@@ -400,7 +400,7 @@ class _HeaderControlState extends State<HeaderControl> {
                                             Clipboard.setData(
                                               ClipboardData(
                                                 text:
-                                                "rate\n${player.state.rate}",
+                                                    "rate\n${player.state.rate}",
                                               ),
                                             );
                                           }),
@@ -1302,12 +1302,13 @@ class _HeaderControlState extends State<HeaderControl> {
                       ),
                       child: Slider(
                         min: 1,
-                        max: 6,
-                        value: sqrt(danmakuDurationVal),
-                        divisions: 50,
+                        max: 4,
+                        value: pow(danmakuDurationVal, 1 / 4) as double,
+                        divisions: 60,
                         label: danmakuDurationVal.toString(),
                         onChanged: (double val) {
-                          danmakuDurationVal = (val * val).toPrecision(2);
+                          danmakuDurationVal =
+                              (pow(val, 4) as double).toPrecision(2);
                           widget.controller!.danmakuDurationVal =
                               danmakuDurationVal;
                           widget.controller?.putDanmakuSettings();
