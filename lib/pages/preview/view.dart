@@ -148,6 +148,7 @@ class _ImagePreviewState extends State<ImagePreview>
                 onPageChanged: (int index) =>
                     _previewController.onChange(index),
                 canScrollPage: (GestureDetails? gestureDetails) =>
+                    gestureDetails?.totalScale == null ||
                     gestureDetails!.totalScale! <= 1.0,
                 itemCount: widget.imgList!.length,
                 itemBuilder: (BuildContext context, int index) {
