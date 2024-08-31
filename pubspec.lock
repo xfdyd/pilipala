@@ -1388,7 +1388,7 @@ packages:
       sha256: "0f787e27ff617e4f88f7074977240406a9c5509444bac64a4dfa5b3200fb5632"
       url: "https://mirrors.tuna.tsinghua.edu.cn/dart-pub/"
     source: hosted
-    version: "8.7.0"
+    version: "8.8.0"
   share_plus:
     dependency: "direct main"
     description:
