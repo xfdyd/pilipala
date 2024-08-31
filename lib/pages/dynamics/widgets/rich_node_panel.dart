@@ -3,6 +3,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 import 'package:PiliPalaX/http/search.dart';
+import 'package:PiliPalaX/utils/app_scheme.dart';
 
 // 富文本
 InlineSpan richNode(item, context) {
@@ -95,10 +96,18 @@ InlineSpan richNode(item, context) {
               alignment: PlaceholderAlignment.middle,
               child: GestureDetector(
                 onTap: () {
+                  String url = i.origText;
+                  if (url.startsWith('//')) {
+                    url = url.replaceFirst('//', 'https://');
+                    PiliScheme.routePush(Uri.parse(url));
+                    return;
+                  }
                   Get.toNamed(
                     '/webview',
                     parameters: {
-                      'url': i.origText,
+                      'url': url.startsWith('//')
+                          ? "https://${url.split('//').last}"
+                          : url,
                       'type': 'url',
                       'pageTitle': ''
                     },
