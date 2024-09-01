@@ -20,7 +20,7 @@ class OwnerFollowList extends StatefulWidget {
 
 class _OwnerFollowListState extends State<OwnerFollowList>
     with AutomaticKeepAliveClientMixin {
-  late int mid;
+  late int? mid;
   late Future _futureBuilderFuture;
   final ScrollController scrollController = ScrollController();
   int pn = 1;
