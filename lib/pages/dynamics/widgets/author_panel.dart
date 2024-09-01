@@ -163,10 +163,9 @@ class MorePanel extends StatelessWidget {
             ),
             leading: const Icon(Icons.share_outlined, size: 19),
             onTap: () async {
-              var result = await Share.share(
+              await Share.share(
                       '${HttpString.baseUrl}/dynamic/${item.idStr} UP主: ${item.modules.moduleAuthor.name}')
                   .whenComplete(() {});
-              return result;
             },
             minLeadingWidth: 0,
           ),

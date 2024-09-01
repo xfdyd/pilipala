@@ -253,9 +253,7 @@ class BangumiIntroController extends GetxController {
                   child: const Text('其它app打开')),
               TextButton(
                   onPressed: () async {
-                    var result =
-                        await Share.share(videoUrl).whenComplete(() {});
-                    return result;
+                    await Share.share(videoUrl).whenComplete(() {});
                   },
                   child: const Text('分享视频')),
             ],

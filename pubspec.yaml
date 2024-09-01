@@ -44,11 +44,11 @@ dependencies:
   dio: ^5.3.3
   cookie_jar: ^4.0.8
   dio_cookie_manager: ^3.1.1
-  connectivity_plus: ^4.0.1
+  connectivity_plus: ^4.0.2
   dio_http2_adapter: ^2.3.1+1
 
   # 图片
-  cached_network_image: ^3.3.0
+  cached_network_image: ^3.4.1
   extended_image: ^8.2.0
   saver_gallery: ^3.0.1
 
@@ -61,11 +61,11 @@ dependencies:
   hive_flutter: ^1.1.0
 
   # 设备信息
-  device_info_plus: ^9.0.2
+  device_info_plus: ^10.1.2
   # 权限
   permission_handler: ^11.0.1
   # 分享
-  share_plus: ^7.0.2
+  share_plus: ^10.0.2
   # cookie 管理
   webview_cookie_manager: ^2.0.6
   # 浏览器
@@ -89,9 +89,9 @@ dependencies:
   encrypt: ^5.0.3
 
   # 视频播放器
-  media_kit: ^1.1.10 # Primary package.
-  media_kit_video: ^1.2.4 # For video rendering.
-  media_kit_libs_video: ^1.0.4
+  media_kit: ^1.1.11 # Primary package.
+  media_kit_video: ^1.2.5 # For video rendering.
+  media_kit_libs_video: ^1.0.5
 
   # 媒体通知
   audio_service: ^0.18.15
@@ -118,7 +118,7 @@ dependencies:
   # 高帧率
   flutter_displaymode: ^0.6.0
   # scheme跳转
-  app_links: ^6.2.0
+  app_links: ^6.3.0
   # 弹幕
   ns_danmaku:
     git:
@@ -136,7 +136,7 @@ dependencies:
   flutter_html: ^3.0.0-beta.2
   # 极验
   gt3_flutter_plugin: ^0.1.0
-  uuid: ^3.0.7
+  uuid: ^4.5.0
   scrollable_positioned_list: ^0.3.8
   nil: ^1.1.1
   catcher_2: ^2.0.0-alpha.2
@@ -163,7 +163,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^4.0.0
   flutter_launcher_icons: ^0.13.1
   # flutter_launcher_icons:
   #   git:

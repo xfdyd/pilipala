@@ -379,12 +379,11 @@ class VideoIntroController extends GetxController {
                   child: const Text('其它app打开')),
               TextButton(
                   onPressed: () async {
-                    var result = await Share.share('${videoDetail.value.title} '
+                    await Share.share('${videoDetail.value.title} '
                             'UP主: ${videoDetail.value.owner!.name!}'
                             ' - $videoUrl')
                         .whenComplete(() {});
                     Get.back();
-                    return result;
                   },
                   child: const Text('分享视频')),
             ],
