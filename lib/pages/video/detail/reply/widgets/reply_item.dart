@@ -1094,6 +1094,10 @@ class MorePanel extends StatelessWidget {
         children: [
           InkWell(
             onTap: () => Get.back(),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(28),
+              topRight: Radius.circular(28),
+            ),
             child: Container(
               height: 35,
               padding: const EdgeInsets.only(bottom: 2),
