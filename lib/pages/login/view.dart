@@ -456,14 +456,24 @@ class _LoginPageState extends State<LoginPage> {
                 )
               : null,
         ),
-        body: TabBarView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          controller: _loginPageCtr.tabController,
-          children: [
-            tabViewOuter(loginByPassword()),
-            tabViewOuter(loginBySmS()),
-            tabViewOuter(loginByQRCode()),
-          ],
+        body: NotificationListener(
+          onNotification: (notification) {
+            if (notification is ScrollUpdateNotification) {
+              if (notification.metrics.axis == Axis.horizontal) {
+                FocusScope.of(context).unfocus();
+              }
+            }
+            return true;
+          },
+          child: TabBarView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            controller: _loginPageCtr.tabController,
+            children: [
+              tabViewOuter(loginByPassword()),
+              tabViewOuter(loginBySmS()),
+              tabViewOuter(loginByQRCode()),
+            ],
+          ),
         ),
       );
     });
@@ -479,5 +489,4 @@ class _LoginPageState extends State<LoginPage> {
               child: child,
             )));
   }
-
 }
