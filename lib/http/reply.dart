@@ -1,5 +1,10 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+
 import '../models/video/reply/data.dart';
 import '../models/video/reply/emote.dart';
+import '../utils/storage.dart';
 import 'api.dart';
 import 'init.dart';
 
@@ -10,12 +15,18 @@ class ReplyHttp {
     required int type,
     int sort = 1,
   }) async {
-    var res = await Request().get(Api.replyList, data: {
-      'oid': oid,
-      'type': type,
-      'pagination_str': '{"offset":"${nextOffset.replaceAll('"', '\\"')}"}',
-      'mode': sort + 2, //2:按时间排序；3：按热度排序
-    });
+    Options? options = GStorage.userInfo.get('userInfoCache') == null
+        ? Options(
+            headers: {HttpHeaders.cookieHeader: "buvid3= ; b_nut= ; sid= "})
+        : null;
+    var res = await Request().get(Api.replyList,
+        data: {
+          'oid': oid,
+          'type': type,
+          'pagination_str': '{"offset":"${nextOffset.replaceAll('"', '\\"')}"}',
+          'mode': sort + 2, //2:按时间排序；3：按热度排序
+        },
+        options: options);
     if (res.data['code'] == 0) {
       return {
         'status': true,
@@ -37,14 +48,21 @@ class ReplyHttp {
     required int type,
     int sort = 1,
   }) async {
-    var res = await Request().get(Api.replyReplyList, data: {
-      'oid': oid,
-      'root': root,
-      'pn': pageNum,
-      'type': type,
-      'sort': 1,
-      'csrf': await Request.getCsrf(),
-    });
+    // 未登录状态下，将cookie设为空，可以请求到全部的评论
+    Options? options = GStorage.userInfo.get('userInfoCache') == null
+        ? Options(
+            headers: {HttpHeaders.cookieHeader: "buvid3= ; b_nut= ; sid= "})
+        : null;
+    var res = await Request().get(Api.replyReplyList,
+        data: {
+          'oid': oid,
+          'root': root,
+          'pn': pageNum,
+          'type': type,
+          'sort': 1,
+          'csrf': await Request.getCsrf(),
+        },
+        options: options);
     if (res.data['code'] == 0) {
       return {
         'status': true,
@@ -86,7 +104,6 @@ class ReplyHttp {
       };
     }
   }
-
 
   static Future getEmoteList({String? business}) async {
     var res = await Request().get(Api.myEmote, data: {
