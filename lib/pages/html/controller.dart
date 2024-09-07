@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:PiliPalaX/http/html.dart';
@@ -99,6 +100,8 @@ class HtmlRenderController extends GetxController {
       } else {
         replyList.addAll(replies);
       }
+    } else {
+      SmartDialog.showToast(res['msg']);
     }
     isLoadingMore = false;
     return res;

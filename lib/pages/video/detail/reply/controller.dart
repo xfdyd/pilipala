@@ -1,5 +1,6 @@
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:PiliPalaX/http/reply.dart';
@@ -97,6 +98,8 @@ class VideoReplyController extends GetxController {
       } else {
         replyList.addAll(replies);
       }
+    } else {
+      SmartDialog.showToast(res['msg']);
     }
   }
 
