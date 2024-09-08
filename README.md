@@ -1,5 +1,5 @@
 <div align="center">
-    <img width="200" height="200" src="https://github.com/orz12/pilipala/blob/main/assets/images/logo/logo_android.png">
+    <img width="200" height="200" src="https://github.com/orz12/PiliPalaX/blob/main/assets/images/logo/logo_android.png">
 </div>
 
 
@@ -14,35 +14,65 @@
 </div>
     <p>使用Flutter开发的BiliBili第三方客户端</p>
     
-<img src="https://github.com/orz12/pilipala/blob/main/assets/screenshots/510shots_so.png" width="32%" alt="home" />
-<img src="https://github.com/orz12/pilipala/blob/main/assets/screenshots/174shots_so.png" width="32%" alt="home" />
-<img src="https://github.com/orz12/pilipala/blob/main/assets/screenshots/850shots_so.png" width="32%" alt="home" />
+<img src="https://github.com/orz12/PiliPalaX/blob/main/assets/screenshots/510shots_so.png" width="32%" alt="home" />
+<img src="https://github.com/orz12/PiliPalaX/blob/main/assets/screenshots/174shots_so.png" width="32%" alt="home" />
+<img src="https://github.com/orz12/PiliPalaX/blob/main/assets/screenshots/850shots_so.png" width="32%" alt="home" />
 <br/>
-<img src="https://github.com/orz12/pilipala/blob/main/assets/screenshots/main_screen.png" width="96%" alt="home" />
+<img src="https://github.com/orz12/PiliPalaX/blob/main/assets/screenshots/main_screen.png" width="96%" alt="home" />
 <br/>
 </div>
 
 ## 开发环境
 
+为临时修复高于3.22.3版本flutter中文字重的bug，使用flutter 3.24.2(stable)，然后在flutter自身的目录中执行
 ```bash
-[✓] Flutter (Channel stable, 3.24.2, on Microsoft Windows [版本 10.0.19045.4046], locale zh-CN)
+git cherry-pick d4124bd --strategy-option theirs
+flutter --version
+```
+以更换Framework和Engine版本（之后flutter doctor就会显示为3.24.3-0.0.pre.1）如下：
+
+```bash
+[√] Flutter (Channel stable, 3.24.3-0.0.pre.1, on Microsoft Windows [版本 10.0.19045.4842], locale zh-CN)
+    • Flutter version 3.24.3-0.0.pre.1 on channel stable at C:\others\flutter
+    • Upstream repository https://github.com/flutter/flutter.git
+    • Framework revision 2d001dcb9d (7 weeks ago), 2024-07-24 00:10:30 -0400
+    • Engine revision 1572635432
+    • Dart version 3.6.0 (build 3.6.0-75.0.dev)
+    • DevTools version 2.37.1
+    • Pub download mirror https://mirrors.tuna.tsinghua.edu.cn/dart-pub
+    • Flutter download mirror https://mirrors.tuna.tsinghua.edu.cn/flutter
 [✓] Android toolchain - develop for Android devices (Android SDK version 34.0.0)
 [✓] Xcode - develop for iOS and macOS (Xcode 15.1)
 [✓] Chrome - develop for the web
-[✓] Android Studio (version 2022.3)
-[✓] VS Code (version 1.85.1)
+[✓] Android Studio (version 2024.1)
+[✓] VS Code (version 1.92.2)
 [✓] Connected device (3 available)
 [✓] Network resources
 
 ```
+注：Framework revision XXXXXX可能会不一致，但后续时间应该是一致的
+<br/>
+Android相关版本：
+> gradle: 7.6.3
+> kotlin: 1.9.22
+> minSdk: 21
+> targetSdk: 34
+> compileSdk: 34
 
+下载后，如果Android编译失败并报了签名相关的问题（例如缺少jks文件等），请保证项目目录下的Android文件夹内存在key.properties，且里面的内容类似于
+```text
+storePassword=aaaaaaaa
+keyPassword=bbbbbbbb
+keyAlias=cccccccc
+storeFile=C:/dd/dddddd.jks
+```
+这些占位符填写的内容和你生成jks证书文件时输入的相匹配。如果你没有jks，可以使用keytool等工具生成，具体过程这里不列出，可自行搜索。
 <br/>
 
 
 ## 技术交流
 
 Telegram: https://t.me/+162zlPtZlT9hNWVl
-QQ频道: https://pd.qq.com/s/3n0b3m5dm
 
 
 <br/>
