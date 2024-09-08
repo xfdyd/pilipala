@@ -538,7 +538,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                 (horizontalScreen ||
                                     MediaQuery.of(context).orientation ==
                                         Orientation.portrait),
-                            onPopInvoked: (bool didPop) {
+                            onPopInvokedWithResult: (bool didPop, Object? result) {
                               if (isFullScreen.value == true) {
                                 plPlayerController!
                                     .triggerFullScreen(status: false);
@@ -673,7 +673,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             width: isFullScreen.value == true ? context.width : videoWidth,
             child: PopScope(
               canPop: isFullScreen.value != true,
-              onPopInvoked: (bool didPop) {
+              onPopInvokedWithResult: (bool didPop, Object? result) {
                 if (isFullScreen.value == true) {
                   plPlayerController!.triggerFullScreen(status: false);
                 }
@@ -766,7 +766,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 : videoHeight,
             child: PopScope(
               canPop: isFullScreen.value != true,
-              onPopInvoked: (bool didPop) {
+              onPopInvokedWithResult: (bool didPop, Object? result) {
                 if (isFullScreen.value == true) {
                   plPlayerController!.triggerFullScreen(status: false);
                 }
@@ -861,7 +861,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               width: isFullScreen.value == true ? context.width : videoWidth,
               child: PopScope(
                 canPop: isFullScreen.value != true,
-                onPopInvoked: (bool didPop) {
+                onPopInvokedWithResult: (bool didPop, Object? result) {
                   if (isFullScreen.value == true) {
                     plPlayerController!.triggerFullScreen(status: false);
                   }
@@ -963,7 +963,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                       isFullScreen.value == true ? context.height : videoHeight,
                   child: PopScope(
                       canPop: isFullScreen.value != true,
-                      onPopInvoked: (bool didPop) {
+                      onPopInvokedWithResult: (bool didPop, Object? result) {
                         if (isFullScreen.value == true) {
                           plPlayerController!.triggerFullScreen(status: false);
                         }

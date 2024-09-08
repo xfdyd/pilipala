@@ -205,7 +205,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
               ),
               PopScope(
                 canPop: plPlayerController?.isFullScreen.value != true,
-                onPopInvoked: (bool didPop) {
+                onPopInvokedWithResult: (bool didPop, Object? result) {
                   if (plPlayerController?.isFullScreen.value == true) {
                     plPlayerController!.triggerFullScreen(status: false);
                   }
