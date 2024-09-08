@@ -272,7 +272,8 @@ class ReplyItem extends StatelessWidget {
         buttonAction(context, replyItem!.replyControl),
         // 一楼的评论
         if ((replyItem!.replyControl!.isShow! ||
-                replyItem!.replies!.isNotEmpty) &&
+                replyItem!.replies!.isNotEmpty ||
+                replyItem!.replyControl!.entryText != null) &&
             showReplyRow!) ...[
           Padding(
             padding: const EdgeInsets.only(top: 5, bottom: 12),
@@ -383,8 +384,10 @@ class ReplyItemRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isShow = replyControl!.isShow!;
-    final int extraRow = replyControl != null && isShow ? 1 : 0;
+    final int extraRow = replyControl?.isShow == true ||
+            (replyControl?.entryText != null && replies!.isEmpty)
+        ? 1
+        : 0;
     return Container(
       margin: const EdgeInsets.only(left: 42, right: 4, top: 0),
       child: Material(
