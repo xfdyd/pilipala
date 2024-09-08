@@ -323,11 +323,14 @@ class Utils {
     }
     LatestDataModel data = LatestDataModel.fromJson(result.data[0]);
     String buildNumber = currentInfo.buildNumber;
+    String remoteVersion = data.tagName!;
     if (Platform.isAndroid) {
       buildNumber = buildNumber.substring(0, buildNumber.length - 1);
+    } else if (Platform.isIOS) {
+      remoteVersion = remoteVersion.replaceAll('-beta', '');
     }
     bool isUpdate =
-        Utils.needUpdate("${currentInfo.version}+$buildNumber", data.tagName!);
+        Utils.needUpdate("${currentInfo.version}+$buildNumber", remoteVersion);
     if (isUpdate) {
       SmartDialog.show(
         animationType: SmartAnimationType.centerFade_otherSlide,
