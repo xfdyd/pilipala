@@ -11,32 +11,13 @@ class ColorSelectPage extends StatefulWidget {
   State<ColorSelectPage> createState() => _ColorSelectPageState();
 }
 
-class Item {
-  Item({
-    required this.expandedValue,
-    required this.headerValue,
-    this.isExpanded = false,
-  });
-
-  String expandedValue;
-  String headerValue;
-  bool isExpanded;
-}
-
-List<Item> generateItems(int count) {
-  return List<Item>.generate(count, (int index) {
-    return Item(
-      headerValue: 'Panel $index',
-      expandedValue: 'This is item number $index',
-    );
-  });
-}
-
 class _ColorSelectPageState extends State<ColorSelectPage> {
   final ColorSelectController ctr = Get.put(ColorSelectController());
 
   @override
   Widget build(BuildContext context) {
+    // 获取当前主题的 ColorScheme
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
@@ -52,6 +33,7 @@ class _ColorSelectPageState extends State<ColorSelectPage> {
               onChanged: (dynamic val) async {
                 ctr.type.value = 0;
                 ctr.setting.put(SettingBoxKey.dynamicColor, true);
+                Get.forceAppUpdate();
               },
             ),
           ),
@@ -70,9 +52,8 @@ class _ColorSelectPageState extends State<ColorSelectPage> {
           Obx(
             () {
               int type = ctr.type.value;
-              return AnimatedOpacity(
-                opacity: type == 1 ? 1 : 0,
-                duration: const Duration(milliseconds: 200),
+              return Offstage(
+                offstage: type == 0,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 12, left: 12, right: 12),
                   child: Wrap(
@@ -136,9 +117,69 @@ class _ColorSelectPageState extends State<ColorSelectPage> {
               );
             },
           ),
+          const SizedBox(height: 20),
+          // 展示 ColorScheme 的颜色
+          ListTile(
+            title: Center(child: Text('${colorScheme.toStringShort()} 可用颜色表')),
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: GridView.extent(
+                shrinkWrap: true, // 自动调整高度
+                physics: const NeverScrollableScrollPhysics(), // 禁用滚动
+                maxCrossAxisExtent: 120, childAspectRatio: 4.5,
+                mainAxisSpacing: 5, crossAxisSpacing: 5,
+                children: _buildColorSchemeDisplay(colorScheme),
+              ),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  List<Widget> _buildColorSchemeDisplay(ColorScheme colorScheme) {
+    String colorSchemeString = colorScheme.toString();
+    final leftBracketIndex = colorSchemeString.indexOf('(');
+
+    if (leftBracketIndex != -1) {
+      colorSchemeString = colorSchemeString.substring(leftBracketIndex + 1);
+    }
+
+    final colorEntries = colorSchemeString
+        .split(',')
+        .where((line) => line.contains('Color('))
+        .map((line) {
+      final parts = line.split(':');
+      final key = parts[0].trim();
+      final color = parts[1].trim();
+      return MapEntry(key, Color(int.parse(color.substring(8, 16), radix: 16)));
+    }).toList();
+
+    return colorEntries.map((entry) {
+      return Container(
+        width: 80, // 固定宽度
+        height: 40, // 固定高度
+        child: Row(
+          children: [
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: entry.value,
+                border: Border.all(color: Colors.black, width: 1),
+              ),
+            ),
+            const SizedBox(width: 4),
+            Expanded(
+                child: Text(entry.key,
+                    maxLines: 3,
+                    style: const TextStyle(
+                      fontSize: 10,
+                    ))),
+          ],
+        ),
+      );
+    }).toList();
   }
 }
 
