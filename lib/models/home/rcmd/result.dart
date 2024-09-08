@@ -23,6 +23,7 @@ class RecVideoItemAppModel {
     this.cardType,
     this.adInfo,
     this.threePoint,
+    this.desc,
   });
 
   int? id;
@@ -48,6 +49,7 @@ class RecVideoItemAppModel {
   String? cardType;
   Map? adInfo;
   ThreePoint? threePoint;
+  String? desc;
 
   RecVideoItemAppModel.fromJson(Map<String, dynamic> json) {
     id = json['player_args'] != null
@@ -90,6 +92,7 @@ class RecVideoItemAppModel {
     threePoint = json['three_point'] != null
         ? ThreePoint.fromJson(json['three_point'])
         : null;
+    desc = json['desc'];
   }
 }
 

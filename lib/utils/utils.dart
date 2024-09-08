@@ -144,6 +144,11 @@ class Utils {
     return '${hour > 0 ? "${paddingStr(hour)}:" : ""}${paddingStr(minute)}:${paddingStr(second)}';
   }
 
+  static String shortenChineseDateString(String date) {
+    if (date.contains("年")) return '${date.split("年").first}年';
+    return date;
+  }
+
   // 完全相对时间显示
   static String formatTimestampToRelativeTime(timeStamp) {
     var difference = DateTime.now()
