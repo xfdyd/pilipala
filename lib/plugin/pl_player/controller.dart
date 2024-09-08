@@ -750,6 +750,8 @@ class PlPlayerController {
         //   SmartDialog.showToast('视频加载日志： $event');
         // }),
         videoPlayerController!.stream.error.listen((String event) {
+          // 直播的错误提示没有参考价值，均不予显示
+          if (videoType.value == 'live') return;
           if (event.startsWith("Failed to open https://") ||
               event.startsWith("Can not open external file https://") ||
               //tcp: ffurl_read returned 0xdfb9b0bb
