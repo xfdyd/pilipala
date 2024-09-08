@@ -750,6 +750,8 @@ class PlPlayerController {
         //   SmartDialog.showToast('视频加载日志： $event');
         // }),
         videoPlayerController!.stream.error.listen((String event) {
+          // 直播的错误提示没有参考价值，均不予显示
+          if (videoType.value == 'live') return;
           if (event.startsWith("Failed to open https://") ||
               event.startsWith("Can not open external file https://") ||
               //tcp: ffurl_read returned 0xdfb9b0bb
@@ -900,13 +902,13 @@ class PlPlayerController {
 
     audioSessionHandler.setActive(true);
 
-    Future.delayed(const Duration(milliseconds: 100), () {
-      getCurrentVolume();
-      if (setting.get(SettingBoxKey.enableAutoBrightness, defaultValue: false)
-          as bool) {
-        getCurrentBrightness();
-      }
-    });
+    // Future.delayed(const Duration(milliseconds: 100), () {
+    //   getCurrentVolume();
+    //   if (setting.get(SettingBoxKey.enableAutoBrightness, defaultValue: false)
+    //       as bool) {
+    //     getCurrentBrightness();
+    //   }
+    // });
   }
 
   /// 暂停播放
@@ -1167,6 +1169,7 @@ class PlPlayerController {
 
   // 全屏
   Future<void> triggerFullScreen({bool status = true}) async {
+    stopScreenTimer();
     FullScreenMode mode = FullScreenModeCode.fromCode(
         setting.get(SettingBoxKey.fullScreenMode, defaultValue: 0))!;
     bool removeSafeArea = setting.get(SettingBoxKey.videoPlayerRemoveSafeArea,
