@@ -1169,6 +1169,7 @@ class PlPlayerController {
 
   // 全屏
   Future<void> triggerFullScreen({bool status = true}) async {
+    stopScreenTimer();
     FullScreenMode mode = FullScreenModeCode.fromCode(
         setting.get(SettingBoxKey.fullScreenMode, defaultValue: 0))!;
     bool removeSafeArea = setting.get(SettingBoxKey.videoPlayerRemoveSafeArea,
