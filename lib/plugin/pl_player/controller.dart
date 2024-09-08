@@ -900,13 +900,13 @@ class PlPlayerController {
 
     audioSessionHandler.setActive(true);
 
-    Future.delayed(const Duration(milliseconds: 100), () {
-      getCurrentVolume();
-      if (setting.get(SettingBoxKey.enableAutoBrightness, defaultValue: false)
-          as bool) {
-        getCurrentBrightness();
-      }
-    });
+    // Future.delayed(const Duration(milliseconds: 100), () {
+    //   getCurrentVolume();
+    //   if (setting.get(SettingBoxKey.enableAutoBrightness, defaultValue: false)
+    //       as bool) {
+    //     getCurrentBrightness();
+    //   }
+    // });
   }
 
   /// 暂停播放
