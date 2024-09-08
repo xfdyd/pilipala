@@ -28,6 +28,7 @@ class _RecommendSettingState extends State<RecommendSetting> {
   // late int filterUnfollowedRatio;
   late int minDurationForRcmd;
   late int minLikeRatioForRecommend;
+  late String banWordForRecommend;
 
   @override
   void initState() {
@@ -44,6 +45,8 @@ class _RecommendSettingState extends State<RecommendSetting> {
         setting.get(SettingBoxKey.minDurationForRcmd, defaultValue: 0);
     minLikeRatioForRecommend =
         setting.get(SettingBoxKey.minLikeRatioForRecommend, defaultValue: 0);
+    banWordForRecommend =
+        setting.get(SettingBoxKey.banWordForRecommend, defaultValue: '');
   }
 
   @override
@@ -142,6 +145,66 @@ class _RecommendSettingState extends State<RecommendSetting> {
                 RecommendFilter.update();
                 setState(() {});
               }
+            },
+          ),
+          ListTile(
+            dense: false,
+            leading: const Icon(Icons.title_outlined),
+            title: Text('标题关键词过滤', style: titleStyle),
+            subtitle: Text(
+              banWordForRecommend.isEmpty ? "点击添加" : banWordForRecommend,
+              style: subTitleStyle,
+            ),
+            onTap: () async {
+              final TextEditingController textController =
+                  TextEditingController(text: banWordForRecommend);
+              await showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('标题关键词过滤'),
+                    content: Column(mainAxisSize: MainAxisSize.min, children: [
+                      const Text('使用空格隔开，如：尝试 测试'),
+                      TextField(
+                        controller: textController,
+                        //decoration: InputDecoration(hintText: hintText),
+                      )
+                    ]),
+                    actions: <Widget>[
+                      TextButton(
+                        child: const Text('清空'),
+                        onPressed: () {
+                          textController.text = '';
+                        },
+                      ),
+                      TextButton(
+                        child: const Text('取消'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          SmartDialog.showToast('关键词未被修改');
+                        },
+                      ),
+                      TextButton(
+                        child: const Text('保存'),
+                        onPressed: () async {
+                          Navigator.of(context).pop();
+                          String filter = textController.text.trim();
+                          banWordForRecommend = filter;
+                          setting.put(SettingBoxKey.banWordForRecommend,
+                              banWordForRecommend);
+                          setState(() {});
+                          RecommendFilter.update();
+                          if (filter.isNotEmpty) {
+                            SmartDialog.showToast('已保存：$banWordForRecommend');
+                          } else {
+                            SmartDialog.showToast('已清除全部关键词');
+                          }
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
             },
           ),
           ListTile(
