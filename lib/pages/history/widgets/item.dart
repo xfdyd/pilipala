@@ -1,3 +1,4 @@
+import 'package:PiliPalaX/utils/app_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -42,17 +43,20 @@ class HistoryItem extends StatelessWidget {
           return;
         }
         if (videoItem.history.business.contains('article')) {
-          int cid = videoItem.history.cid ??
-              // videoItem.history.oid ??
-              await SearchHttp.ab2c(aid: aid, bvid: bvid);
-          Get.toNamed(
-            '/webview',
-            parameters: {
-              'url': 'https://www.bilibili.com/read/cv$cid',
-              'type': 'note',
-              'pageTitle': videoItem.title
-            },
-          );
+          // int cid = videoItem.history.cid ??
+          //     // videoItem.history.oid ??
+          //     await SearchHttp.ab2c(aid: aid, bvid: bvid);
+          // if (cid == -1) cid = aid;
+          // Get.toNamed(
+          //   '/webview',
+          //   parameters: {
+          //     'url': 'https://www.bilibili.com/read/cv$cid',
+          //     'type': 'note',
+          //     'pageTitle': videoItem.title
+          //   },
+          // );
+          PiliScheme.routePush(Uri.parse(
+              "https://www.bilibili.com/read/cv${videoItem.history.oid}"));
         } else if (videoItem.history.business == 'live') {
           if (videoItem.liveStatus == 1) {
             LiveItemModel liveItem = LiveItemModel.fromJson({

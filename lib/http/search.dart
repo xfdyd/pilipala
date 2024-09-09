@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
 import '../models/bangumi/info.dart';
 import '../models/common/search_type.dart';
@@ -139,7 +140,12 @@ class SearchHttp {
     }
     final dynamic res =
         await Request().get(Api.ab2c, data: <String, dynamic>{...data});
-    return res.data['data'].first['cid'];
+    if (res.data['code'] == 0) {
+      return res.data['data'].first['cid'];
+    } else {
+      SmartDialog.showToast("ab2c error: ${res.data['message']}");
+      return -1;
+    }
   }
 
   static Future<Map<String, dynamic>> bangumiInfo(
