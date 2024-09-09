@@ -96,6 +96,7 @@ class _StyleSettingState extends State<StyleSetting> {
             leading: Icon(Icons.design_services_outlined),
             setKey: SettingBoxKey.enableMYBar,
             defaultVal: true,
+            needReboot: true,
           ),
           const SetSwitchItem(
             title: '首页背景渐变',
