@@ -66,10 +66,10 @@ InlineSpan picsNodes(List<OpusPicsModel> pics) {
                           ),
                           height > Get.size.height * 0.9
                               ? const PBadge(
-                            text: '长图',
-                            right: 8,
-                            bottom: 8,
-                          )
+                                  text: '长图',
+                                  right: 8,
+                                  bottom: 8,
+                                )
                               : const SizedBox(),
                         ],
                       )),
@@ -104,7 +104,7 @@ InlineSpan picsNodes(List<OpusPicsModel> pics) {
                     width: maxWidth,
                     height: maxWidth,
                     origAspectRatio:
-                    pics[i].width!.toInt() / pics[i].height!.toInt(),
+                        pics[i].width!.toInt() / pics[i].height!.toInt(),
                   ),
                 ));
           },
@@ -118,10 +118,10 @@ InlineSpan picsNodes(List<OpusPicsModel> pics) {
             double maxWidth = box.maxWidth.truncateToDouble();
             double crossCount = len < 3 ? 2 : 3;
             double height = maxWidth /
-                crossCount *
-                (len % crossCount == 0
-                    ? len ~/ crossCount
-                    : len ~/ crossCount + 1) +
+                    crossCount *
+                    (len % crossCount == 0
+                        ? len ~/ crossCount
+                        : len ~/ crossCount + 1) +
                 6;
             return Container(
               padding: const EdgeInsets.only(top: 6),
@@ -145,6 +145,7 @@ InlineSpan picsNodes(List<OpusPicsModel> pics) {
     children: spanChildren,
   );
 }
+
 Widget forWard(item, context, ctr, source, {floor = 1}) {
   TextStyle authorStyle =
       TextStyle(color: Theme.of(context).colorScheme.primary);
@@ -157,6 +158,7 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
   if (hasPics) {
     pics = item.modules.moduleDynamic.major.opus.pics;
   }
+  InlineSpan? richNodes = richNode(item, context);
   switch (item.type) {
     // 图文
     case 'DYNAMIC_TYPE_DRAW':
@@ -201,12 +203,13 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
             //     ),
             //   ),
             // ],
-            Text.rich(
-              richNode(item, context),
-              // 被转发状态(floor=2) 隐藏
-              maxLines: source == 'detail' && floor != 2 ? 999 : 4,
-              overflow: TextOverflow.ellipsis,
-            ),
+            if (richNodes != null)
+              Text.rich(
+                richNodes,
+                // 被转发状态(floor=2) 隐藏
+                maxLines: source == 'detail' && floor != 2 ? 999 : 4,
+                overflow: TextOverflow.ellipsis,
+              ),
             if (hasPics) ...[
               Text.rich(
                 picsNodes(pics),
@@ -263,6 +266,7 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
     case 'DYNAMIC_TYPE_UGC_SEASON':
       return videoSeasonWidget(item, context, 'ugcSeason');
     case 'DYNAMIC_TYPE_WORD':
+      InlineSpan? richNodes = richNode(item, context);
       return floor == 2
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,12 +293,13 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
                   ],
                 ),
                 const SizedBox(height: 8),
-                Text.rich(
-                  richNode(item, context),
-                  // 被转发状态(floor=2) 隐藏
-                  maxLines: source == 'detail' && floor != 2 ? 999 : 4,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                if (richNodes != null)
+                  Text.rich(
+                    richNodes,
+                    // 被转发状态(floor=2) 隐藏
+                    maxLines: source == 'detail' && floor != 2 ? 999 : 4,
+                    overflow: TextOverflow.ellipsis,
+                  ),
               ],
             )
           : item.modules.moduleDynamic.additional != null

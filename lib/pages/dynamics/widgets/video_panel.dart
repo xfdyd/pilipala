@@ -73,11 +73,12 @@ Widget videoSeasonWidget(item, context, type, {floor = 1}) {
       //   const SizedBox(height: 6),
       // ],
       if (floor == 2 && item.modules.moduleDynamic.desc != null) ...[
-        Text.rich(richNode(item, context)),
+        Text.rich(richNode(item, context)!),
         const SizedBox(height: 6),
       ],
       Padding(
-          padding: EdgeInsets.symmetric(horizontal: StyleString.safeSpace),
+          padding:
+              const EdgeInsets.symmetric(horizontal: StyleString.safeSpace),
           child: LayoutBuilder(builder: (context, box) {
             double width = box.maxWidth;
             return Stack(
