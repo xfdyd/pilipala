@@ -284,10 +284,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     // _bufferedListener?.cancel();
 
     /// 开启
-    if (setting.get(SettingBoxKey.enableAutoBrightness, defaultValue: false)
-        as bool) {
-      videoDetailController.brightness = plPlayerController!.brightness.value;
-    }
     if (plPlayerController != null) {
       videoDetailController.defaultST = plPlayerController!.position.value;
       videoIntroController.isPaused = true;
