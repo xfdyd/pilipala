@@ -34,7 +34,9 @@ import '../pages/member_coin/index.dart';
 import '../pages/member_dynamics/index.dart';
 import '../pages/member_like/index.dart';
 import '../pages/member_search/index.dart';
-import '../pages/member_seasons/index.dart';
+import '../pages/member_season/view.dart';
+import '../pages/member_seasons_and_series/index.dart';
+import '../pages/member_series/view.dart';
 import '../pages/msg_feed_top/sys_msg/view.dart';
 import '../pages/search/index.dart';
 import '../pages/search_result/index.dart';
@@ -165,18 +167,21 @@ class Routes {
     // 登录页面
     CustomGetPage(name: '/loginPage', page: () => const LoginPage()),
     // 用户动态
-    CustomGetPage(
-        name: '/memberDynamics', page: () => const MemberDynamicsPage()),
+    // CustomGetPage(
+    //     name: '/memberDynamics', page: () => const MemberDynamicsPage()),
     // 用户投稿
-    CustomGetPage(
-        name: '/memberArchive', page: () => const MemberArchivePage()),
+    // CustomGetPage(
+    //     name: '/memberArchive', page: () => const MemberArchivePage()),
     // 用户最近投币
     CustomGetPage(name: '/memberCoin', page: () => const MemberCoinPage()),
     // 用户最近喜欢
     CustomGetPage(name: '/memberLike', page: () => const MemberLikePage()),
     // 用户专栏
-    CustomGetPage(
-        name: '/memberSeasons', page: () => const MemberSeasonsPage()),
+    // CustomGetPage(
+    //     name: '/memberSeasons', page: () => const MemberSeasonsPage()),
+    CustomGetPage(name: '/memberSeason', page: () => const MemberSeasonPage()),
+
+    CustomGetPage(name: '/memberSeries', page: () => const MemberSeriesPage()),
     // 日志
     CustomGetPage(name: '/logs', page: () => const LogsPage()),
     // 搜索关注

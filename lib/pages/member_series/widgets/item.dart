@@ -7,17 +7,17 @@ import 'package:PiliPalaX/common/widgets/stat/view.dart';
 import 'package:PiliPalaX/http/search.dart';
 import 'package:PiliPalaX/utils/utils.dart';
 
-class MemberSeasonsItem extends StatelessWidget {
-  final dynamic seasonItem;
+class MemberSeriesItem extends StatelessWidget {
+  final dynamic seriesItem;
 
-  const MemberSeasonsItem({
+  const MemberSeriesItem({
     Key? key,
-    required this.seasonItem,
+    required this.seriesItem,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    String heroTag = Utils.makeHeroTag(seasonItem.aid);
+    String heroTag = Utils.makeHeroTag(seriesItem.aid);
     return Card(
       elevation: 0,
       clipBehavior: Clip.hardEdge,
@@ -25,9 +25,9 @@ class MemberSeasonsItem extends StatelessWidget {
       child: InkWell(
         onTap: () async {
           int cid =
-          await SearchHttp.ab2c(aid: seasonItem.aid, bvid: seasonItem.bvid);
-          Get.toNamed('/video?bvid=${seasonItem.bvid}&cid=$cid',
-              arguments: {'videoItem': seasonItem, 'heroTag': heroTag});
+              await SearchHttp.ab2c(aid: seriesItem.aid, bvid: seriesItem.bvid);
+          Get.toNamed('/video?bvid=${seriesItem.bvid}&cid=$cid',
+              arguments: {'videoItem': seriesItem, 'heroTag': heroTag});
         },
         child: Column(
           children: [
@@ -41,18 +41,18 @@ class MemberSeasonsItem extends StatelessWidget {
                     Hero(
                       tag: heroTag,
                       child: NetworkImgLayer(
-                        src: seasonItem.pic,
+                        src: seriesItem.pic,
                         width: maxWidth,
                         height: maxHeight,
                       ),
                     ),
-                    if (seasonItem.pubdate != null)
+                    if (seriesItem.pubdate != null)
                       PBadge(
                         bottom: 6,
                         right: 6,
                         type: 'gray',
                         text: Utils.CustomStamp_str(
-                            timestamp: seasonItem.pubdate, date: 'YY-MM-DD'),
+                            timestamp: seriesItem.pubdate, date: 'YY-MM-DD'),
                       )
                   ],
                 );
@@ -65,7 +65,7 @@ class MemberSeasonsItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    seasonItem.title,
+                    seriesItem.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -73,13 +73,13 @@ class MemberSeasonsItem extends StatelessWidget {
                   Row(
                     children: [
                       StatView(
-                        view: seasonItem.view,
+                        view: seriesItem.view,
                         theme: 'gray',
                       ),
                       const Spacer(),
                       Text(
                         Utils.CustomStamp_str(
-                            timestamp: seasonItem.pubdate, date: 'YY-MM-DD'),
+                            timestamp: seriesItem.pubdate, date: 'YY-MM-DD'),
                         style: TextStyle(
                           fontSize: 11,
                           color: Theme.of(context).colorScheme.outline,

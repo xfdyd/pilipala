@@ -299,6 +299,9 @@ class Api {
   // 用户动态
   static const String memberDynamic = '/x/polymer/web-dynamic/v1/feed/space';
 
+  // 用户图文
+  static const String memberOpus = '/x/polymer/web-dynamic/v1/opus/feed/space';
+
   // 稍后再看
   static const String toViewLater = '/x/v2/history/toview/add';
 
@@ -564,14 +567,14 @@ class Api {
   /// 最近追番
   static const getRecentBangumiApi = '/x/space/bangumi/follow/list';
 
-  /// 用户专栏
-  static const getMemberSeasonsApi = '/x/polymer/web-space/home/seasons_series';
+  /// 用户合集与视频列表
+  static const getMemberSeasonsAndSeriesApi = '/x/polymer/web-space/seasons_series_list';
 
   /// 获赞数 播放数
   /// mid
   static const getMemberViewApi = '/x/space/upstat';
 
-  /// 查询某个专栏
+  /// 查询指定合集
   /// mid
   /// season_id
   /// sort_reverse
@@ -579,6 +582,10 @@ class Api {
   /// page_size
   static const getSeasonDetailApi =
       '/x/polymer/web-space/seasons_archives_list';
+
+  /// 查询指定视频列表
+  static const getSeriesDetailApi =
+      '/x/series/archives';
 
   /// 获取未读动态数
   static const getUnreadDynamic = '/x/web-interface/dynamic/entrance';

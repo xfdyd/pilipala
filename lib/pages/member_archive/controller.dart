@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:PiliPalaX/utils/app_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -5,10 +8,12 @@ import 'package:PiliPalaX/http/member.dart';
 import 'package:PiliPalaX/models/member/archive.dart';
 
 class MemberArchiveController extends GetxController {
-  final ScrollController scrollController = ScrollController();
-  late int mid;
+  MemberArchiveController({required this.mid});
+  final int mid;
   int pn = 1;
   int count = 0;
+  String episodicButtonText = "播放全部";
+  String episodicButtonUri = "";
   RxMap<String, String> currentOrder = <String, String>{}.obs;
   List<Map<String, String>> orderList = [
     {'type': 'pubdate', 'label': '最新发布'},
@@ -20,14 +25,16 @@ class MemberArchiveController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    mid = int.parse(Get.parameters['mid']!);
     currentOrder.value = orderList.first;
   }
 
   // 获取用户投稿
   Future getMemberArchive(type) async {
-    if (type == 'init') {
+    if (type == 'init' || type == 'refresh') {
       pn = 1;
+    }
+    if (type == 'refresh') {
+      archivesList.clear();
     }
     var res = await MemberHttp.memberArchive(
       mid: mid,
@@ -35,7 +42,9 @@ class MemberArchiveController extends GetxController {
       order: currentOrder['type']!,
     );
     if (res['status']) {
-      if (type == 'init') {
+      episodicButtonText = res['data'].episodicButton?.text ?? "";
+      episodicButtonUri = res['data'].episodicButton?.uri ?? "";
+      if (type == 'init' || type == 'refresh') {
         archivesList.value = res['data'].list.vlist;
       }
       if (type == 'onLoad') {
@@ -60,8 +69,20 @@ class MemberArchiveController extends GetxController {
     getMemberArchive('init');
   }
 
+  episodicButton() async {
+    if (episodicButtonUri.isNotEmpty) {
+      PiliScheme.routePush(Uri.parse('https:' + episodicButtonUri));
+    } else {
+      SmartDialog.showToast('暂无播放链接');
+    }
+  }
+
   // 上拉加载
   Future onLoad() async {
-    getMemberArchive('onLoad');
+    await getMemberArchive('onLoad');
+  }
+
+  Future onRefresh() async {
+    await getMemberArchive('refresh');
   }
 }

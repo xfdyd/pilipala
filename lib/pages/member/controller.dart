@@ -13,7 +13,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../video/detail/introduction/widgets/group_panel.dart';
 
-class MemberController extends GetxController {
+class MemberController extends GetxController with GetTickerProviderStateMixin {
   int? mid;
   MemberController({this.mid});
   Rx<MemberInfoModel> memberInfo = MemberInfoModel().obs;
@@ -29,6 +29,7 @@ class MemberController extends GetxController {
   RxInt attribute = (-1).obs;
   RxString attributeText = '关注'.obs;
   RxList<MemberCoinsDataModel> recentCoinsList = <MemberCoinsDataModel>[].obs;
+  late TabController tabController;
 
   @override
   void onInit() async {
@@ -38,6 +39,7 @@ class MemberController extends GetxController {
     ownerMid = userInfo != null ? userInfo.mid : -1;
     face.value = Get.arguments['face'] ?? '';
     heroTag = Get.arguments['heroTag'] ?? '';
+    tabController = TabController(length: 3, vsync: this);
     relationSearch();
   }
 
@@ -49,6 +51,8 @@ class MemberController extends GetxController {
     if (res['status']) {
       memberInfo.value = res['data'];
       face.value = res['data'].face;
+    } else {
+      SmartDialog.showToast(res['msg']);
     }
     return res;
   }
@@ -237,16 +241,6 @@ class MemberController extends GetxController {
 
   void shareUser() {
     Share.share('${memberInfo.value.name} - https://space.bilibili.com/$mid');
-  }
-
-  // 请求专栏
-  Future getMemberSeasons() async {
-    if (userInfo == null) return;
-    var res = await MemberHttp.getMemberSeasons(mid, 1, 10);
-    if (!res['status']) {
-      SmartDialog.showToast("用户专栏请求异常：${res['msg']}");
-    }
-    return res;
   }
 
   // 请求投币视频

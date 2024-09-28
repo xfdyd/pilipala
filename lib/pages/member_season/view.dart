@@ -6,32 +6,31 @@ import '../../utils/grid.dart';
 import 'controller.dart';
 import 'widgets/item.dart';
 
-class MemberSeasonsPage extends StatefulWidget {
-  const MemberSeasonsPage({super.key});
+class MemberSeasonPage extends StatefulWidget {
+  const MemberSeasonPage({super.key});
 
   @override
-  State<MemberSeasonsPage> createState() => _MemberSeasonsPageState();
+  State<MemberSeasonPage> createState() => _MemberSeasonPageState();
 }
 
-class _MemberSeasonsPageState extends State<MemberSeasonsPage> {
-  final MemberSeasonsController _memberSeasonsController =
-      Get.put(MemberSeasonsController());
+class _MemberSeasonPageState extends State<MemberSeasonPage> {
+  final MemberSeasonController _memberSeasonController =
+      Get.put(MemberSeasonController());
   late Future _futureBuilderFuture;
   late ScrollController scrollController;
 
   @override
   void initState() {
     super.initState();
-    _futureBuilderFuture =
-        _memberSeasonsController.getSeasonDetail('onRefresh');
-    scrollController = _memberSeasonsController.scrollController;
+    _futureBuilderFuture = _memberSeasonController.getSeasonDetail('init');
+    scrollController = _memberSeasonController.scrollController;
     scrollController.addListener(
       () {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
           EasyThrottle.throttle(
               'member_archives', const Duration(milliseconds: 500), () {
-            _memberSeasonsController.onLoad();
+            _memberSeasonController.onLoad();
           });
         }
       },
@@ -42,24 +41,29 @@ class _MemberSeasonsPageState extends State<MemberSeasonsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 0,
-        centerTitle: false,
-        title: Text('Ta的专栏', style: Theme.of(context).textTheme.titleMedium),
-      ),
+          titleSpacing: 0,
+          centerTitle: false,
+          title: Obx(
+            () => Text(
+                '${_memberSeasonController.meta.value.name}(${_memberSeasonController.meta.value.total})',
+                style: Theme.of(context).textTheme.titleMedium),
+          )
+          // title: Text('Ta的专栏', style: Theme.of(context).textTheme.titleMedium),
+          ),
       body: Padding(
         padding: const EdgeInsets.only(
           left: StyleString.safeSpace,
           right: StyleString.safeSpace,
         ),
         child: SingleChildScrollView(
-          controller: _memberSeasonsController.scrollController,
+          controller: _memberSeasonController.scrollController,
           child: FutureBuilder(
             future: _futureBuilderFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 if (snapshot.data != null) {
                   Map data = snapshot.data as Map;
-                  List list = _memberSeasonsController.seasonsList;
+                  List list = _memberSeasonController.seasonsList;
                   if (data['status']) {
                     return Obx(
                       () => list.isNotEmpty
@@ -76,27 +80,29 @@ class _MemberSeasonsPageState extends State<MemberSeasonsPage> {
                                   ),
                                   physics: const NeverScrollableScrollPhysics(),
                                   shrinkWrap: true,
-                                  itemCount: _memberSeasonsController
+                                  itemCount: _memberSeasonController
                                       .seasonsList.length,
                                   itemBuilder: (context, i) {
-                                    return MemberSeasonsItem(
-                                      seasonItem: _memberSeasonsController
+                                    return MemberSeasonItem(
+                                      seasonItem: _memberSeasonController
                                           .seasonsList[i],
                                     );
                                   },
                                 );
                               },
                             )
-                          : const SizedBox(),
+                          : const Text('暂无数据'),
                     );
                   } else {
-                    return const SizedBox();
+                    return const Text('查询出错');
                   }
                 } else {
-                  return const SizedBox();
+                  return const Text('返回异常');
                 }
               } else {
-                return const SizedBox();
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
               }
             },
           ),
