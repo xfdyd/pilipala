@@ -2,6 +2,8 @@
 
 import 'dart:convert';
 
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
 class IdUtils {
   static final XOR_CODE = BigInt.parse('23442827791579');
   static final MASK_CODE = BigInt.parse('2251799813685247');
@@ -47,6 +49,10 @@ class IdUtils {
 
   /// bv转av
   static int bv2av(String bvid) {
+    if (bvid.length != 12) {
+      SmartDialog.showToast('BV号长度错误，当前传入值为：$bvid');
+      return 0;
+    }
     List<String> bvidArr = bvid.split('');
     final tmpValue = bvidArr[3];
     bvidArr[3] = bvidArr[9];
