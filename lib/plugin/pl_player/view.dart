@@ -527,7 +527,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             onInteractionStart: (ScaleStartDetails details) {
               if (_.controlsLock.value) return;
               // 如果起点太靠上则屏蔽
-              if (details.localFocalPoint.dy < 40) return;
+              if (details.localFocalPoint.dy < 30) return;
               if (details.pointerCount == 2) {
                 interacting = true;
               }
