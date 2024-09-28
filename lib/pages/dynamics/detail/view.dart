@@ -22,7 +22,7 @@ import '../widgets/dynamic_panel.dart';
 
 class DynamicDetailPage extends StatefulWidget {
   // const DynamicDetailPage({super.key});
-  const DynamicDetailPage({Key? key}) : super(key: key);
+  const DynamicDetailPage({super.key});
 
   @override
   State<DynamicDetailPage> createState() => _DynamicDetailPageState();

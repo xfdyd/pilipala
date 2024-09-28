@@ -12,9 +12,9 @@ class MemberCoinsItem extends StatelessWidget {
   final MemberCoinsDataModel coinItem;
 
   const MemberCoinsItem({
-    Key? key,
+    super.key,
     required this.coinItem,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

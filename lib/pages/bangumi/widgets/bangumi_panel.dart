@@ -113,7 +113,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
                 height: 34,
                 child: TextButton(
                   style: ButtonStyle(
-                    padding: MaterialStateProperty.all(EdgeInsets.zero),
+                    padding: WidgetStateProperty.all(EdgeInsets.zero),
                   ),
                   onPressed: () {
                     ListSheet(

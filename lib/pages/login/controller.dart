@@ -324,14 +324,14 @@ class LoginPageController extends GetxController
           SmartDialog.showToast("当前账号未支持手机号验证，请尝试其它登录方式");
           return;
         }
-        TextEditingController _textFieldController = TextEditingController();
+        TextEditingController textFieldController = TextEditingController();
         String captchaKey = '';
         Get.dialog(AlertDialog(
           title: const Text("本次登录需要验证您的手机号"),
           content: Column(children: [
             Text(accountInfo['hindTel'] ?? '未能获取手机号'),
             TextField(
-              controller: _textFieldController,
+              controller: textFieldController,
               decoration: const InputDecoration(hintText: "请输入短信验证码"),
             ),
           ]),
@@ -373,7 +373,7 @@ class LoginPageController extends GetxController
             ),
             TextButton(
               onPressed: () async {
-                String? code = _textFieldController.text;
+                String? code = textFieldController.text;
                 if (code.isEmpty) {
                   SmartDialog.showToast("请输入短信验证码");
                   return;

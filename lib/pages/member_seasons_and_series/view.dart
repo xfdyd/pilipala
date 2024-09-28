@@ -4,7 +4,6 @@ import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/constants.dart';
-import '../../utils/grid.dart';
 import '../member/widgets/seasons.dart';
 import 'controller.dart';
 
@@ -85,7 +84,6 @@ class _MemberSeasonsAndSeriesPageState
                     return commonWidget('请求到的数据为空');
                   }
                   if (snapshot.data['status']) {
-                    Map data = snapshot.data as Map;
                     if (_ctr.seasonsList.isEmpty && _ctr.seriesList.isEmpty) {
                       print("none");
                       return commonWidget('用户没有设置合集或视频列表');

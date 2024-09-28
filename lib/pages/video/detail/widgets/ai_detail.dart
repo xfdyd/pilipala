@@ -6,14 +6,13 @@ import 'package:PiliPalaX/models/video/ai.dart';
 import 'package:PiliPalaX/pages/video/detail/index.dart';
 import 'package:PiliPalaX/utils/utils.dart';
 
-
 class AiDetail extends StatelessWidget {
   final ModelResult? modelResult;
 
   const AiDetail({
-    Key? key,
+    super.key,
     this.modelResult,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

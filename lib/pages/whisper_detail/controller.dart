@@ -76,7 +76,7 @@ class WhisperDetailController extends GetxController {
       SmartDialog.showToast('请输入内容');
       return;
     }
-    if (mid == null) {
+    if (mid == '') {
       SmartDialog.showToast('这里不能发');
       return;
     }

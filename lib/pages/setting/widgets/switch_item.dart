@@ -21,8 +21,8 @@ class SetSwitchItem extends StatefulWidget {
     this.callFn,
     this.needReboot,
     this.leading,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<SetSwitchItem> createState() => _SetSwitchItemState();

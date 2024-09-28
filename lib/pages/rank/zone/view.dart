@@ -16,7 +16,7 @@ import 'package:PiliPalaX/pages/rank/zone/index.dart';
 import '../../../utils/grid.dart';
 
 class ZonePage extends StatefulWidget {
-  const ZonePage({Key? key, required this.rid}) : super(key: key);
+  const ZonePage({super.key, required this.rid});
 
   final int rid;
 
@@ -84,8 +84,8 @@ class _ZonePageState extends State<ZonePage>
         slivers: [
           SliverPadding(
             // 单列布局 EdgeInsets.zero
-            padding:
-                const EdgeInsets.fromLTRB(StyleString.cardSpace, StyleString.safeSpace, 0, 0),
+            padding: const EdgeInsets.fromLTRB(
+                StyleString.cardSpace, StyleString.safeSpace, 0, 0),
             sliver: FutureBuilder(
               future: _futureBuilderFuture,
               builder: (context, snapshot) {

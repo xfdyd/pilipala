@@ -106,7 +106,7 @@ class _RcmdPageState extends State<RcmdPage>
                       );
                     } else {
                       return HttpError(
-                        errMsg: data == null ? "" : data['msg'],
+                        errMsg: data['msg'],
                         fn: () {
                           setState(() {
                             _futureBuilderFuture =

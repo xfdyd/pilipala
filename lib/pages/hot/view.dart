@@ -16,7 +16,7 @@ import 'package:PiliPalaX/pages/main/index.dart';
 import '../../utils/grid.dart';
 
 class HotPage extends StatefulWidget {
-  const HotPage({Key? key}) : super(key: key);
+  const HotPage({super.key});
 
   @override
   State<HotPage> createState() => _HotPageState();

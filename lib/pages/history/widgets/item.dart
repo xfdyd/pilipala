@@ -246,11 +246,10 @@ class HistoryItem extends StatelessWidget {
                                         child: IconButton(
                                           tooltip: '取消选择',
                                           style: ButtonStyle(
-                                            padding: MaterialStateProperty.all(
+                                            padding: WidgetStateProperty.all(
                                                 EdgeInsets.zero),
                                             backgroundColor:
-                                                MaterialStateProperty
-                                                    .resolveWith(
+                                                WidgetStateProperty.resolveWith(
                                               (states) {
                                                 return Colors.white
                                                     .withOpacity(0.8);

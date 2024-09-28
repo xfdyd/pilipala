@@ -12,7 +12,7 @@ class ActionItem extends StatelessWidget {
   final String semanticsLabel;
 
   const ActionItem({
-    Key? key,
+    super.key,
     this.icon,
     this.selectIcon,
     this.onTap,
@@ -21,7 +21,7 @@ class ActionItem extends StatelessWidget {
     this.text,
     this.selectStatus = false,
     required this.semanticsLabel,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

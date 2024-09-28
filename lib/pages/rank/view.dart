@@ -5,7 +5,7 @@ import '../../utils/feed_back.dart';
 import './controller.dart';
 
 class RankPage extends StatefulWidget {
-  const RankPage({Key? key}) : super(key: key);
+  const RankPage({super.key});
 
   @override
   State<RankPage> createState() => _RankPageState();

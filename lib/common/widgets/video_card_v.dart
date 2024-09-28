@@ -23,11 +23,11 @@ class VideoCardV extends StatelessWidget {
   final Function()? longPressEnd;
 
   const VideoCardV({
-    Key? key,
+    super.key,
     required this.videoItem,
     this.longPress,
     this.longPressEnd,
-  }) : super(key: key);
+  });
 
   bool isStringNumeric(String str) {
     RegExp numericRegex = RegExp(r'^\d+$');
@@ -208,7 +208,7 @@ class VideoCardV extends StatelessWidget {
 
 class VideoContent extends StatelessWidget {
   final dynamic videoItem;
-  const VideoContent({Key? key, required this.videoItem}) : super(key: key);
+  const VideoContent({super.key, required this.videoItem});
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -302,9 +302,9 @@ class VideoStat extends StatelessWidget {
   final dynamic videoItem;
 
   const VideoStat({
-    Key? key,
+    super.key,
     required this.videoItem,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -358,7 +358,8 @@ class VideoStat extends StatelessWidget {
                           .outline
                           .withOpacity(0.8),
                     ),
-                    text: Utils.shortenChineseDateString(videoItem.desc.split(' · ').last)),
+                    text: Utils.shortenChineseDateString(
+                        videoItem.desc.split(' · ').last)),
               )),
           const SizedBox(width: 2),
         ]

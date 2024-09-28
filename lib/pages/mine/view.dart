@@ -259,7 +259,7 @@ class _MinePageState extends State<MinePage> {
         ],
       ),
       const SizedBox(height: 10),
-      Container(
+      SizedBox(
           width: 240,
           height: 100,
           child: GridView.count(
@@ -364,11 +364,11 @@ class ActionItem extends StatelessWidget {
   final String? text;
 
   const ActionItem({
-    Key? key,
+    super.key,
     this.icon,
     this.onTap,
     this.text,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -94,12 +94,10 @@ class _RecommendSettingState extends State<RecommendSetting> {
                     SmartDialog.showToast('尚未登录，无法收到个性化推荐');
                   }
                 }
-                if (result != null) {
-                  defaultRcmdType = result;
-                  setting.put(SettingBoxKey.defaultRcmdType, result);
-                  SmartDialog.showToast('下次启动时生效');
-                  setState(() {});
-                }
+                defaultRcmdType = result;
+                setting.put(SettingBoxKey.defaultRcmdType, result);
+                SmartDialog.showToast('下次启动时生效');
+                setState(() {});
               }
             },
           ),

@@ -240,10 +240,10 @@ class _MediaPageState extends State<MediaPage>
                                     child: IconButton(
                                       tooltip: '查看更多',
                                       style: ButtonStyle(
-                                        padding: MaterialStateProperty.all(
+                                        padding: WidgetStateProperty.all(
                                             EdgeInsets.zero),
                                         backgroundColor:
-                                            MaterialStateProperty.resolveWith(
+                                            WidgetStateProperty.resolveWith(
                                                 (states) {
                                           return Theme.of(context)
                                               .colorScheme

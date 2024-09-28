@@ -156,7 +156,7 @@ class _ColorSelectPageState extends State<ColorSelectPage> {
     }).toList();
 
     return colorEntries.map((entry) {
-      return Container(
+      return SizedBox(
         width: 80, // 固定宽度
         height: 40, // 固定高度
         child: Row(

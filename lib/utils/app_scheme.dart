@@ -288,7 +288,7 @@ class PiliScheme {
     // https | m.bilibili.com | /bangumi/play/ss39708
     // final String scheme = value.scheme!;
     final String host = value.host;
-    final String? path = value.path;
+    final String path = value.path;
     Map<String, String>? query = value.queryParameters;
     RegExp regExp = RegExp(r'^((www\.)|(m\.))?bilibili\.com$');
     if (regExp.hasMatch(host)) {
@@ -385,7 +385,8 @@ class PiliScheme {
           break;
         case 'space':
           print('个人空间');
-          Get.toNamed('/member?mid=${matchNum(path).first}', arguments: {'face': ''});
+          Get.toNamed('/member?mid=${matchNum(path).first}',
+              arguments: {'face': ''});
           break;
         case 'medialist':
           print('播放列表');

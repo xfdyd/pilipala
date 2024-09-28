@@ -6,15 +6,14 @@ class StatDanMu extends StatelessWidget {
   final dynamic danmu;
   final String? size;
 
-  const StatDanMu({Key? key, this.theme, this.danmu, this.size})
-      : super(key: key);
+  const StatDanMu({super.key, this.theme, this.danmu, this.size});
 
   @override
   Widget build(BuildContext context) {
     Map<String, Color> colorObject = {
       'white': Colors.white,
       'gray': Theme.of(context).colorScheme.outline.withOpacity(0.8),
-      'black': Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+      'black': Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
     };
     Color color = colorObject[theme]!;
     return Row(

@@ -15,8 +15,8 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
   const BottomControl({
     this.controller,
     this.buildBottomControl,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);
@@ -26,8 +26,8 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
     Color colorTheme = Theme.of(context).colorScheme.primary;
     final _ = controller!;
     //阅读器限制
-    Timer? _accessibilityDebounce;
-    double _lastAnnouncedValue = -1;
+    Timer? accessibilityDebounce;
+    double lastAnnouncedValue = -1;
     return Container(
       color: Colors.transparent,
       height: 90,
@@ -66,14 +66,14 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
                       },
                       onDragUpdate: (duration) {
                         double newProgress = duration.timeStamp.inSeconds / max;
-                        if ((newProgress - _lastAnnouncedValue).abs() > 0.02) {
-                          _accessibilityDebounce?.cancel();
-                          _accessibilityDebounce =
+                        if ((newProgress - lastAnnouncedValue).abs() > 0.02) {
+                          accessibilityDebounce?.cancel();
+                          accessibilityDebounce =
                               Timer(const Duration(milliseconds: 200), () {
                             SemanticsService.announce(
                                 "${(newProgress * 100).round()}%",
                                 TextDirection.ltr);
-                            _lastAnnouncedValue = newProgress;
+                            lastAnnouncedValue = newProgress;
                           });
                         }
                         _.onUpdatedSliderProgress(duration.timeStamp);

@@ -1,7 +1,4 @@
-import 'dart:developer';
-
 import 'package:PiliPalaX/utils/app_scheme.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/http/member.dart';
@@ -71,7 +68,7 @@ class MemberArchiveController extends GetxController {
 
   episodicButton() async {
     if (episodicButtonUri.isNotEmpty) {
-      PiliScheme.routePush(Uri.parse('https:' + episodicButtonUri));
+      PiliScheme.routePush(Uri.parse('https:$episodicButtonUri'));
     } else {
       SmartDialog.showToast('暂无播放链接');
     }

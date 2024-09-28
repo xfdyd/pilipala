@@ -23,10 +23,10 @@ class BangumiIntroPanel extends StatefulWidget {
   final int? cid;
   final String heroTag;
   const BangumiIntroPanel({
-    Key? key,
+    super.key,
     this.cid,
     required this.heroTag,
-  }) : super(key: key);
+  });
 
   @override
   State<BangumiIntroPanel> createState() => _BangumiIntroPanelState();
@@ -247,11 +247,11 @@ class _BangumiInfoState extends State<BangumiInfo> {
                                       child: IconButton(
                                         tooltip: '收藏',
                                         style: ButtonStyle(
-                                          padding: MaterialStateProperty.all(
+                                          padding: WidgetStateProperty.all(
                                               EdgeInsets.zero),
                                           backgroundColor:
-                                              MaterialStateProperty.resolveWith(
-                                                  (Set<MaterialState> states) {
+                                              WidgetStateProperty.resolveWith(
+                                                  (Set<WidgetState> states) {
                                             return t
                                                 .colorScheme.primaryContainer
                                                 .withOpacity(0.7);

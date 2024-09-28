@@ -90,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
         RepaintBoundary(
             key: globalKey,
             child: Obx(() => QrImageView(
-                  backgroundColor: Theme.of(context).colorScheme.background,
+                  backgroundColor: Theme.of(context).colorScheme.surface,
                   eyeStyle: QrEyeStyle(
                     eyeShape: QrEyeShape.square,
                     color: Theme.of(context).colorScheme.primary,

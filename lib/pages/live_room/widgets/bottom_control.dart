@@ -17,8 +17,8 @@ class BottomControl extends StatefulWidget implements PreferredSizeWidget {
     this.controller,
     this.liveRoomCtr,
     this.floating,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<BottomControl> createState() => _BottomControlState();
@@ -91,7 +91,7 @@ class _BottomControlState extends State<BottomControl> {
               child: IconButton(
                 tooltip: '画中画',
                 style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  padding: WidgetStateProperty.all(EdgeInsets.zero),
                 ),
                 onPressed: () async {
                   bool canUsePiP = false;

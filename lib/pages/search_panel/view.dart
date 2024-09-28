@@ -20,8 +20,7 @@ class SearchPanel extends StatefulWidget {
   final SearchType? searchType;
   final String? tag;
   const SearchPanel(
-      {required this.keyword, required this.searchType, this.tag, Key? key})
-      : super(key: key);
+      {required this.keyword, required this.searchType, this.tag, super.key});
 
   @override
   State<SearchPanel> createState() => _SearchPanelState();

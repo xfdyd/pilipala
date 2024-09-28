@@ -1,6 +1,3 @@
-import 'dart:ffi';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -8,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:PiliPalaX/common/constants.dart';
-import 'package:PiliPalaX/common/widgets/http_error.dart';
 import 'package:PiliPalaX/pages/mine/controller.dart';
 import 'package:PiliPalaX/pages/video/detail/index.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
@@ -95,8 +91,7 @@ class VideoInfo extends StatefulWidget {
   final String? heroTag;
 
   const VideoInfo(
-      {Key? key, this.loadingStatus = false, this.videoDetail, this.heroTag})
-      : super(key: key);
+      {super.key, this.loadingStatus = false, this.videoDetail, this.heroTag});
 
   @override
   State<VideoInfo> createState() => _VideoInfoState();

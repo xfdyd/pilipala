@@ -472,7 +472,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 size: 24,
                 color: Colors.white,
               ),
-              fuc: () => _.triggerFullScreen!(status: !_.isFullScreen.value),
+              fuc: () => _.triggerFullScreen(status: !_.isFullScreen.value),
             )),
       ),
     };
@@ -1226,7 +1226,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                                   Duration.zero,
                                   player.state.duration,
                                 );
-                                widget.controller.seekTo(result, type: 'slider');
+                                widget.controller
+                                    .seekTo(result, type: 'slider');
                                 widget.controller.play();
                               },
                             ),
@@ -1271,7 +1272,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                                   Duration.zero,
                                   player.state.duration,
                                 );
-                                widget.controller.seekTo(result, type: 'slider');
+                                widget.controller
+                                    .seekTo(result, type: 'slider');
                                 widget.controller.play();
                               },
                             ),

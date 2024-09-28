@@ -11,9 +11,9 @@ class MemberSeasonItem extends StatelessWidget {
   final dynamic seasonItem;
 
   const MemberSeasonItem({
-    Key? key,
+    super.key,
     required this.seasonItem,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

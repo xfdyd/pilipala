@@ -16,11 +16,6 @@ class LiveController extends GetxController {
   List<OverlayEntry?> popupDialog = <OverlayEntry?>[];
   Box setting = GStorage.setting;
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
-
   // 获取推荐
   Future queryLiveList(type) async {
     // if (type == 'init') {

@@ -2,7 +2,7 @@
 
 import 'dart:io';
 
-import 'package:dismissible_page/dismissible_page.dart';
+// import 'package:dismissible_page/dismissible_page.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -18,10 +18,10 @@ class ImagePreview extends StatefulWidget {
   final int? initialPage;
   final List<String>? imgList;
   const ImagePreview({
-    Key? key,
+    super.key,
     this.initialPage,
     this.imgList,
-  }) : super(key: key);
+  });
 
   @override
   _ImagePreviewState createState() => _ImagePreviewState();

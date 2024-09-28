@@ -57,7 +57,7 @@ class HtmlHttp {
         'avatar': avatar,
         'uname': uname,
         'updateTime': updateTime,
-        'content': (test ?? '') + opusContent,
+        'content': test + opusContent,
         'commentId': int.parse(commentId)
       };
     } catch (err) {

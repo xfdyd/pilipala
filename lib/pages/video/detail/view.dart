@@ -29,7 +29,7 @@ import '../../../services/shutdown_timer_service.dart';
 import 'widgets/header_control.dart';
 
 class VideoDetailPage extends StatefulWidget {
-  const VideoDetailPage({Key? key}) : super(key: key);
+  const VideoDetailPage({super.key});
 
   @override
   State<VideoDetailPage> createState() => _VideoDetailPageState();

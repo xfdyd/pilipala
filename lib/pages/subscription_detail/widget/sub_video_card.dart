@@ -16,10 +16,10 @@ class SubVideoCardH extends StatelessWidget {
   final int? searchType;
 
   const SubVideoCardH({
-    Key? key,
+    super.key,
     required this.videoItem,
     this.searchType,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -697,9 +697,9 @@ class PlPlayerController {
 
           /// 触发回调事件
           for (var element in _statusListeners) {
-            if (element != null) {
-              element(event ? PlayerStatus.playing : PlayerStatus.paused);
-            }
+            // if (element != null) {
+            element(event ? PlayerStatus.playing : PlayerStatus.paused);
+            // }
           }
           if (videoPlayerController!.state.position.inSeconds != 0) {
             makeHeartBeat(positionSeconds.value, type: 'status');
