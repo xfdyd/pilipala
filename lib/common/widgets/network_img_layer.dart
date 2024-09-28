@@ -39,10 +39,7 @@ class NetworkImgLayer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final int defaultImgQuality = GlobalData().imgQuality;
-    final String imageUrl =
-        '${src!.startsWith('//') ? 'https:${src!}' : src!}@${quality ?? defaultImgQuality}q.webp';
     int? memCacheWidth, memCacheHeight;
-
     if (width > height || (origAspectRatio != null && origAspectRatio! > 1)) {
       memCacheWidth = width.cacheSize(context);
     } else if (width < height ||
@@ -53,7 +50,7 @@ class NetworkImgLayer extends StatelessWidget {
       memCacheWidth = width.cacheSize(context);
       // memCacheHeight = height.cacheSize(context);
     }
-    Widget res = src != '' && src != null
+    Widget res = src != null && src != ''
         ? ClipRRect(
             clipBehavior: Clip.antiAlias,
             borderRadius: BorderRadius.circular(
@@ -64,9 +61,11 @@ class NetworkImgLayer extends StatelessWidget {
                       : StyleString.imgRadius.x,
             ),
             child: CachedNetworkImage(
-              imageUrl: imageUrl,
+              imageUrl:
+                  '${src!.startsWith('//') ? 'https:${src!}' : src!}@${quality ?? defaultImgQuality}q.webp',
               width: width,
-              height: ignoreHeight == null || ignoreHeight == false? height:null,
+              height:
+                  ignoreHeight == null || ignoreHeight == false ? height : null,
               memCacheWidth: memCacheWidth,
               memCacheHeight: memCacheHeight,
               fit: BoxFit.cover,
