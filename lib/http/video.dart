@@ -135,6 +135,7 @@ class VideoHttp {
         'bili-http-engine': 'cronet',
       }),
     );
+    log(res.data['data'].toString());
     if (res.data['code'] == 0) {
       List<RecVideoItemAppModel> list = [];
       List<int> blackMidsList = localCache

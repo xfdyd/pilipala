@@ -533,6 +533,9 @@ class Api {
   static const String safeCenterSmsVerify =
       '${HttpString.passBaseUrl}/x/safecenter/login/tel/verify';
 
+  static const String oauth2AccessToken =
+      '${HttpString.passBaseUrl}/x/passport-login/oauth2/access_token';
+
   /// 密码加密密钥
   /// disable_rcmd
   /// local_id
@@ -568,7 +571,8 @@ class Api {
   static const getRecentBangumiApi = '/x/space/bangumi/follow/list';
 
   /// 用户合集与视频列表
-  static const getMemberSeasonsAndSeriesApi = '/x/polymer/web-space/seasons_series_list';
+  static const getMemberSeasonsAndSeriesApi =
+      '/x/polymer/web-space/seasons_series_list';
 
   /// 获赞数 播放数
   /// mid
@@ -584,8 +588,7 @@ class Api {
       '/x/polymer/web-space/seasons_archives_list';
 
   /// 查询指定视频列表
-  static const getSeriesDetailApi =
-      '/x/series/archives';
+  static const getSeriesDetailApi = '/x/series/archives';
 
   /// 获取未读动态数
   static const getUnreadDynamic = '/x/web-interface/dynamic/entrance';

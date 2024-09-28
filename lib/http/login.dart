@@ -110,6 +110,7 @@ class LoginHttp {
       'build': '1462100',
       'buvid': buvid,
       'c_locale': 'zh_CN',
+      'channel': 'yingyongbao',
       'cid': cid,
       // if (deviceTouristId != null) 'device_tourist_id': deviceTouristId,
       'disable_rcmd': '0',
@@ -369,7 +370,7 @@ class LoginHttp {
     }
   }
 
-  // 风控验证手机前的验证码
+  // 风控验证手机前的极验验证码
   static Future preCapture() async {
     var res = await Request().post(Api.preCapture);
     print(res);
@@ -385,7 +386,7 @@ class LoginHttp {
     }
   }
 
-  // 风控验证手机
+  // 风控验证手机：发送短信验证码
   static Future safeCenterSmsCode({
     String? smsType,
     required String tmpCode,
@@ -393,15 +394,24 @@ class LoginHttp {
     required String geeSeccode,
     required String geeValidate,
     required String recaptchaToken,
+    required String refererUrl,
   }) async {
-    var res = await Request().post(Api.safeCenterSmsCode, data: {
-      'sms_type': smsType ?? 'loginTelCheck',
-      'tmp_code': tmpCode,
-      'gee_challenge': geeChallenge,
-      'gee_seccode': geeSeccode,
-      'gee_validate': geeValidate,
-      'recaptcha_token': recaptchaToken,
-    });
+    var res = await Request().post(
+      Api.safeCenterSmsCode,
+      data: {
+        'disable_rcmd': 0,
+        'sms_type': smsType ?? 'loginTelCheck',
+        'tmp_code': tmpCode,
+        'gee_challenge': geeChallenge,
+        'gee_seccode': geeSeccode,
+        'gee_validate': geeValidate,
+        'recaptcha_token': recaptchaToken,
+      },
+      options:
+          Options(contentType: Headers.formUrlEncodedContentType, headers: {
+        "Referer": refererUrl,
+      }),
+    );
     print(res);
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
@@ -415,21 +425,86 @@ class LoginHttp {
     }
   }
 
-  static Future safeCenterSmsVerify(
-      {String? type,
-      required String code,
-      required String tmpCode,
-      required String requestId,
-      required String source,
-      required String captchaKey}) async {
-    var res = await Request().post(Api.safeCenterSmsVerify, data: {
-      'type': type ?? 'loginTelCheck',
+  // 风控验证手机：提交短信验证码
+  static Future safeCenterSmsVerify({
+    String? type,
+    required String code,
+    required String tmpCode,
+    required String requestId,
+    required String source,
+    required String captchaKey,
+    required String refererUrl,
+  }) async {
+    var res = await Request().post(
+      Api.safeCenterSmsVerify,
+      data: {
+        'type': type ?? 'loginTelCheck',
+        'code': code,
+        'tmp_code': tmpCode,
+        'request_id': requestId,
+        'source': source,
+        'captcha_key': captchaKey,
+      },
+      options:
+          Options(contentType: Headers.formUrlEncodedContentType, headers: {
+        "Referer": refererUrl,
+      }),
+    );
+    print(res);
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {
+        'status': false,
+        'code': res.data['code'],
+        'msg': res.data['message'],
+        'data': res.data['data']
+      };
+    }
+  }
+
+  // 风控验证手机：用oauthCode换回accessToken
+  static Future oauth2AccessToken({
+    required String code,
+  }) async {
+    Map<String, dynamic> data = {
+      'appkey': Constants.appKey,
+      'build': '1462100',
+      'buvid': buvid,
+      'c_locale': 'zh_CN',
+      'channel': 'yingyongbao',
       'code': code,
-      'tmp_code': tmpCode,
-      'request_id': requestId,
-      'source': source,
-      'captcha_key': captchaKey,
+      'device': 'phone',
+      'device_id': deviceId,
+      'device_name': 'vivo',
+      'device_platform': 'Android14vivo',
+      'disable_rcmd': '0',
+      'grant_type': 'authorization_code',
+      'local_id': buvid,
+      'mobi_app': 'android_hd',
+      'platform': 'android',
+      's_locale': 'zh_CN',
+      'statistics': Constants.statistics,
+      'ts': (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString(),
+    };
+    String sign = Utils.appSign(
+      data,
+      Constants.appKey,
+      Constants.appSec,
+    );
+    data['sign'] = sign;
+    data.map((key, value) {
+      print('$key: $value');
+      return MapEntry<String, dynamic>(key, value);
     });
+    var res = await Request().post(
+      Api.oauth2AccessToken,
+      data: data,
+      options: Options(
+        contentType: Headers.formUrlEncodedContentType,
+        headers: headers,
+      ),
+    );
     print(res);
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
