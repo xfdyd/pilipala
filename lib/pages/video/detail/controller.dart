@@ -150,7 +150,12 @@ class VideoDetailController extends GetxController
         defaultValue: VideoDecodeFormats.values[1].code);
     cacheAudioQa = setting.get(SettingBoxKey.defaultAudioQa,
         defaultValue: AudioQuality.hiRes.code);
-    oid.value = IdUtils.bv2av(Get.parameters['bvid']!);
+    if (Get.parameters['bvid'] != null && Get.parameters['bvid']!.isNotEmpty) {
+      oid.value = IdUtils.bv2av(Get.parameters['bvid']!);
+    } else {
+      SmartDialog.showToast('视频信息获取失败，可能为充电视频等特殊情况');
+      oid.value = 0;
+    }
   }
 
   showReplyReplyPanel() {
@@ -307,9 +312,10 @@ class VideoDetailController extends GetxController
     if (result['status']) {
       data = result['data'];
       if (data.acceptDesc!.isNotEmpty && data.acceptDesc!.contains('试看')) {
-        SmartDialog.showToast(
-          '该视频为专属视频，仅提供试看',
+        SmartDialog.showNotify(
+          msg: '该视频为专属视频，仅提供试看',
           displayTime: const Duration(seconds: 3),
+          notifyType: NotifyType.warning,
         );
       }
       if (data.dash == null && data.durl != null) {
@@ -331,7 +337,11 @@ class VideoDetailController extends GetxController
         return result;
       }
       if (data.dash == null) {
-        SmartDialog.showToast('视频资源不存在');
+        SmartDialog.showNotify(
+          msg: '视频资源不存在',
+          displayTime: const Duration(seconds: 3),
+          notifyType: NotifyType.error,
+        );
         isShowCover.value = false;
         return result;
       }
@@ -435,12 +445,20 @@ class VideoDetailController extends GetxController
     } else {
       if (result['code'] == -404) {
         isShowCover.value = false;
-        SmartDialog.showToast('视频不存在或已被删除');
+        SmartDialog.showNotify(
+          msg: '视频不存在或已被删除',
+          displayTime: const Duration(seconds: 3),
+          notifyType: NotifyType.error,
+        );
       }
       if (result['code'] == 87008) {
         SmartDialog.showToast("当前视频可能是专属视频，可能需包月充电观看(${result['msg']})");
       } else {
-        SmartDialog.showToast("错误（${result['code']}）：${result['msg']}");
+        SmartDialog.showNotify(
+          msg: '错误（${result['code']}）：${result['msg']}',
+          displayTime: const Duration(seconds: 3),
+          notifyType: NotifyType.warning,
+        );
       }
     }
     return result;
