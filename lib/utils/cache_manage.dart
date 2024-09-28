@@ -49,19 +49,24 @@ class CacheManage {
 
   // 循环计算文件的大小（递归）
   Future<double> getTotalSizeOfFilesInDir(final FileSystemEntity file) async {
-    if (file is File) {
-      int length = await file.length();
-      return double.parse(length.toString());
-    }
-    if (file is Directory) {
-      final List<FileSystemEntity> children = file.listSync();
-      double total = 0;
-      for (final FileSystemEntity child in children) {
-        total += await getTotalSizeOfFilesInDir(child);
+    double total = 0;
+    try {
+      if (file is File) {
+        total = (await file.length()).toDouble();
       }
-      return total;
+      if (file is Directory) {
+        final List<FileSystemEntity> children = file.listSync();
+        for (final FileSystemEntity child in children) {
+          total += await getTotalSizeOfFilesInDir(child);
+        }
+      }
+    } catch (e) {
+      // 忽略找不到文件的错误
+      if (e is! PathNotFoundException) {
+        print('Error retrieving size for ${file.path}: $e');
+      }
     }
-    return 0;
+    return total;
   }
 
   // 缓存大小格式转换
