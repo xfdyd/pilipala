@@ -73,7 +73,7 @@ class MemberController extends GetxController {
 
   Future delayedUpdateRelation() async {
     await Future.delayed(const Duration(milliseconds: 1000), () async {
-      SmartDialog.showToast('更新状态');
+      // SmartDialog.showToast('更新状态');
       await relationSearch();
       memberInfo.update((val) {});
     });
