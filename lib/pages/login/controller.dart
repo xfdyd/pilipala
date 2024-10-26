@@ -303,7 +303,7 @@ class LoginPageController extends GetxController
       }
       if (data['status'] == 2) {
         SmartDialog.showToast(data['message']);
-        return;
+        // return;
         //{"code":0,"message":"0","ttl":1,"data":{"status":2,"message":"本次登录环境存在风险, 需使用手机号进行验证或绑定","url":"https://passport.bilibili.com/h5-app/passport/risk/verify?tmp_token=9e785433940891dfa78f033fb7928181&request_id=e5a6d6480df04097870be56c6e60f7ef&source=risk","token_info":null,"cookie_info":null,"sso":null,"is_new":false,"is_tourist":false}}
         //todo: 后续登录流程：https://ivan.hanloth.cn/archives/530/
         String url = data['url']!;
@@ -429,6 +429,8 @@ class LoginPageController extends GetxController
                 }
                 SmartDialog.showToast('正在保存身份信息');
                 await afterLoginByApp(data['token_info'], data['cookie_info']);
+                Get.back();
+                Get.back();
               },
               child: const Text("确认"),
             ),

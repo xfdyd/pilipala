@@ -396,17 +396,24 @@ class LoginHttp {
     required String recaptchaToken,
     required String refererUrl,
   }) async {
+    Map<String, dynamic> data = {
+      'disable_rcmd': '0',
+      'sms_type': smsType ?? 'loginTelCheck',
+      'tmp_code': tmpCode,
+      'gee_challenge': geeChallenge,
+      'gee_seccode': geeSeccode,
+      'gee_validate': geeValidate,
+      'recaptcha_token': recaptchaToken,
+    };
+    String sign = Utils.appSign(
+      data,
+      Constants.appKey,
+      Constants.appSec,
+    );
+    data['sign'] = sign;
     var res = await Request().post(
       Api.safeCenterSmsCode,
-      data: {
-        'disable_rcmd': 0,
-        'sms_type': smsType ?? 'loginTelCheck',
-        'tmp_code': tmpCode,
-        'gee_challenge': geeChallenge,
-        'gee_seccode': geeSeccode,
-        'gee_validate': geeValidate,
-        'recaptcha_token': recaptchaToken,
-      },
+      data: data,
       options:
           Options(contentType: Headers.formUrlEncodedContentType, headers: {
         "Referer": refererUrl,
@@ -435,16 +442,23 @@ class LoginHttp {
     required String captchaKey,
     required String refererUrl,
   }) async {
+    Map<String, dynamic> data = {
+      'type': type ?? 'loginTelCheck',
+      'code': code,
+      'tmp_code': tmpCode,
+      'request_id': requestId,
+      'source': source,
+      'captcha_key': captchaKey,
+    };
+    String sign = Utils.appSign(
+      data,
+      Constants.appKey,
+      Constants.appSec,
+    );
+    data['sign'] = sign;
     var res = await Request().post(
       Api.safeCenterSmsVerify,
-      data: {
-        'type': type ?? 'loginTelCheck',
-        'code': code,
-        'tmp_code': tmpCode,
-        'request_id': requestId,
-        'source': source,
-        'captcha_key': captchaKey,
-      },
+      data: data,
       options:
           Options(contentType: Headers.formUrlEncodedContentType, headers: {
         "Referer": refererUrl,
@@ -471,20 +485,20 @@ class LoginHttp {
       'appkey': Constants.appKey,
       'build': '1462100',
       'buvid': buvid,
-      'c_locale': 'zh_CN',
-      'channel': 'yingyongbao',
+      // 'c_locale': 'zh_CN',
+      // 'channel': 'yingyongbao',
       'code': code,
-      'device': 'phone',
-      'device_id': deviceId,
-      'device_name': 'vivo',
-      'device_platform': 'Android14vivo',
+      // 'device': 'phone',
+      // 'device_id': deviceId,
+      // 'device_name': 'vivo',
+      // 'device_platform': 'Android14vivo',
       'disable_rcmd': '0',
       'grant_type': 'authorization_code',
       'local_id': buvid,
       'mobi_app': 'android_hd',
       'platform': 'android',
-      's_locale': 'zh_CN',
-      'statistics': Constants.statistics,
+      // 's_locale': 'zh_CN',
+      // 'statistics': Constants.statistics,
       'ts': (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString(),
     };
     String sign = Utils.appSign(
