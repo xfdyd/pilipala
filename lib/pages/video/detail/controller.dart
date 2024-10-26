@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -70,7 +69,7 @@ class VideoDetailController extends GetxController
   ReplyItemModel? firstFloor;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   RxString bgCover = ''.obs;
-  PlPlayerController plPlayerController = PlPlayerController.getInstance();
+  PlPlayerController? plPlayerController;
 
   late VideoItem firstVideo;
   late AudioItem firstAudio;
@@ -83,8 +82,7 @@ class VideoDetailController extends GetxController
   bool enableHeart = true;
   var userInfo;
   late bool isFirstTime = true;
-  Floating? floating;
-  late PreferredSizeWidget headerControl;
+  PreferredSizeWidget? headerControl;
 
   // late bool enableCDN;
   late int? cacheVideoQa;
@@ -95,7 +93,7 @@ class VideoDetailController extends GetxController
   PersistentBottomSheetController? replyReplyBottomSheetCtr;
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
     final Map argMap = Get.arguments;
     userInfo = userInfoCache.get('userInfoCache');
@@ -108,7 +106,9 @@ class VideoDetailController extends GetxController
         }
       }
       if (keys.contains('pic')) {
-        videoItem['pic'] = argMap['pic'];
+        if (argMap['pic'] != null && argMap['pic'] != '') {
+          videoItem['pic'] = argMap['pic'];
+        }
       }
     }
     bool defaultShowComment =
@@ -117,7 +117,27 @@ class VideoDetailController extends GetxController
         length: 2, vsync: this, initialIndex: defaultShowComment ? 1 : 0);
     autoPlay.value =
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
-    if (autoPlay.value) isShowCover.value = false;
+    if (autoPlay.value) {
+      isShowCover.value = false;
+      plPlayerController = PlPlayerController.getInstance();
+      headerControl = HeaderControl(
+        controller: plPlayerController,
+        videoDetailCtr: this,
+        heroTag: heroTag,
+      );
+    }
+    if (videoItem['pic']?.isEmpty != false) {
+      VideoHttp.videoIntro(bvid: bvid).then(
+        (value) {
+          if (value['status']) {
+            videoItem['pic'] = value['data'].pic;
+            isShowCover.refresh();
+          } else {
+            SmartDialog.showToast("视频封面获取失败：${value['msg']}");
+          }
+        },
+      );
+    }
     enableHA.value = setting.get(SettingBoxKey.enableHA, defaultValue: true);
     hwdec.value = setting.get(SettingBoxKey.hardwareDecoding,
         defaultValue: Platform.isAndroid ? 'auto-safe' : 'auto');
@@ -127,16 +147,6 @@ class VideoDetailController extends GetxController
     }
     danmakuCid.value = cid.value;
 
-    ///
-    if (Platform.isAndroid) {
-      floating = Floating();
-    }
-    headerControl = HeaderControl(
-      controller: plPlayerController,
-      videoDetailCtr: this,
-      floating: floating,
-      heroTag: heroTag,
-    );
     // CDN优化
     // enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: true);
 
@@ -183,11 +193,12 @@ class VideoDetailController extends GetxController
   /// 更新画质、音质
   /// TODO 继续进度播放
   updatePlayer() {
+    if (plPlayerController == null) return;
     isShowCover.value = false;
-    defaultST = plPlayerController.position.value;
-    plPlayerController.removeListeners();
-    plPlayerController.isBuffering.value = false;
-    plPlayerController.buffered.value = Duration.zero;
+    defaultST = plPlayerController!.position.value;
+    plPlayerController!.removeListeners();
+    plPlayerController!.isBuffering.value = false;
+    plPlayerController!.buffered.value = Duration.zero;
 
     /// 根据currentVideoQa和currentDecodeFormats 重新设置videoUrl
     List<VideoItem> videoList =
@@ -272,7 +283,13 @@ class VideoDetailController extends GetxController
     if (brightness != null) {
       ScreenBrightness().setScreenBrightness(brightness!);
     }
-    await plPlayerController.setDataSource(
+    plPlayerController ??= PlPlayerController.getInstance();
+    headerControl ??= HeaderControl(
+      controller: plPlayerController,
+      videoDetailCtr: this,
+      heroTag: heroTag,
+    );
+    await plPlayerController!.setDataSource(
       DataSource(
         videoSource: video ?? videoUrl,
         audioSource: audio ?? audioUrl,
@@ -303,7 +320,7 @@ class VideoDetailController extends GetxController
     );
 
     /// 开启自动全屏时，在player初始化完成后立即传入headerControl
-    plPlayerController.headerControl = headerControl;
+    plPlayerController!.headerControl = headerControl;
   }
 
   // 视频链接

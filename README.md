@@ -53,7 +53,8 @@ flutter --version
 注：Framework revision XXXXXX可能会不一致，但后续时间应该是一致的
 <br/>
 Android相关版本：
-> gradle: 7.6.3
+> JDK: 21.0.4
+> gradle: 8.10.2
 > kotlin: 1.9.22
 > minSdk: 21
 > targetSdk: 34

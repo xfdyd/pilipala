@@ -97,11 +97,11 @@ class DownloadUtils {
       final SaveResult result = await SaverGallery.saveImage(
         Uint8List.fromList(response.data),
         quality: 100,
-        name: picName,
-        fileExtension: 'jpg',
+        fileName: picName,
+        extension: 'jpg',
         // 保存到 PiliPalaX文件夹
         androidRelativePath: "Pictures/PiliPalaX",
-        androidExistNotSave: false,
+        skipIfExists: false,
       );
       SmartDialog.dismiss();
       if (result.isSuccess) {

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
@@ -12,11 +11,9 @@ import 'package:PiliPalaX/utils/storage.dart';
 class BottomControl extends StatefulWidget implements PreferredSizeWidget {
   final PlPlayerController? controller;
   final LiveRoomController? liveRoomCtr;
-  final Floating? floating;
   const BottomControl({
     this.controller,
     this.liveRoomCtr,
-    this.floating,
     super.key,
   });
 
@@ -94,16 +91,16 @@ class _BottomControlState extends State<BottomControl> {
                   padding: WidgetStateProperty.all(EdgeInsets.zero),
                 ),
                 onPressed: () async {
-                  bool canUsePiP = false;
-                  widget.controller!.hiddenControls(false);
-                  try {
-                    canUsePiP = await widget.floating!.isPipAvailable;
-                  } on PlatformException catch (_) {
-                    canUsePiP = false;
-                  }
-                  if (canUsePiP) {
-                    await widget.floating!.enable(const EnableManual());
-                  } else {}
+                  // bool canUsePiP = false;
+                  // widget.controller!.hiddenControls(false);
+                  // try {
+                  //   canUsePiP = await widget.floating!.isPipAvailable;
+                  // } on PlatformException catch (_) {
+                  //   canUsePiP = false;
+                  // }
+                  // if (canUsePiP) {
+                  //   await widget.floating!.enable(const ImmediatePiP());
+                  // } else {}
                 },
                 icon: const Icon(
                   Icons.picture_in_picture_outlined,

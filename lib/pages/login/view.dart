@@ -69,11 +69,11 @@ class _LoginPageState extends State<LoginPage> {
                     "PiliPalaX_loginQRCode_${DateTime.now().toString().replaceAll(' ', '_').replaceAll(':', '-').split('.').first}";
                 final SaveResult result = await SaverGallery.saveImage(
                   Uint8List.fromList(pngBytes),
-                  name: picName,
-                  fileExtension: 'png',
+                  fileName: picName,
+                  extension: 'png',
                   // 保存到 PiliPalaX文件夹
                   androidRelativePath: "Pictures/PiliPalaX",
-                  androidExistNotSave: false,
+                  skipIfExists: false,
                 );
                 SmartDialog.dismiss();
                 if (result.isSuccess) {

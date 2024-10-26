@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
@@ -24,14 +23,10 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
 
   bool isShowCover = true;
   bool isPlay = true;
-  Floating? floating;
 
   @override
   void initState() {
     super.initState();
-    if (Platform.isAndroid) {
-      floating = Floating();
-    }
     videoSourceInit();
     _futureBuilderFuture = _liveRoomController.queryLiveInfo();
     plPlayerController!.autoEnterFullscreen();
@@ -44,7 +39,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
 
   @override
   void dispose() {
-    floating?.dispose();
+    // floating?.dispose();
     plPlayerController!.dispose();
     super.dispose();
   }
@@ -60,7 +55,6 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
             bottomControl: BottomControl(
               controller: plPlayerController,
               liveRoomCtr: _liveRoomController,
-              floating: floating,
             ),
           );
         } else {
@@ -228,14 +222,14 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
         ],
       ),
     );
-    if (Platform.isAndroid) {
-      return PiPSwitcher(
-        childWhenDisabled: childWhenDisabled,
-        childWhenEnabled: videoPlayerPanel,
-        floating: floating,
-      );
-    } else {
+    // if (Platform.isAndroid) {
+    //   return PiPSwitcher(
+    //     childWhenDisabled: childWhenDisabled,
+    //     childWhenEnabled: videoPlayerPanel,
+    //     floating: floating,
+    //   );
+    // } else {
       return childWhenDisabled;
-    }
+    // }
   }
 }

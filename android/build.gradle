@@ -33,6 +33,22 @@ subprojects {
                 }
             }
         }
+        if (project.hasProperty('android')) {
+            project.android {
+                if (namespace == null) {
+                    project.logger.error(
+                        "Warning: 'namespace' is not specified in Flutter plugin: "
+                            + project.name
+                            + ". Defaulting to the package name "
+                            + project.group
+                            + " of the plugin.\nSee "
+                            + "https://d.android.com/r/tools/upgrade-assistant/set-namespace"
+                            + "for information about setting the namespace."
+                    )
+                    namespace project.group
+                }
+            }
+        }
     }
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
