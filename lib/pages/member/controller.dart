@@ -11,7 +11,7 @@ import 'package:PiliPalaX/models/member/info.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../video/detail/introduction/widgets/group_panel.dart';
+import 'package:PiliPalaX/pages/video/introduction/widgets/group_panel.dart';
 
 class MemberController extends GetxController with GetTickerProviderStateMixin {
   int? mid;

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:PiliPalaX/pages/video/detail/introduction/controller.dart';
+import 'package:PiliPalaX/pages/video/introduction/detail/controller.dart';
 import 'package:PiliPalaX/utils/id_utils.dart';
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +24,7 @@ import 'package:screen_brightness/screen_brightness.dart';
 
 import '../../common/widgets/audio_video_progress_bar.dart';
 import '../../models/video_detail_res.dart';
-import '../../pages/bangumi/introduction/controller.dart';
+import 'package:PiliPalaX/pages/video/introduction/bangumi/controller.dart';
 import '../../common/widgets/list_sheet.dart';
 import '../../utils/utils.dart';
 import 'models/bottom_control_type.dart';

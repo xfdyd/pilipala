@@ -14,7 +14,7 @@ import 'package:PiliPalaX/http/init.dart';
 import 'package:PiliPalaX/models/common/color_type.dart';
 import 'package:PiliPalaX/models/common/theme_type.dart';
 import 'package:PiliPalaX/pages/search/index.dart';
-import 'package:PiliPalaX/pages/video/detail/index.dart';
+import 'package:PiliPalaX/pages/video/index.dart';
 import 'package:PiliPalaX/router/app_pages.dart';
 import 'package:PiliPalaX/pages/main/view.dart';
 import 'package:PiliPalaX/services/service_locator.dart';

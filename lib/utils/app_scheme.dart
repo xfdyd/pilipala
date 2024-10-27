@@ -1,15 +1,15 @@
 import 'dart:async';
 
 import 'package:PiliPalaX/models/common/reply_type.dart';
-import 'package:PiliPalaX/pages/video/detail/reply/widgets/reply_item.dart';
+import 'package:PiliPalaX/pages/video/reply/widgets/reply_item.dart';
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart';
-import '../http/search.dart';
-import '../models/common/search_type.dart';
-import '../pages/video/detail/reply_reply/view.dart';
+import 'package:PiliPalaX/http/search.dart';
+import 'package:PiliPalaX/models/common/search_type.dart';
+import 'package:PiliPalaX/pages/video/reply_reply/view.dart';
 import 'id_utils.dart';
 import 'url_utils.dart';
 import 'utils.dart';

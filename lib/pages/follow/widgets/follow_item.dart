@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 import 'package:PiliPalaX/models/follow/result.dart';
 import 'package:PiliPalaX/pages/follow/index.dart';
-import 'package:PiliPalaX/pages/video/detail/introduction/widgets/group_panel.dart';
+import 'package:PiliPalaX/pages/video/introduction/widgets/group_panel.dart';
 import 'package:PiliPalaX/utils/feed_back.dart';
 import 'package:PiliPalaX/utils/utils.dart';
 

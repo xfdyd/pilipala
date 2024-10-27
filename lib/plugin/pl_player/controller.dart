@@ -24,7 +24,7 @@ import 'package:screen_brightness/screen_brightness.dart';
 import 'package:universal_platform/universal_platform.dart';
 
 import '../../models/video/play/subtitle.dart';
-import '../../pages/video/detail/controller.dart';
+import '../../pages/video/controller.dart';
 // import 'package:wakelock_plus/wakelock_plus.dart';
 
 Box videoStorage = GStorage.video;
