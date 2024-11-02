@@ -501,13 +501,13 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     final PlPlayerController _ = widget.controller;
     final Color colorTheme = Theme.of(context).colorScheme.primary;
     const TextStyle subTitleStyle = TextStyle(
-      height: 1.5,
+      height: 1.3,
       fontSize: 20.0,
       letterSpacing: 0.1,
       wordSpacing: 0.1,
       color: Color(0xffffffff),
       fontWeight: FontWeight.normal,
-      backgroundColor: Color(0xaa000000),
+      backgroundColor: Color(0x99000000),
     );
     const TextStyle textStyle = TextStyle(
       color: Colors.white,
