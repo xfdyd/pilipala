@@ -1644,7 +1644,7 @@ class _HeaderControlState extends State<HeaderControl> {
                   //             TextButton(
                   //                 style: ButtonStyle(
                   //                   foregroundColor:
-                  //                       MaterialStateProperty.resolveWith(
+                  //                       WidgetStateProperty.resolveWith(
                   //                           (states) {
                   //                     return Theme.of(context)
                   //                         .snackBarTheme
@@ -1661,7 +1661,7 @@ class _HeaderControlState extends State<HeaderControl> {
                   //             TextButton(
                   //                 style: ButtonStyle(
                   //                   foregroundColor:
-                  //                       MaterialStateProperty.resolveWith(
+                  //                       WidgetStateProperty.resolveWith(
                   //                           (states) {
                   //                     return Theme.of(context)
                   //                         .snackBarTheme
@@ -1707,7 +1707,7 @@ class _HeaderControlState extends State<HeaderControl> {
               child: IconButton(
                 tooltip: "更多设置",
                 style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  padding: WidgetStateProperty.all(EdgeInsets.zero),
                 ),
                 onPressed: () => showSettingSheet(),
                 icon: const Icon(

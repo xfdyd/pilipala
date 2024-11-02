@@ -373,7 +373,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         child: TextButton(
           onPressed: () => _.toggleVideoFit(),
           style: ButtonStyle(
-            padding: MaterialStateProperty.all(EdgeInsets.zero),
+            padding: WidgetStateProperty.all(EdgeInsets.zero),
           ),
           child: Obx(
             () => Text(

@@ -467,9 +467,11 @@ class VideoDetailController extends GetxController
           displayTime: const Duration(seconds: 3),
           notifyType: NotifyType.error,
         );
-      }
-      if (result['code'] == 87008) {
-        SmartDialog.showToast("当前视频可能是专属视频，可能需包月充电观看(${result['msg']})");
+      } else if (result['code'] == 87008) {
+        SmartDialog.showNotify(
+            msg: "当前视频可能是专属视频，可能需包月充电观看(${result['msg']})",
+            displayTime: const Duration(seconds: 3),
+            notifyType: NotifyType.warning);
       } else {
         SmartDialog.showNotify(
           msg: '错误（${result['code']}）：${result['msg']}',

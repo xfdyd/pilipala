@@ -68,7 +68,7 @@ class SearchVideoPanel extends StatelessWidget {
                 child: IconButton(
                   tooltip: '筛选',
                   style: ButtonStyle(
-                    padding: MaterialStateProperty.all(EdgeInsets.zero),
+                    padding: WidgetStateProperty.all(EdgeInsets.zero),
                   ),
                   onPressed: () => controller.onShowFilterDialog(context, ctr),
                   icon: Icon(

@@ -153,7 +153,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                   height: 34,
                   child: TextButton.icon(
                     style: ButtonStyle(
-                      padding: MaterialStateProperty.all(const EdgeInsets.only(
+                      padding: WidgetStateProperty.all(const EdgeInsets.only(
                           left: 10, top: 6, bottom: 6, right: 10)),
                     ),
                     onPressed: () => ctr.queryHotSearchList(),

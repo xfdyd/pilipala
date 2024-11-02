@@ -150,7 +150,7 @@ class _ExtraSettingState extends State<ExtraSetting> {
                 alignment: Alignment.centerRight,
                 scale: 0.8,
                 child: Switch(
-                    thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
+                    thumbIcon: WidgetStateProperty.resolveWith<Icon?>(
                         (Set<MaterialState> states) {
                       if (states.isNotEmpty &&
                           states.first == MaterialState.selected) {
@@ -279,7 +279,7 @@ class _ExtraSettingState extends State<ExtraSetting> {
               alignment: Alignment.centerRight,
               scale: 0.8,
               child: Switch(
-                thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
+                thumbIcon: WidgetStateProperty.resolveWith<Icon?>(
                     (Set<MaterialState> states) {
                   if (states.isNotEmpty &&
                       states.first == MaterialState.selected) {
