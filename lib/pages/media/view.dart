@@ -105,18 +105,18 @@ class _MediaPageState extends State<MediaPage>
             // 网格视图替代 for 循环
             Padding(
               padding: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 10,
+                horizontal: 50,
+                vertical: 30,
               ),
               child: GridView.builder(
                 physics:
                     const NeverScrollableScrollPhysics(), // 禁用GridView自己的滚动，防止冲突
                 shrinkWrap: true,
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 200,
-                  crossAxisSpacing: 0, // 网格之间的水平间距
-                  mainAxisSpacing: 10, // 网格之间的垂直间距
-                  childAspectRatio: 4, // 宽高比，1表示正方形网格
+                  maxCrossAxisExtent: 500,
+                  crossAxisSpacing: 10, // 网格之间的水平间距
+                  mainAxisSpacing: 25, // 网格之间的垂直间距
+                  childAspectRatio: 9, // 宽高比，1表示正方形网格
                 ),
                 itemCount: mediaController.list.length,
                 itemBuilder: (context, index) {
@@ -124,17 +124,21 @@ class _MediaPageState extends State<MediaPage>
                   return GestureDetector(
                     onTap: () => item['onTap'](),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      // mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
                           item['icon'],
                           color: primary,
-                          size: 30, // 图标大小
+                          size: 25, // 图标大小
                         ),
-                        const SizedBox(width: 8), // 图标和文字之间的间距
+                        const SizedBox(width: 12), // 图标和文字之间的间距
                         Text(
                           item['title'],
-                          style: const TextStyle(fontSize: 14),
+                          style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .fontSize),
                           // textAlign: TextAlign.center, // 文字居中
                         ),
                       ],
@@ -155,10 +159,10 @@ class _MediaPageState extends State<MediaPage>
   Widget favFolder(mediaController, context) {
     return Column(
       children: [
-        Divider(
-          height: 20,
-          color: Theme.of(context).dividerColor.withOpacity(0.1),
-        ),
+        // Divider(
+        //   height: 0,
+        //   color: Theme.of(context).dividerColor.withOpacity(0.1),
+        // ),
         ListTile(
           onTap: () => Get.toNamed('/fav'),
           leading: null,
