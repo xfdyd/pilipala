@@ -21,7 +21,6 @@ import 'package:PiliPalaX/pages/video/introduction/detail/index.dart';
 import 'package:PiliPalaX/pages/video/related/index.dart';
 import 'package:PiliPalaX/plugin/pl_player/index.dart';
 import 'package:PiliPalaX/plugin/pl_player/models/play_repeat.dart';
-import 'package:PiliPalaX/services/service_locator.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 
 import '../../../services/shutdown_timer_service.dart';
@@ -62,7 +61,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late bool showStatusBarBackgroundColor;
   // 生命周期监听
   // late final AppLifecycleListener _lifecycleListener;
-  bool isShowing = true;
+  // bool isShowing = true;
   RxBool isFullScreen = false.obs;
   late StreamSubscription<bool> fullScreenStatusListener;
   // late final MethodChannel onUserLeaveHintListener;
@@ -269,7 +268,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       plPlayerController!.removeStatusLister(playerListener);
       fullScreenStatusListener.cancel();
       plPlayerController!.disable();
-      plPlayerController!.dispose();
+      // plPlayerController!.dispose();
     }
     // videoPlayerServiceHandler.onVideoDetailDispose();
     VideoDetailPage.routeObserver.unsubscribe(this);
@@ -292,28 +291,37 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       fullScreenStatusListener.cancel();
       plPlayerController!.disable();
     }
-    isShowing = false;
-    if (mounted) {
-      setState(() => {});
-    }
+    // isShowing = false;
+    // if (mounted) {
+    //   setState(() => {});
+    // }
     super.didPushNext();
   }
 
   @override
   // 返回当前页面时
   void didPopNext() async {
-    isShowing = true;
-    if (mounted) {
-      setState(() => {});
-    }
-    super.didPopNext();
+    // isShowing = true;
+    // if (mounted) {
+    //   setState(() => {});
+    // }
     videoDetailController.isFirstTime = false;
     // final bool autoplay = autoPlayEnable;
-    videoDetailController.autoPlay.value =
-        !videoDetailController.isShowCover.value;
-    print("autoplay:${videoDetailController.autoPlay.value}");
-    await videoDetailController.playerInit(
+    videoDetailController.playerInit(
         autoplay: videoDetailController.autoPlay.value);
+
+    videoDetailController.autoPlay.value =
+    !videoDetailController.isShowCover.value;
+    print("autoplay:${videoDetailController.autoPlay.value}");
+    if (videoDetailController.videoType == SearchType.video) {
+      final videoIntroController =
+      Get.find<VideoIntroController>(tag: Get.arguments['heroTag']);
+      videoIntroController.videoDetail.refresh();
+    } else if (videoDetailController.videoType == SearchType.media_bangumi) {
+      final bangumiIntroController =
+      Get.find<BangumiIntroController>(tag: Get.arguments['heroTag']);
+      bangumiIntroController.bangumiDetail.refresh();
+    }
 
     /// 未开启自动播放时，未播放跳转下一页返回/播放后跳转下一页返回
     videoIntroController.isPaused = videoDetailController.autoPlay.value;
@@ -342,6 +350,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     if (plPlayerController != null) {
       listenFullScreenStatus();
     }
+    super.didPopNext();
   }
 
   @override
@@ -505,14 +514,14 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                           Orientation.landscape &&
                       !horizontalScreen &&
                       !isFullScreen.value &&
-                      isShowing &&
+                      // isShowing &&
                       mounted) {
                     hideStatusBar();
                   }
                   if (MediaQuery.of(context).orientation ==
                           Orientation.portrait &&
                       !isFullScreen.value &&
-                      isShowing &&
+                      // isShowing &&
                       mounted) {
                     if (!removeSafeArea) showStatusBar();
                   }
@@ -547,8 +556,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                         },
                         child: Stack(
                           children: <Widget>[
-                            if (isShowing) plPlayer,
-
+                            // if (isShowing) plPlayer,
+                            plPlayer,
                             /// 关闭自动播放时 手动播放
                             if (!videoDetailController
                                 .autoPlay.value) ...<Widget>[
@@ -677,8 +686,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   }
                 },
                 child: Stack(children: <Widget>[
-                  if (isShowing) plPlayer,
-
+                  // if (isShowing) plPlayer,
+                  plPlayer,
                   /// 关闭自动播放时 手动播放
                   if (!videoDetailController.autoPlay.value) ...<Widget>[
                     Obx(
@@ -770,8 +779,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 }
               },
               child: Stack(children: <Widget>[
-                if (isShowing) plPlayer,
-
+                // if (isShowing) plPlayer,
+                plPlayer,
                 /// 关闭自动播放时 手动播放
                 if (!videoDetailController.autoPlay.value) ...<Widget>[
                   Obx(
@@ -864,8 +873,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 },
                 child: Stack(
                   children: <Widget>[
-                    if (isShowing) plPlayer,
-
+                    // if (isShowing) plPlayer,
+                    plPlayer,
                     /// 关闭自动播放时 手动播放
                     if (!videoDetailController.autoPlay.value) ...<Widget>[
                       Obx(
@@ -963,8 +972,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   },
                   child: Stack(
                     children: <Widget>[
-                      if (isShowing) plPlayer,
-
+                      // if (isShowing) plPlayer,
+                      plPlayer,
                       /// 关闭自动播放时 手动播放
                       if (!videoDetailController.autoPlay.value) ...<Widget>[
                         Obx(
@@ -1160,9 +1169,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-      if (!isShowing) {
-        return ColoredBox(color: Theme.of(context).colorScheme.background);
-      }
+      // if (!isShowing) {
+      //   return ColoredBox(color: Theme.of(context).colorScheme.background);
+      // }
       if (constraints.maxWidth > constraints.maxHeight * 1.25) {
 //             hideStatusBar();
 //             videoDetailController.hiddenReplyReplyPanel();

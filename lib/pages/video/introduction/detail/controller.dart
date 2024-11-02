@@ -20,6 +20,7 @@ import 'package:PiliPalaX/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:PiliPalaX/pages/member/controller.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:PiliPalaX/services/service_locator.dart';
 
 import '../../../../../http/search.dart';
 import '../../../../../models/model_hot_video_item.dart';
@@ -112,6 +113,33 @@ class VideoIntroController extends GetxController {
       startTimer(); // 在页面加载时启动定时器
     }
     queryVideoIntro();
+
+    videoDetail.listen((value) {
+
+      if ((value.pages?.length ?? 0) > 1) {
+
+        final VideoDetailController videoDetailCtr =
+            Get.find<VideoDetailController>(tag: heroTag);
+        final cid = videoDetailCtr.cid.value;
+        final current =
+            value.pages?.firstWhere((element) => element.cid == cid);
+
+        videoPlayerServiceHandler.onVideoDetailChange(
+            current?.pagePart ?? "",
+            value.title ?? "",
+            Duration(seconds: current?.duration ?? 0),
+            value.pic ?? "");
+
+      } else {
+
+        videoPlayerServiceHandler.onVideoDetailChange(
+            value.title ?? "",
+            value.owner?.name ?? "",
+            Duration(seconds: value.duration ?? 0),
+            value.pic ?? "");
+
+      }
+    });
   }
 
   // 获取视频简介&分p

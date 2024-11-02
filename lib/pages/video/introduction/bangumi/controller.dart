@@ -16,6 +16,7 @@ import 'package:PiliPalaX/utils/id_utils.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:PiliPalaX/services/service_locator.dart';
 
 class BangumiIntroController extends GetxController {
   // 视频bvid
@@ -88,6 +89,20 @@ class BangumiIntroController extends GetxController {
     }
     userInfo = userInfoCache.get('userInfoCache');
     userLogin = userInfo != null;
+    bangumiDetail.listen((value) {
+      final VideoDetailController videoDetailCtr =
+          Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
+      final cid = videoDetailCtr.cid.value;
+      final current =
+          value.episodes?.firstWhere((element) => element.cid == cid);
+
+      videoPlayerServiceHandler.onVideoDetailChange(
+        current?.longTitle ?? "",
+        value.title ?? "",
+        Duration(milliseconds: current?.duration ?? 0),
+        value.cover ?? "",
+      );
+    });
   }
 
   // 获取番剧简介&选集
@@ -286,6 +301,8 @@ class BangumiIntroController extends GetxController {
     videoDetailCtr.cid.value = cid;
     videoDetailCtr.danmakuCid.value = cid;
     videoDetailCtr.queryVideoUrl();
+    // 触发媒体通知更新
+    bangumiDetail.refresh();
     // 重新请求评论
     try {
       /// 未渲染回复组件时可能异常

@@ -1,5 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:PiliPalaX/plugin/pl_player/index.dart';
 import 'package:PiliPalaX/utils/storage.dart';
@@ -62,6 +63,10 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     print(newMediaItem);
     print(newMediaItem.title);
     debugPrint(StackTrace.current.toString());
+    print(Get.currentRoute);
+    // if (!Get.currentRoute.startsWith('/video') && !Get.currentRoute.startsWith('/live')) {
+    //   return;
+    // }
     if (!mediaItem.isClosed) mediaItem.add(newMediaItem);
   }
 
@@ -106,8 +111,8 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   onVideoDetailChange(
       String? title, String? artist, Duration? duration, String? artUri) {
     if (!enableBackgroundPlay) return;
-    print('当前调用栈为：');
-    print(StackTrace.current);
+    // print('当前调用栈为：');
+    // print(StackTrace.current);
     if (!PlPlayerController.instanceExists()) return;
     MediaItem mediaItem = MediaItem(
       id: UniqueKey().toString(),
@@ -185,13 +190,26 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
 
   clear() {
     if (!enableBackgroundPlay) return;
-    mediaItem.add(null);
     playbackState.add(PlaybackState(
       processingState: AudioProcessingState.idle,
       playing: false,
     ));
+    mediaItem.add(null);
     // _item.clear();
-    stop();
+    // stop();
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      String top = Get.currentRoute;
+      print("delayed top:$top");
+      if (!top.startsWith('/video') && !top.startsWith('/live')) {
+        playbackState.add(PlaybackState(
+          processingState: AudioProcessingState.idle,
+          playing: false,
+        ));
+        mediaItem.add(null);
+        // _item.clear();
+        // stop();
+      }
+    });
   }
 
   onPositionChange(Duration position) {

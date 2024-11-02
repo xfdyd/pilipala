@@ -233,7 +233,7 @@ class PlPlayerController {
   /// 全屏方向
   Rx<String> get direction => _direction;
 
-  Rx<int> get playerCount => _playerCount;
+  // Rx<int> get playerCount => _playerCount;
 
   ///
   Rx<String> get videoType => _videoType;
@@ -397,9 +397,9 @@ class PlPlayerController {
     _instance ??= PlPlayerController._();
     // print('getInstance');
     // print(StackTrace.current);
-    _instance!._playerCount.value += 1;
-    print("_playerCount");
-    print(_instance!._playerCount.value);
+    // _instance!._playerCount.value += 1;
+    // print("_playerCount");
+    // print(_instance!._playerCount.value);
     _videoType.value = videoType;
     return _instance!;
   }
@@ -429,6 +429,8 @@ class PlPlayerController {
     bool enableHeart = true,
   }) async {
     try {
+      // if (playerStatus.status.value == PlayerStatus.disabled) return;
+
       this.dataSource = dataSource;
       _autoPlay = autoplay;
       _looping = looping;
@@ -447,9 +449,9 @@ class PlPlayerController {
         await pause(notify: false);
       }
 
-      if (_playerCount.value == 0) {
-        return;
-      }
+      // if (_playerCount.value == 0) {
+      //   return;
+      // }
       // 配置Player 音轨、字幕等等
       _videoPlayerController = await _createVideoController(
           dataSource, _looping, enableHA, hwdec, width, height);
@@ -898,8 +900,13 @@ class PlPlayerController {
   /// 播放视频
   /// TODO  _duration.value丢失
   Future<void> play({bool repeat = false, bool hideControls = true}) async {
-    if (_playerCount.value == 0) return;
-    if (playerStatus.status.value == PlayerStatus.disabled) return;
+    // String top = Get.currentRoute;
+    // print("top:$top");
+    // if (!top.startsWith('/video')) {
+    //   return;
+    // }
+    // if (_playerCount.value == 0) return;
+    // if (playerStatus.status.value == PlayerStatus.disabled) return;
     // 播放时自动隐藏控制条
     controls = !hideControls;
     // repeat为true，将从头播放
@@ -931,9 +938,17 @@ class PlPlayerController {
     }
   }
 
-  Future<void> disable() async {
-    playerStatus.status.value = PlayerStatus.disabled;
-    await _videoPlayerController?.stop();
+  // 感觉用这个管理状态也不是很好用
+  void disable() async {
+    String top = Get.currentRoute;
+    print("top:$top");
+    if (!top.startsWith('/video') && !top.startsWith('/live')) {
+      // playerStatus.status.value = PlayerStatus.disabled;
+      _heartDuration = 0;
+      _videoPlayerController?.stop();
+      videoPlayerServiceHandler.clear();
+      return;
+    }
   }
 
   /// 更改播放状态
@@ -1298,15 +1313,15 @@ class PlPlayerController {
     setting.put(SettingBoxKey.danmakuMassiveMode, massiveMode);
   }
 
-  Future<void> dispose({String type = 'single'}) async {
+  Future<void> dispose() async {
     // 每次减1，最后销毁
-    if (type == 'single' && playerCount.value > 1) {
-      _playerCount.value -= 1;
-      _heartDuration = 0;
-      pause();
-      return;
-    }
-    _playerCount.value = 0;
+    // if (type == 'single' && playerCount.value > 1) {
+    //   _playerCount.value -= 1;
+    //   _heartDuration = 0;
+    //   pause();
+    //   return;
+    // }
+    // _playerCount.value = 0;
     pause();
     try {
       _timer?.cancel();
