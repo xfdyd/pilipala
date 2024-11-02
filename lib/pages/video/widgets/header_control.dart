@@ -227,18 +227,39 @@ class _HeaderControlState extends State<HeaderControl> {
                     ListTile(
                       onTap: () {
                         Get.back();
-                        Player? player =
-                            widget.controller?.videoPlayerController;
-                        if (player == null) {
-                          SmartDialog.showToast('播放器未初始化');
-                          return;
-                        }
-                        var pp = player.platform as NativePlayer;
-                        pp.setProperty("video", "no");
                       },
                       dense: true,
-                      leading: const Icon(Icons.headphones_outlined, size: 20),
-                      title: const Text('听视频（需返回首页才能终止该状态）', style: titleStyle),
+                      leading:
+                          const Icon(Icons.switch_video_outlined, size: 20),
+                      title: const Text('功能', style: titleStyle),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ActionRowLineItem(
+                            onTap: () {
+                              Get.back();
+                              widget.controller!.setOnlyPlayAudio(null);
+                            },
+                            text: " 听视频 ",
+                            selectStatus:
+                                widget.controller!.onlyPlayAudio.value,
+                          ),
+                          const SizedBox(width: 10),
+                          // const SizedBox(width: 10),
+                          ActionRowLineItem(
+                              onTap: () {
+                                Get.back();
+                                widget.controller!
+                                    .setContinuePlayInBackground(null);
+                              },
+                              text: " 后台播放 ",
+                              selectStatus: widget
+                                  .controller!
+                                  .continuePlayInBackground
+                                  .value //continuePlayInBackground,
+                              )
+                        ],
+                      ),
                     ),
                     ListTile(
                       onTap: () => {Get.back(), showSetVideoQa()},
@@ -1600,8 +1621,10 @@ class _HeaderControlState extends State<HeaderControl> {
                   }
                   FlPiP().enable(
                       ios: FlPiPiOSConfig(
-                          videoPath: player.state.track.video.toString(),
-                          audioPath: player.state.track.audio.toString(),
+                          videoPath:
+                              widget.controller!.dataSource.videoSource ?? "",
+                          audioPath:
+                              widget.controller!.dataSource.audioSource ?? "",
                           packageName: null),
                       android: FlPiPAndroidConfig(
                           aspectRatio: Rational(

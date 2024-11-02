@@ -647,7 +647,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               _gestureType = null;
             },
             child: Video(
-              key: ValueKey('${_.videoFit.value}'),
+              key: ValueKey(
+                  '${_.videoFit.value}${_.continuePlayInBackground.value}'),
               controller: videoController,
               controls: NoVideoControls,
               pauseUponEnteringBackgroundMode:

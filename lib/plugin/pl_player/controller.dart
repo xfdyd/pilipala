@@ -88,7 +88,9 @@ class PlPlayerController {
   late StreamSubscription<DataStatus> _dataListenerForEnterFullscreen;
 
   /// 后台播放
-  final Rx<bool> _continuePlayInBackground = false.obs;
+  Rx<bool> _continuePlayInBackground = false.obs;
+
+  Rx<bool> _onlyPlayAudio = false.obs;
 
   ///
   // ignore: prefer_final_fields
@@ -213,6 +215,9 @@ class PlPlayerController {
 
   /// 后台播放
   Rx<bool> get continuePlayInBackground => _continuePlayInBackground;
+
+  /// 听视频
+  Rx<bool> get onlyPlayAudio => _onlyPlayAudio;
 
   /// 是否长按倍速
   Rx<bool> get doubleSpeedStatus => _doubleSpeedStatus;
@@ -1367,5 +1372,18 @@ class PlPlayerController {
       language: s['language']!,
     ));
     _vttSubtitlesIndex.value = index;
+  }
+
+  void setContinuePlayInBackground(bool? status) {
+    _continuePlayInBackground.value =
+        status ?? !_continuePlayInBackground.value;
+    setting.put(SettingBoxKey.continuePlayInBackground,
+        _continuePlayInBackground.value);
+  }
+
+  void setOnlyPlayAudio(bool? status) {
+    _onlyPlayAudio.value = status ?? !_onlyPlayAudio.value;
+    videoPlayerController?.setVideoTrack(
+        _onlyPlayAudio.value ? VideoTrack.no() : VideoTrack.auto());
   }
 }
