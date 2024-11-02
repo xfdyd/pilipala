@@ -36,6 +36,7 @@ class HistorySearchController extends GetxController {
   //  提交搜索内容
   void submit() {
     loadingStatus.value = 'loading';
+    loadingText.value = '加载中...';
     pn = 1;
     searchHistories();
   }
@@ -56,8 +57,9 @@ class HistorySearchController extends GetxController {
         historyList.addAll(res['data'].list);
       }
       historyList.refresh();
-      count = res['data'].page['total'];
-      if (historyList.length == count) {
+      // count = res['data'].page['total'];
+      // if (historyList.length == count) {
+      if (!res['data'].hasMore){
         loadingText.value = '没有更多了';
       }
     }

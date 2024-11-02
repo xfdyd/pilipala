@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:PiliPalaX/http/constants.dart';
+import 'package:PiliPalaX/http/init.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -10,6 +13,8 @@ import 'package:PiliPalaX/models/member/coin.dart';
 import 'package:PiliPalaX/models/member/info.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:html/dom.dart' as dom;
+import 'package:html/parser.dart' as html_parser;
 
 import 'package:PiliPalaX/pages/video/introduction/widgets/group_panel.dart';
 
@@ -29,6 +34,7 @@ class MemberController extends GetxController with GetTickerProviderStateMixin {
   RxInt attribute = (-1).obs;
   RxString attributeText = '关注'.obs;
   RxList<MemberCoinsDataModel> recentCoinsList = <MemberCoinsDataModel>[].obs;
+  String? wwebid;
   late TabController tabController;
 
   @override
@@ -47,7 +53,8 @@ class MemberController extends GetxController with GetTickerProviderStateMixin {
   Future<Map<String, dynamic>> getInfo() async {
     await getMemberStat();
     await getMemberView();
-    var res = await MemberHttp.memberInfo(mid: mid);
+    await getWwebid();
+    var res = await MemberHttp.memberInfo(mid: mid, wwebid: wwebid);
     if (res['status']) {
       memberInfo.value = res['data'];
       face.value = res['data'].face;
@@ -55,6 +62,20 @@ class MemberController extends GetxController with GetTickerProviderStateMixin {
       SmartDialog.showToast(res['msg']);
     }
     return res;
+  }
+
+  Future getWwebid() async {
+    try {
+      dynamic response =
+      await Request().get('${HttpString.spaceBaseUrl}/$mid/dynamic');
+      dom.Document document = html_parser.parse(response.data);
+      dom.Element? scriptElement =
+      document.querySelector('script#__RENDER_DATA__');
+      wwebid = jsonDecode(
+          Uri.decodeComponent(scriptElement?.text ?? ''))['access_id'];
+    } catch (e) {
+      print('failed to get wwebid: $e');
+    }
   }
 
   // 获取用户状态

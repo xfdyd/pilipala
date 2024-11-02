@@ -1,17 +1,20 @@
 class HistoryData {
   HistoryData({
+    this.hasMore,
     this.cursor,
     this.tab,
     this.list,
     this.page,
   });
 
+  bool? hasMore;
   Cursor? cursor;
   List<HisTabItem>? tab;
   List<HisListItem>? list;
   Map? page;
 
   HistoryData.fromJson(Map<String, dynamic> json) {
+    hasMore = json['has_more'];
     cursor = json['cursor'] != null ? Cursor.fromJson(json['cursor']) : null;
     tab = json['tab'] != null
         ? json['tab'].map<HisTabItem>((e) => HisTabItem.fromJson(e)).toList()

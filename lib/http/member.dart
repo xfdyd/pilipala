@@ -16,12 +16,14 @@ class MemberHttp {
   static Future memberInfo({
     int? mid,
     String token = '',
+    dynamic wwebid,
   }) async {
     Map params = await WbiSign().makSign({
       'mid': mid,
       'token': token,
       'platform': 'web',
       'web_location': 1550101,
+      'w_webid': wwebid,
     });
     var res = await Request().get(
       Api.memberInfo,
