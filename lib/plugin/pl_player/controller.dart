@@ -12,7 +12,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import 'package:ns_danmaku/ns_danmaku.dart';
+import 'package:canvas_danmaku/canvas_danmaku.dart';
 import 'package:PiliPalaX/http/video.dart';
 import 'package:PiliPalaX/pages/mine/controller.dart';
 import 'package:PiliPalaX/plugin/pl_player/index.dart';
@@ -249,9 +249,10 @@ class PlPlayerController {
   late double fontSizeVal;
   late double strokeWidth;
   late int fontWeight;
-  late double danmakuDurationVal;
+  late int danmakuDurationVal;
+  late bool massiveMode;
   late List<double> speedsList;
-  double? defaultDuration;
+  // int? defaultDuration;
   late bool enableAutoLongPressSpeed = false;
   late bool enableLongShowControl;
 
@@ -324,7 +325,7 @@ class PlPlayerController {
   PlPlayerController._() {
     _videoType = videoType;
     isOpenDanmu.value =
-        setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: false);
+        setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: true);
     danmakuWeight.value =
         setting.get(SettingBoxKey.danmakuWeight, defaultValue: 0);
     danmakuFilterRule.value = localCache.get(LocalCacheKey.danmakuFilterRule,
@@ -340,11 +341,14 @@ class PlPlayerController {
         setting.get(SettingBoxKey.danmakuFontScale, defaultValue: 1.0);
     // 弹幕时间
     danmakuDurationVal =
-        setting.get(SettingBoxKey.danmakuDuration, defaultValue: 7.29);
+        setting.get(SettingBoxKey.danmakuDuration, defaultValue: 7.29).round();
     // 描边粗细
     strokeWidth = setting.get(SettingBoxKey.strokeWidth, defaultValue: 1.5);
     // 弹幕字体粗细
     fontWeight = setting.get(SettingBoxKey.fontWeight, defaultValue: 5);
+    // 弹幕海量模式
+    massiveMode =
+        setting.get(SettingBoxKey.danmakuMassiveMode, defaultValue: false);
     playRepeat = PlayRepeat.values.toList().firstWhere(
           (e) =>
               e.value ==
@@ -507,9 +511,7 @@ class PlPlayerController {
     _heartDuration = 0;
     _position.value = Duration.zero;
     // 初始化时清空弹幕，防止上次重叠
-    if (danmakuController != null) {
-      danmakuController!.clear();
-    }
+    danmakuController?.clear();
     int bufferSize =
         setting.get(SettingBoxKey.expandBuffer, defaultValue: false)
             ? (videoType.value == 'live' ? 64 * 1024 * 1024 : 32 * 1024 * 1024)
@@ -854,13 +856,14 @@ class PlPlayerController {
   Future<void> setPlaybackSpeed(double speed) async {
     /// TODO  _duration.value丢失
     await _videoPlayerController?.setRate(speed);
-    try {
-      DanmakuOption currentOption = danmakuController!.option;
-      defaultDuration ??= currentOption.duration;
-      DanmakuOption updatedOption = currentOption.copyWith(
-          duration: (defaultDuration! / speed) * playbackSpeed);
-      danmakuController!.updateOption(updatedOption);
-    } catch (_) {}
+    // 移除倍速时改变弹幕速度的能力
+    // try {
+    //   DanmakuOption currentOption = danmakuController!.option;
+    //   defaultDuration ??= currentOption.duration;
+    //   DanmakuOption updatedOption = currentOption.copyWith(
+    //       duration: ((defaultDuration! / speed) * playbackSpeed).round());
+    //   danmakuController!.updateOption(updatedOption);
+    // } catch (_) {}
     // fix 长按倍速后放开不恢复
     if (!doubleSpeedStatus.value) {
       _playbackSpeed.value = speed;
@@ -1287,6 +1290,7 @@ class PlPlayerController {
     setting.put(SettingBoxKey.danmakuDuration, danmakuDurationVal);
     setting.put(SettingBoxKey.strokeWidth, strokeWidth);
     setting.put(SettingBoxKey.fontWeight, fontWeight);
+    setting.put(SettingBoxKey.danmakuMassiveMode, massiveMode);
   }
 
   Future<void> dispose({String type = 'single'}) async {

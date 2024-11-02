@@ -159,7 +159,7 @@ class SettingBoxKey {
       disableLikeMsg = 'disableLikeMsg',
       defaultHomePage = 'defaultHomePage',
 
-      // 弹幕相关设置 权重（云屏蔽） 屏蔽类型 显示区域 透明度 字体大小 弹幕时间 描边粗细 字体粗细
+      // 弹幕相关设置 权重（云屏蔽） 屏蔽类型 显示区域 透明度 字体大小 弹幕时间 描边粗细 字体粗细 海量模式
       danmakuWeight = 'danmakuWeight',
       danmakuBlockType = 'danmakuBlockType',
       danmakuShowArea = 'danmakuShowArea',
@@ -168,6 +168,7 @@ class SettingBoxKey {
       danmakuDuration = 'danmakuDuration',
       strokeWidth = 'strokeWidth',
       fontWeight = 'fontWeight',
+      danmakuMassiveMode = 'danmakuMassiveMode',
 
       // 代理host port
       systemProxyHost = 'systemProxyHost',

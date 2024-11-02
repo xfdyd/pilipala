@@ -120,10 +120,14 @@ dependencies:
   # scheme跳转
   app_links: ^6.3.0
   # 弹幕
-  ns_danmaku:
+  canvas_danmaku:
     git:
-      url: https://github.com/orz12/flutter_ns_danmaku.git
-      ref: master
+      url: https://github.com/orz12/canvas_danmaku.git
+      ref: main
+#  ns_danmaku:
+#    git:
+#      url: https://github.com/orz12/flutter_ns_danmaku.git
+#      ref: master
   # 状态栏图标控制
   status_bar_control: ^3.2.1
   # 代理

@@ -67,7 +67,7 @@ class _PlaySettingState extends State<PlaySetting> {
             subTitle: '是否展示弹幕',
             leading: Icon(Icons.comment_outlined),
             setKey: SettingBoxKey.enableShowDanmaku,
-            defaultVal: false,
+            defaultVal: true,
           ),
           ListTile(
             dense: false,
@@ -153,16 +153,19 @@ class _PlaySettingState extends State<PlaySetting> {
             setKey: SettingBoxKey.allowRotateScreen,
             defaultVal: true,
           ),
-          const SetSwitchItem(
+          SetSwitchItem(
             title: '后台播放',
             subTitle: '进入后台时继续播放',
             leading: Icon(Icons.motion_photos_pause_outlined),
             setKey: SettingBoxKey.continuePlayInBackground,
             defaultVal: false,
+            callFn: (val) {
+              SmartDialog.showToast('如果该设置未生效，请重启');
+            },
           ),
           if (Platform.isAndroid)
             SetSwitchItem(
-                title: '后台画中画',
+                title: '后台画中画（暂时无效）',
                 subTitle: '进入后台时以小窗形式（PiP）播放',
                 leading: const Icon(Icons.picture_in_picture_outlined),
                 setKey: SettingBoxKey.autoPiP,
@@ -176,7 +179,7 @@ class _PlaySettingState extends State<PlaySetting> {
                 }),
           if (Platform.isAndroid)
             const SetSwitchItem(
-              title: '画中画不加载弹幕',
+              title: '画中画不加载弹幕（暂时无效）',
               subTitle: '当弹幕开关开启时，小窗屏蔽弹幕以获得较好的体验',
               leading: Icon(Icons.comments_disabled_outlined),
               setKey: SettingBoxKey.pipNoDanmaku,

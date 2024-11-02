@@ -11,7 +11,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:media_kit/media_kit.dart';
-import 'package:ns_danmaku/ns_danmaku.dart';
+import 'package:canvas_danmaku/canvas_danmaku.dart';
 import 'package:PiliPalaX/http/user.dart';
 import 'package:PiliPalaX/models/video/play/quality.dart';
 import 'package:PiliPalaX/models/video/play/url.dart';
@@ -83,9 +83,10 @@ class _HeaderControlState extends State<HeaderControl> {
   }
 
   void listenFullScreenStatus() {
-    fullScreenStatusListener = widget
-        .videoDetailCtr!.plPlayerController!.isFullScreen
-        .listen((bool status) {
+    // fullScreenStatusListener = widget
+    //     .videoDetailCtr!.plPlayerController!.isFullScreen
+    fullScreenStatusListener =
+        widget.controller!.isFullScreen.listen((bool status) {
       isFullScreen = status;
 
       /// TODO setState() called after dispose()
@@ -152,7 +153,7 @@ class _HeaderControlState extends State<HeaderControl> {
                     //   trailing: Transform.scale(
                     //     scale: 0.75,
                     //     child: Switch(
-                    //       thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
+                    //       thumbIcon: WidgetStateProperty.resolveWith<Icon?>(
                     //           (Set<MaterialState> states) {
                     //         if (states.isNotEmpty &&
                     //             states.first == MaterialState.selected) {
@@ -517,16 +518,11 @@ class _HeaderControlState extends State<HeaderControl> {
                           SmartDialog.showToast('发送成功');
                           // 发送成功，自动预览该弹幕，避免重新请求
                           // TODO: 暂停状态下预览弹幕仍会移动与计时，可考虑添加到dmSegList或其他方式实现
-                          widget.controller!.danmakuController!.addItems([
-                            DanmakuItem(
-                              msg,
-                              color: Colors.white,
-                              time: widget
-                                  .controller!.position.value.inMilliseconds,
-                              type: DanmakuItemType.scroll,
-                              isSend: true,
-                            )
-                          ]);
+                          widget.controller!.danmakuController!.addDanmaku(
+                              DanmakuContentItem(msg,
+                                  color: Colors.white,
+                                  type: DanmakuItemType.scroll,
+                                  selfSend: true));
                           Get.back();
                         } else {
                           SmartDialog.showToast('发送失败，错误信息为${res['msg']}');
@@ -963,11 +959,13 @@ class _HeaderControlState extends State<HeaderControl> {
     // 字体大小
     double fontSizeVal = widget.controller!.fontSizeVal;
     // 弹幕速度
-    double danmakuDurationVal = widget.controller!.danmakuDurationVal;
+    int danmakuDurationVal = widget.controller!.danmakuDurationVal;
     // 弹幕描边
     double strokeWidth = widget.controller!.strokeWidth;
     // 字体粗细
     int fontWeight = widget.controller!.fontWeight;
+    // 海量模式
+    bool massiveMode = widget.controller!.massiveMode;
 
     final DanmakuController danmakuController =
         widget.controller!.danmakuController!;
@@ -1119,7 +1117,26 @@ class _HeaderControlState extends State<HeaderControl> {
                             selectStatus: showArea == i['value'],
                           ),
                           const SizedBox(width: 10),
-                        ]
+                        ],
+                        const Spacer(),
+                        ActionRowLineItem(
+                          onTap: () {
+                            massiveMode = !massiveMode;
+                            widget.controller!.massiveMode = massiveMode;
+                            widget.controller?.putDanmakuSettings();
+                            setState(() {});
+                            try {
+                              final DanmakuOption currentOption =
+                                  danmakuController.option;
+                              final DanmakuOption updatedOption = currentOption
+                                  .copyWith(massiveMode: massiveMode);
+                              danmakuController.updateOption(updatedOption);
+                            } catch (_) {}
+                          },
+                          text: "海量模式",
+                          selectStatus: massiveMode,
+                        ),
+                        const SizedBox(width: 10),
                       ],
                     ),
                   ),
@@ -1299,14 +1316,13 @@ class _HeaderControlState extends State<HeaderControl> {
                             enabledThumbRadius: 6.0),
                       ),
                       child: Slider(
-                        min: 1,
+                        min: 1.2,
                         max: 4,
                         value: pow(danmakuDurationVal, 1 / 4) as double,
-                        divisions: 60,
+                        divisions: 28,
                         label: danmakuDurationVal.toString(),
                         onChanged: (double val) {
-                          danmakuDurationVal =
-                              (pow(val, 4) as double).toPrecision(2);
+                          danmakuDurationVal = (pow(val, 4) as double).round();
                           widget.controller!.danmakuDurationVal =
                               danmakuDurationVal;
                           widget.controller?.putDanmakuSettings();
@@ -1314,8 +1330,9 @@ class _HeaderControlState extends State<HeaderControl> {
                           try {
                             final DanmakuOption updatedOption =
                                 danmakuController.option.copyWith(
-                                    duration: danmakuDurationVal /
-                                        widget.controller!.playbackSpeed);
+                                    duration: (danmakuDurationVal /
+                                            widget.controller!.playbackSpeed)
+                                        .round());
                             danmakuController.updateOption(updatedOption);
                           } catch (_) {}
                         },
@@ -1530,7 +1547,7 @@ class _HeaderControlState extends State<HeaderControl> {
               child: IconButton(
                 tooltip: '发弹幕',
                 style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  padding: WidgetStateProperty.all(EdgeInsets.zero),
                 ),
                 onPressed: () => showShootDanmakuSheet(),
                 icon: const Icon(
@@ -1547,7 +1564,7 @@ class _HeaderControlState extends State<HeaderControl> {
                 () => IconButton(
                   tooltip: "${_.isOpenDanmu.value ? '关闭' : '开启'}弹幕",
                   style: ButtonStyle(
-                    padding: MaterialStateProperty.all(EdgeInsets.zero),
+                    padding: WidgetStateProperty.all(EdgeInsets.zero),
                   ),
                   onPressed: () {
                     _.isOpenDanmu.value = !_.isOpenDanmu.value;
