@@ -29,6 +29,7 @@ import '../../common/widgets/list_sheet.dart';
 import '../../utils/utils.dart';
 import 'models/bottom_control_type.dart';
 import 'models/bottom_progress_behavior.dart';
+import 'models/play_status.dart';
 import 'widgets/app_bar_ani.dart';
 import 'widgets/backward_seek.dart';
 import 'widgets/bottom_control.dart';
@@ -61,7 +62,7 @@ class PLVideoPlayer extends StatefulWidget {
 }
 
 class _PLVideoPlayerState extends State<PLVideoPlayer>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   late AnimationController animationController;
   late VideoController videoController;
   late VideoIntroController? videoIntroController;
@@ -101,6 +102,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   Timer? _accessibilityDebounce;
   double _lastAnnouncedValue = -1;
 
+  bool onlyPlayAudioUponEnteringBackgroundMode = false;
+
   void onDoubleTapSeekBackward() {
     _mountSeekBackwardButton.value = true;
   }
@@ -133,6 +136,27 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         onDoubleTapSeekForward();
         break;
     }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if ([
+          AppLifecycleState.paused,
+          AppLifecycleState.detached,
+        ].contains(state) &&
+        PlPlayerController.getPlayerStatusIfExists() == PlayerStatus.playing &&
+        !onlyPlayAudioUponEnteringBackgroundMode &&
+        !widget.controller.onlyPlayAudio.value) {
+      onlyPlayAudioUponEnteringBackgroundMode = true;
+      widget.controller.setOnlyPlayAudio(true);
+    } else if (PlPlayerController.getPlayerStatusIfExists() ==
+            PlayerStatus.playing &&
+        onlyPlayAudioUponEnteringBackgroundMode &&
+        widget.controller.onlyPlayAudio.value) {
+      onlyPlayAudioUponEnteringBackgroundMode = false;
+      widget.controller.setOnlyPlayAudio(false);
+    }
+    super.didChangeAppLifecycleState(state);
   }
 
   @override

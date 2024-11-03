@@ -1619,6 +1619,8 @@ class _HeaderControlState extends State<HeaderControl> {
                     SmartDialog.showToast('播放器未初始化');
                     return;
                   }
+                  print(widget.controller!.dataSource.videoSource);
+                  print(widget.controller!.dataSource.audioSource);
                   FlPiP().enable(
                       ios: FlPiPiOSConfig(
                           videoPath:
