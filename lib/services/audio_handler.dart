@@ -197,7 +197,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     mediaItem.add(null);
     // _item.clear();
     // stop();
-    Future.delayed(const Duration(milliseconds: 1000), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       String top = Get.currentRoute;
       print("delayed top:$top");
       if (!top.startsWith('/video') && !top.startsWith('/live')) {
