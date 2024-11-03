@@ -91,19 +91,15 @@ dependencies:
   # 视频播放器
   media_kit:
     git:
-      url: https://github.com/orz12/media-kit.git
-      ref: master
+      url: https://github.com/media-kit/media-kit.git
+      ref: main
       path: media_kit
   media_kit_video:
     git:
-      url: https://github.com/orz12/media-kit.git
-      ref: master
+      url: https://github.com/media-kit/media-kit.git
+      ref: main
       path: media_kit_video
-  media_kit_libs_video:
-    git:
-      url: https://github.com/orz12/media-kit.git
-      ref: master
-      path: media_kit_libs_video
+  media_kit_libs_video: ^1.0.5
 
   # 媒体通知
   audio_service: ^0.18.15
