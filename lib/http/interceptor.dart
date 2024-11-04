@@ -82,23 +82,31 @@ class ApiInterceptor extends Interceptor {
   }
 
   static Future<String> checkConnect() async {
-    final ConnectivityResult connectivityResult =
-        await Connectivity().checkConnectivity();
-    switch (connectivityResult) {
-      case ConnectivityResult.mobile:
-        return '流量';
-      case ConnectivityResult.wifi:
-        return 'Wi-Fi';
-      case ConnectivityResult.ethernet:
-        return '局域';
-      case ConnectivityResult.vpn:
-        return '代理';
-      case ConnectivityResult.other:
-        return '其他';
-      case ConnectivityResult.none:
-        return '无';
-      default:
-        return '';
-    }
+    final List<ConnectivityResult> connectivityResults =
+        await (Connectivity().checkConnectivity());
+
+    final connectionTypes = connectivityResults
+        .map((result) {
+          switch (result) {
+            case ConnectivityResult.mobile:
+              return '流量';
+            case ConnectivityResult.wifi:
+              return 'Wi-Fi';
+            case ConnectivityResult.ethernet:
+              return '局域';
+            case ConnectivityResult.vpn:
+              return '代理';
+            case ConnectivityResult.other:
+              return '其他';
+            case ConnectivityResult.none:
+              return '无';
+            default:
+              return '';
+          }
+        })
+        .where((type) => type.isNotEmpty)
+        .toList();
+
+    return connectionTypes.join('、');
   }
 }
