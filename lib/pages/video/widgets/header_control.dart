@@ -1621,6 +1621,7 @@ class _HeaderControlState extends State<HeaderControl> {
                   }
                   print(widget.controller!.dataSource.videoSource);
                   print(widget.controller!.dataSource.audioSource);
+                  widget.controller!.controls = false;
                   FlPiP().enable(
                       ios: FlPiPiOSConfig(
                           videoPath:
@@ -1629,10 +1630,13 @@ class _HeaderControlState extends State<HeaderControl> {
                               widget.controller!.dataSource.audioSource ?? "",
                           packageName: null),
                       android: FlPiPAndroidConfig(
-                          aspectRatio: Rational(
-                        widget.videoDetailCtr!.data.dash!.video!.first.width!,
-                        widget.videoDetailCtr!.data.dash!.video!.first.height!,
-                      )));
+                        aspectRatio: Rational(
+                          widget.videoDetailCtr!.data.dash!.video!.first.width!,
+                          widget
+                              .videoDetailCtr!.data.dash!.video!.first.height!,
+                        ),
+                        // createNewEngine: true,
+                      ));
                   // bool canUsePiP = widget.floating != null &&
                   //     await widget.floating!.isPipAvailable;
                   // widget.controller!.hiddenControls(false);

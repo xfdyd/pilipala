@@ -4,6 +4,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:auto_orientation/auto_orientation.dart';
+import 'package:fl_pip/fl_pip.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -311,15 +312,15 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         autoplay: videoDetailController.autoPlay.value);
 
     videoDetailController.autoPlay.value =
-    !videoDetailController.isShowCover.value;
+        !videoDetailController.isShowCover.value;
     print("autoplay:${videoDetailController.autoPlay.value}");
     if (videoDetailController.videoType == SearchType.video) {
       final videoIntroController =
-      Get.find<VideoIntroController>(tag: Get.arguments['heroTag']);
+          Get.find<VideoIntroController>(tag: Get.arguments['heroTag']);
       videoIntroController.videoDetail.refresh();
     } else if (videoDetailController.videoType == SearchType.media_bangumi) {
       final bangumiIntroController =
-      Get.find<BangumiIntroController>(tag: Get.arguments['heroTag']);
+          Get.find<BangumiIntroController>(tag: Get.arguments['heroTag']);
       bangumiIntroController.bangumiDetail.refresh();
     }
 
@@ -558,6 +559,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                           children: <Widget>[
                             // if (isShowing) plPlayer,
                             plPlayer,
+
                             /// 关闭自动播放时 手动播放
                             if (!videoDetailController
                                 .autoPlay.value) ...<Widget>[
@@ -688,6 +690,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 child: Stack(children: <Widget>[
                   // if (isShowing) plPlayer,
                   plPlayer,
+
                   /// 关闭自动播放时 手动播放
                   if (!videoDetailController.autoPlay.value) ...<Widget>[
                     Obx(
@@ -781,6 +784,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               child: Stack(children: <Widget>[
                 // if (isShowing) plPlayer,
                 plPlayer,
+
                 /// 关闭自动播放时 手动播放
                 if (!videoDetailController.autoPlay.value) ...<Widget>[
                   Obx(
@@ -875,6 +879,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   children: <Widget>[
                     // if (isShowing) plPlayer,
                     plPlayer,
+
                     /// 关闭自动播放时 手动播放
                     if (!videoDetailController.autoPlay.value) ...<Widget>[
                       Obx(
@@ -974,6 +979,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     children: <Widget>[
                       // if (isShowing) plPlayer,
                       plPlayer,
+
                       /// 关闭自动播放时 手动播放
                       if (!videoDetailController.autoPlay.value) ...<Widget>[
                         Obx(
@@ -1151,6 +1157,20 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               ),
       );
   Widget autoChoose(Widget childWhenDisabled) {
+
+    return PiPBuilder(builder: (PiPStatusInfo? statusInfo) {
+      print("PiPStatusInfo${statusInfo?.status}");
+      switch (statusInfo?.status) {
+        case PiPStatus.enabled:
+          return childWhenEnabled;
+        case PiPStatus.disabled:
+          return childWhenDisabled;
+        case PiPStatus.unavailable:
+          return childWhenDisabled;
+        case null:
+          return childWhenDisabled;
+      }
+    });
     // if (Platform.isAndroid) {
     //   return PiPSwitcher(
     //     childWhenDisabled: childWhenDisabled,
@@ -1158,7 +1178,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     //     floating: floating,
     //   );
     // }
-    return childWhenDisabled;
+    // return childWhenDisabled;
   }
 
   @override
