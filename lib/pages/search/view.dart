@@ -97,6 +97,8 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
               visible: _searchController.enableHotKey,
               child: hotSearch(_searchController),
             ),
+
+            SizedBox(height: MediaQuery.of(context).padding.bottom + 50),
           ],
         ),
       ),
@@ -133,7 +135,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
 
   Widget hotSearch(ctr) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 14, 4, 0),
+      padding: const EdgeInsets.fromLTRB(10, 14, 4, 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -227,8 +229,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
     return Obx(
       () => Container(
         width: double.infinity,
-        padding: EdgeInsets.fromLTRB(
-            10, 25, 6, MediaQuery.of(context).padding.bottom + 50),
+        padding: const EdgeInsets.fromLTRB(10, 0, 6, 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
