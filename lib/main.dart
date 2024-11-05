@@ -171,9 +171,7 @@ class MyApp extends StatelessWidget {
             ),
             pageTransitionsTheme: const PageTransitionsTheme(
               builders: <TargetPlatform, PageTransitionsBuilder>{
-                TargetPlatform.android: ZoomPageTransitionsBuilder(
-                  allowEnterRouteSnapshotting: false,
-                ),
+                TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
               },
             ),
           ),
