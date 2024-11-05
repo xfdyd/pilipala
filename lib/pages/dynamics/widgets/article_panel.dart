@@ -33,16 +33,19 @@ Widget articlePanel(item, context, {floor = 1}) {
           ),
           const SizedBox(height: 8),
         ],
-        Text(
-          item.modules.moduleDynamic.major.opus.title,
-          style: Theme.of(context)
-              .textTheme
-              .titleMedium!
-              .copyWith(fontWeight: FontWeight.bold),
-        ),
+        Row(children: [
+          Text(
+            item.modules.moduleDynamic.major.opus.title,
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium!
+                .copyWith(fontWeight: FontWeight.bold),
+          )
+        ]),
         const SizedBox(height: 2),
-        if (item.modules.moduleDynamic.major.opus.summary.text !=
-            'undefined') ...[
+        if (item.modules.moduleDynamic.major.opus.summary.text != 'undefined' &&
+            item.modules.moduleDynamic.major.opus.summary.richTextNodes
+                .isNotEmpty) ...[
           Text(
             item.modules.moduleDynamic.major.opus.summary.richTextNodes.first
                 .text,

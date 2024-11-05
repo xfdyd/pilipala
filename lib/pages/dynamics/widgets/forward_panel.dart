@@ -159,6 +159,7 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
     pics = item.modules.moduleDynamic.major.opus.pics;
   }
   InlineSpan? richNodes = richNode(item, context);
+  print(item.type);
   switch (item.type) {
     // 图文
     case 'DYNAMIC_TYPE_DRAW':
@@ -339,6 +340,42 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
           )
         ],
       );
+    case 'DYNAMIC_TYPE_COMMON_SQUARE':
+      debugPrint('commonSquare: ${item.modules.moduleDynamic.major}');
+      return GestureDetector(
+          onTap: () => Get.toNamed('/webview', parameters: {
+                'url': item.modules.moduleDynamic.major.common.jumpUrl,
+                'type': 'url',
+                'pageTitle':
+                    item.modules.moduleDynamic.major.common.title ?? "",
+              }),
+          child: Row(
+            children: [
+              const SizedBox(width: 20),
+              NetworkImgLayer(
+                src: item.modules.moduleDynamic.major.common.cover ?? "",
+                width: 50,
+                height: 50,
+              ),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.modules.moduleDynamic.major.common.title ?? "",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    item.modules.moduleDynamic.major.common.desc ?? "",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              )
+            ],
+          ));
     default:
       return const SizedBox(
         width: double.infinity,
