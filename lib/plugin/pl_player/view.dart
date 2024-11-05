@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:PiliPalaX/pages/video/introduction/detail/controller.dart';
@@ -140,6 +141,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!Platform.isIOS) {
+      super.didChangeAppLifecycleState(state);
+      return;
+    }
     if ([
           AppLifecycleState.paused,
           AppLifecycleState.detached,
@@ -147,12 +152,14 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         PlPlayerController.getPlayerStatusIfExists() == PlayerStatus.playing &&
         !onlyPlayAudioUponEnteringBackgroundMode &&
         !widget.controller.onlyPlayAudio.value) {
+      print('onlyPlayAudioUponEnteringBackgroundMode On');
       onlyPlayAudioUponEnteringBackgroundMode = true;
       widget.controller.setOnlyPlayAudio(true);
     } else if (PlPlayerController.getPlayerStatusIfExists() ==
             PlayerStatus.playing &&
         onlyPlayAudioUponEnteringBackgroundMode &&
         widget.controller.onlyPlayAudio.value) {
+      print('onlyPlayAudioUponEnteringBackgroundMode Off');
       onlyPlayAudioUponEnteringBackgroundMode = false;
       widget.controller.setOnlyPlayAudio(false);
     }
