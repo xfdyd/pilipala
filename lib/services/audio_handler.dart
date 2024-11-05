@@ -188,8 +188,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   //   }
   // }
 
-  clear() {
-    if (!enableBackgroundPlay) return;
+  void clearImpl() {
     playbackState.add(PlaybackState(
       processingState: AudioProcessingState.idle,
       playing: false,
@@ -197,17 +196,26 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     mediaItem.add(null);
     // _item.clear();
     // stop();
-    Future.delayed(const Duration(milliseconds: 500), () {
-      String top = Get.currentRoute;
-      print("delayed top:$top");
-      if (!top.startsWith('/video') && !top.startsWith('/live')) {
-        playbackState.add(PlaybackState(
-          processingState: AudioProcessingState.idle,
-          playing: false,
-        ));
-        mediaItem.add(null);
-        // _item.clear();
-        // stop();
+  }
+
+  bool checkTop() {
+    String top = Get.currentRoute;
+    print("top:$top");
+    return top.startsWith('/video') || top.startsWith('/live');
+  }
+
+  clear() {
+    if (!enableBackgroundPlay) return;
+    clearImpl();
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (!checkTop()) {
+        clearImpl();
+      } else {
+        Future.delayed(const Duration(milliseconds: 400), () {
+          if (!checkTop()) {
+            clearImpl();
+          }
+        });
       }
     });
   }
