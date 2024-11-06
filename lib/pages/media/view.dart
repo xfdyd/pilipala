@@ -105,44 +105,49 @@ class _MediaPageState extends State<MediaPage>
             // 网格视图替代 for 循环
             Padding(
               padding: const EdgeInsets.symmetric(
-                horizontal: 50,
-                vertical: 30,
+                horizontal: 10,
+                vertical: 20,
               ),
               child: GridView.builder(
                 physics:
                     const NeverScrollableScrollPhysics(), // 禁用GridView自己的滚动，防止冲突
                 shrinkWrap: true,
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 500,
-                  crossAxisSpacing: 10, // 网格之间的水平间距
-                  mainAxisSpacing: 25, // 网格之间的垂直间距
-                  childAspectRatio: 9, // 宽高比，1表示正方形网格
+                  maxCrossAxisExtent: 400,
+                  crossAxisSpacing: 0, // 网格之间的水平间距
+                  mainAxisSpacing: 0, // 网格之间的垂直间距
+                  childAspectRatio: 6, // 宽高比，1表示正方形网格
                 ),
                 itemCount: mediaController.list.length,
                 itemBuilder: (context, index) {
                   var item = mediaController.list[index];
                   return GestureDetector(
+                    behavior: HitTestBehavior.translucent,
                     onTap: () => item['onTap'](),
-                    child: Row(
-                      // mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          item['icon'],
-                          color: primary,
-                          size: 25, // 图标大小
-                        ),
-                        const SizedBox(width: 12), // 图标和文字之间的间距
-                        Text(
-                          item['title'],
-                          style: TextStyle(
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .fontSize),
-                          // textAlign: TextAlign.center, // 文字居中
-                        ),
-                      ],
-                    ),
+                    child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 13),
+                        child: Row(
+                          // mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              item['icon'],
+                              color: primary,
+                              size: 22, // 图标大小
+                            ),
+                            const SizedBox(width: 12), // 图标和文字之间的间距
+                            Text(
+                              item['title'],
+                              style: TextStyle(
+                                  fontSize: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium!
+                                      .fontSize),
+                              // textAlign: TextAlign.center, // 文字居中
+                            ),
+                            const Spacer(),
+                          ],
+                        )),
                   );
                 },
               ),
