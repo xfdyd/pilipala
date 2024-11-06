@@ -112,6 +112,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     appbarStreamListen();
     // lifecycleListener();
     autoScreen();
+
     // onUserLeaveHintListener = const MethodChannel("onUserLeaveHint");
     // onUserLeaveHintListener.setMethodCallHandler((call) async {
     //   if (call.method == 'onUserLeaveHint') {
@@ -145,7 +146,28 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       plPlayerController!.addStatusLister(playerListener);
       listenFullScreenStatus();
       await plPlayerController!.autoEnterFullscreen();
-      // autoEnterPip();
+      Future.wait([_futureBuilderFuture]).then((result) {
+        autoEnterPip();
+      });
+    }
+  }
+
+  void autoEnterPip() {
+    String top = Get.currentRoute;
+    if (autoPiP && (top.startsWith('/video') || top.startsWith('/live'))) {
+      FlPiP().enable(
+          ios: FlPiPiOSConfig(
+              enabledWhenBackground: true,
+              videoPath: videoDetailController.videoUrl,
+              audioPath: videoDetailController.audioUrl,
+              packageName: null),
+          android: FlPiPAndroidConfig(
+            enabledWhenBackground: true,
+            aspectRatio: Rational(
+              videoDetailController.data.dash!.video!.first.width!,
+              videoDetailController.data.dash!.video!.first.height!,
+            ),
+          ));
     }
   }
 
@@ -207,7 +229,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     listenFullScreenStatus();
     await plPlayerController!.autoEnterFullscreen();
     videoDetailController.autoPlay.value = true;
-    // autoEnterPip();
+    autoEnterPip();
   }
 
   // // 生命周期监听
@@ -404,6 +426,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     plPlayerController!.videoController == null
                 ? nil
                 : PLVideoPlayer(
+                    key: Key(heroTag),
                     controller: plPlayerController!,
                     videoIntroController:
                         videoDetailController.videoType == SearchType.video
@@ -1130,6 +1153,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         () => !videoDetailController.autoPlay.value
             ? const SizedBox()
             : PLVideoPlayer(
+                key: Key(heroTag),
                 controller: plPlayerController!,
                 videoIntroController:
                     videoDetailController.videoType == SearchType.video
@@ -1157,7 +1181,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               ),
       );
   Widget autoChoose(Widget childWhenDisabled) {
-
     return PiPBuilder(builder: (PiPStatusInfo? statusInfo) {
       print("PiPStatusInfo${statusInfo?.status}");
       switch (statusInfo?.status) {

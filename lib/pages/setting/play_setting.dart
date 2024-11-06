@@ -165,7 +165,7 @@ class _PlaySettingState extends State<PlaySetting> {
           ),
           if (Platform.isAndroid)
             SetSwitchItem(
-                title: '后台画中画（暂时无效）',
+                title: '后台画中画',
                 subTitle: '进入后台时以小窗形式（PiP）播放',
                 leading: const Icon(Icons.picture_in_picture_outlined),
                 setKey: SettingBoxKey.autoPiP,
@@ -179,7 +179,7 @@ class _PlaySettingState extends State<PlaySetting> {
                 }),
           if (Platform.isAndroid)
             const SetSwitchItem(
-              title: '画中画不加载弹幕（暂时无效）',
+              title: '画中画不加载弹幕',
               subTitle: '当弹幕开关开启时，小窗屏蔽弹幕以获得较好的体验',
               leading: Icon(Icons.comments_disabled_outlined),
               setKey: SettingBoxKey.pipNoDanmaku,

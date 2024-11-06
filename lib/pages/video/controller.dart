@@ -192,7 +192,7 @@ class VideoDetailController extends GetxController
 
   /// 更新画质、音质
   /// TODO 继续进度播放
-  updatePlayer() {
+  updatePlayer() async {
     if (plPlayerController == null) return;
     isShowCover.value = false;
     defaultST = plPlayerController!.position.value;

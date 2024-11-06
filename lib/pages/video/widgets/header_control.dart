@@ -1624,10 +1624,8 @@ class _HeaderControlState extends State<HeaderControl> {
                   widget.controller!.controls = false;
                   FlPiP().enable(
                       ios: FlPiPiOSConfig(
-                          videoPath:
-                              widget.controller!.dataSource.videoSource ?? "",
-                          audioPath:
-                              widget.controller!.dataSource.audioSource ?? "",
+                          videoPath: widget.videoDetailCtr!.videoUrl,
+                          audioPath: widget.videoDetailCtr!.audioUrl,
                           packageName: null),
                       android: FlPiPAndroidConfig(
                         aspectRatio: Rational(
