@@ -196,10 +196,10 @@ class _ContentState extends State<Content> {
                 selectionControls: MaterialTextSelectionControls(),
                 child: Text.rich(
                   /// fix 默认20px高度
-                  style: const TextStyle(height: 0),
+                  //style: const TextStyle(height: 0),
                   richNodes,
-                  maxLines: 4,
-                  overflow: TextOverflow.ellipsis,
+                  maxLines: widget.source == 'detail' ? 999 : 4,
+                  overflow: TextOverflow.fade,
                 ),
               ),
             ),

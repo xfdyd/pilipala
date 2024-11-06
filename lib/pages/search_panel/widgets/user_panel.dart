@@ -38,7 +38,8 @@ Widget searchUserPanel(BuildContext context, ctr, list) {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  Column(
+                  Expanded(
+                      child: Column(
                     mainAxisSize: MainAxisSize.max,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -69,9 +70,11 @@ Widget searchUserPanel(BuildContext context, ctr, list) {
                         Text(
                           i.officialVerify['desc'],
                           style: style,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                     ],
-                  )
+                  )),
                 ],
               ),
             );
