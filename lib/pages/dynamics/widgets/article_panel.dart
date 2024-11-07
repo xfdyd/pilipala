@@ -49,7 +49,7 @@ Widget articlePanel(item, context, {floor = 1}) {
           Text(
             item.modules.moduleDynamic.major.opus.summary.richTextNodes.first
                 .text,
-            maxLines: 4,
+            maxLines: 6,
             style: const TextStyle(height: 1.55),
             overflow: TextOverflow.ellipsis,
           ),

@@ -208,7 +208,7 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
               Text.rich(
                 richNodes,
                 // 被转发状态(floor=2) 隐藏
-                maxLines: source == 'detail' && floor != 2 ? 999 : 4,
+                maxLines: source == 'detail' && floor != 2 ? 999 : 6,
                 overflow: TextOverflow.fade,
               ),
             if (hasPics) ...[
@@ -238,7 +238,7 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
       );
     // 视频
     case 'DYNAMIC_TYPE_AV':
-      return videoSeasonWidget(item, context, 'archive', floor: floor);
+      return videoSeasonWidget(item, context, 'archive', source, floor: floor);
     // 文章
     case 'DYNAMIC_TYPE_ARTICLE':
       return Container(
@@ -265,7 +265,7 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
       return livePanel(item, context, floor: floor);
     // 合集
     case 'DYNAMIC_TYPE_UGC_SEASON':
-      return videoSeasonWidget(item, context, 'ugcSeason');
+      return videoSeasonWidget(item, context, 'ugcSeason', source);
     case 'DYNAMIC_TYPE_WORD':
       InlineSpan? richNodes = richNode(item, context);
       return floor == 2
@@ -298,7 +298,7 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
                   Text.rich(
                     richNodes,
                     // 被转发状态(floor=2) 隐藏
-                    maxLines: source == 'detail' && floor != 2 ? 999 : 4,
+                    maxLines: source == 'detail' && floor != 2 ? 999 : 6,
                     overflow: TextOverflow.ellipsis,
                   ),
               ],
@@ -312,9 +312,9 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
                 )
               : const SizedBox(height: 0);
     case 'DYNAMIC_TYPE_PGC':
-      return videoSeasonWidget(item, context, 'pgc', floor: floor);
+      return videoSeasonWidget(item, context, 'pgc', source, floor: floor);
     case 'DYNAMIC_TYPE_PGC_UNION':
-      return videoSeasonWidget(item, context, 'pgc', floor: floor);
+      return videoSeasonWidget(item, context, 'pgc', source, floor: floor);
     // 直播结束
     case 'DYNAMIC_TYPE_NONE':
       return Row(

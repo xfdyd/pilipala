@@ -198,7 +198,7 @@ class _ContentState extends State<Content> {
                   /// fix 默认20px高度
                   //style: const TextStyle(height: 0),
                   richNodes,
-                  maxLines: widget.source == 'detail' ? 999 : 4,
+                  maxLines: widget.source == 'detail' ? 999 : 6,
                   overflow: TextOverflow.fade,
                 ),
               ),
