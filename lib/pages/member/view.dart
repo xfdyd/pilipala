@@ -105,6 +105,19 @@ class _MemberPageState extends State<MemberPage>
                   ],
                 ),
               ),
+              PopupMenuItem(
+                onTap: () {
+                  Clipboard.setData(
+                    ClipboardData(text: _memberController.mid.toString()),
+                  );
+                  SmartDialog.showToast('已复制${_memberController.mid}至剪贴板');
+                },
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  const Icon(Icons.copy, size: 19),
+                  const SizedBox(width: 10),
+                  Text('复制UID：${_memberController.mid}')
+                ]),
+              ),
             ],
           ),
         ],
@@ -220,7 +233,7 @@ class _MemberPageState extends State<MemberPage>
               style: Theme.of(context)
                   .textTheme
                   .titleMedium!
-                  .copyWith(fontWeight: FontWeight.bold),
+                  .copyWith(fontWeight: FontWeight.bold, height: 2),
             )),
             const SizedBox(width: 2),
             if (_memberController.memberInfo.value.sex == '女')
@@ -267,22 +280,6 @@ class _MemberPageState extends State<MemberPage>
                       _memberController.memberInfo.value.vip!.label!['text'],
                 ),
             ],
-            TextButton(
-                child: Text("UID ${_memberController.mid}",
-                    style: TextStyle(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .secondary
-                          .withOpacity(0.5),
-                      fontSize: 12,
-                      // fontWeight: FontWeight.w200,
-                    )),
-                onPressed: () {
-                  Clipboard.setData(
-                    ClipboardData(text: _memberController.mid.toString()),
-                  );
-                  SmartDialog.showToast('已复制${_memberController.mid}至剪贴板');
-                }),
           ],
         ),
         if (_memberController.memberInfo.value.official != null &&
