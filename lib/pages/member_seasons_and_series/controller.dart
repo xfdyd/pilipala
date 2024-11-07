@@ -44,7 +44,7 @@ class MemberSeasonsAndSeriesController extends GetxController {
   Future onLoad() async {
     if (currentTotal >= total) return;
     pn += 1;
-    await getMemberSeasonsAndSeries('onLoad');
+    return await getMemberSeasonsAndSeries('onLoad');
   }
 
   Future onRefresh() async {
@@ -52,6 +52,6 @@ class MemberSeasonsAndSeriesController extends GetxController {
     seasonsList.clear();
     seriesList.clear();
     currentTotal = 0;
-    await getMemberSeasonsAndSeries('onRefresh');
+    return await getMemberSeasonsAndSeries('onRefresh');
   }
 }

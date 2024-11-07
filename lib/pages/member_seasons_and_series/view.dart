@@ -28,7 +28,7 @@ class _MemberSeasonsAndSeriesPageState
     super.initState();
     mid = widget.mid;
     _ctr = Get.put(MemberSeasonsAndSeriesController(mid: mid));
-    _futureBuilderFuture = _ctr.getMemberSeasonsAndSeries('init');
+    _futureBuilderFuture = _ctr.onRefresh();
   }
 
   Widget commonWidget(msg) {
