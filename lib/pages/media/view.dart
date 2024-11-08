@@ -109,6 +109,7 @@ class _MediaPageState extends State<MediaPage>
                 vertical: 20,
               ),
               child: GridView.builder(
+                padding: EdgeInsets.zero,
                 physics:
                     const NeverScrollableScrollPhysics(), // 禁用GridView自己的滚动，防止冲突
                 shrinkWrap: true,
@@ -116,7 +117,7 @@ class _MediaPageState extends State<MediaPage>
                   maxCrossAxisExtent: 400,
                   crossAxisSpacing: 0, // 网格之间的水平间距
                   mainAxisSpacing: 0, // 网格之间的垂直间距
-                  childAspectRatio: 6, // 宽高比，1表示正方形网格
+                  mainAxisExtent: 60,
                 ),
                 itemCount: mediaController.list.length,
                 itemBuilder: (context, index) {
@@ -125,8 +126,7 @@ class _MediaPageState extends State<MediaPage>
                     behavior: HitTestBehavior.translucent,
                     onTap: () => item['onTap'](),
                     child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 30, vertical: 13),
+                        padding: const EdgeInsets.symmetric(horizontal: 30),
                         child: Row(
                           // mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -152,6 +152,7 @@ class _MediaPageState extends State<MediaPage>
                 },
               ),
             ),
+            const SizedBox(height: 20),
             Obx(() => mediaController.userLogin.value
                 ? favFolder(mediaController, context)
                 : const SizedBox(height: 0))
