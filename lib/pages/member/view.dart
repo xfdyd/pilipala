@@ -12,6 +12,7 @@ import '../member_archive/view.dart';
 import '../member_dynamics/view.dart';
 import '../member_seasons_and_series/view.dart';
 import 'widgets/profile.dart';
+import 'package:PiliPalaX/common/widgets/spring_physics.dart';
 
 class MemberPage extends StatefulWidget {
   const MemberPage({super.key});
@@ -155,6 +156,7 @@ class _MemberPageState extends State<MemberPage>
           ];
         },
         body: TabBarView(
+          physics: const CustomTabBarViewScrollPhysics(),
           controller: _memberController.tabController,
           children: [
             MemberDynamicsPage(mid: mid),

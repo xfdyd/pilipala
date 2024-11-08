@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 import 'package:PiliPalaX/utils/feed_back.dart';
 import './controller.dart';
+import 'package:PiliPalaX/common/widgets/spring_physics.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -101,6 +102,7 @@ class _HomePageState extends State<HomePage>
           ],
           Expanded(
             child: TabBarView(
+              physics: const CustomTabBarViewScrollPhysics(),
               controller: _homeController.tabController,
               children: _homeController.tabsPageList,
             ),

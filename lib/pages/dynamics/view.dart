@@ -12,6 +12,7 @@ import 'package:PiliPalaX/utils/storage.dart';
 
 import 'controller.dart';
 import 'widgets/up_panel.dart';
+import 'package:PiliPalaX/common/widgets/spring_physics.dart';
 
 class DynamicsPage extends StatefulWidget {
   const DynamicsPage({super.key});
@@ -166,7 +167,7 @@ class _DynamicsPageState extends State<DynamicsPage>
           if (upPanelPosition == UpPanelPosition.leftFixed) upPanelPart(),
           Expanded(
               child: TabBarView(
-            physics: const AlwaysScrollableScrollPhysics(),
+            physics: const CustomTabBarViewScrollPhysics(),
             controller: _dynamicsController.tabController,
             children: _dynamicsController.tabsPageList,
           )),

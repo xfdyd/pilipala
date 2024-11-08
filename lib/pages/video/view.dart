@@ -26,6 +26,7 @@ import 'package:PiliPalaX/utils/storage.dart';
 
 import '../../../services/shutdown_timer_service.dart';
 import 'widgets/header_control.dart';
+import 'package:PiliPalaX/common/widgets/spring_physics.dart';
 
 class VideoDetailPage extends StatefulWidget {
   const VideoDetailPage({super.key});
@@ -640,7 +641,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                       // ),
                       Expanded(
                         child: TabBarView(
-                          physics: const BouncingScrollPhysics(),
+                          physics: const CustomTabBarViewScrollPhysics(),
                           controller: videoDetailController.tabCtr,
                           children: <Widget>[
                             CustomScrollView(
@@ -669,6 +670,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                             ),
                             Obx(
                               () => VideoReplyPanel(
+                                key: const PageStorageKey<String>('评论'),
                                 bvid: videoDetailController.bvid,
                                 oid: videoDetailController.oid.value,
                                 heroTag: heroTag,
@@ -742,7 +744,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             ),
             Expanded(
               child: TabBarView(
-                physics: const BouncingScrollPhysics(),
+                physics: const CustomTabBarViewScrollPhysics(),
                 controller: videoDetailController.tabCtr,
                 children: <Widget>[
                   CustomScrollView(
@@ -770,6 +772,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   ),
                   Obx(
                     () => VideoReplyPanel(
+                      key: const PageStorageKey<String>('评论'),
                       bvid: videoDetailController.bvid,
                       oid: videoDetailController.oid.value,
                       heroTag: heroTag,
@@ -853,6 +856,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             Expanded(
               child: Obx(
                 () => VideoReplyPanel(
+                  key: const PageStorageKey<String>('评论'),
                   bvid: videoDetailController.bvid,
                   oid: videoDetailController.oid.value,
                   heroTag: heroTag,
@@ -933,6 +937,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             Expanded(
               child: Obx(
                 () => VideoReplyPanel(
+                  key: const PageStorageKey<String>('评论'),
                   bvid: videoDetailController.bvid,
                   oid: videoDetailController.oid.value,
                   heroTag: heroTag,
@@ -941,7 +946,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             ),
             // Expanded(
             //   child: TabBarView(
-            //     physics: const BouncingScrollPhysics(),
+            //     physics: const CustomTabBarViewScrollPhysics(),
             //     controller: videoDetailController.tabCtr,
             //     children: <Widget>[
             //       CustomScrollView(
@@ -967,6 +972,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             //       ),
             //       Obx(
             //             () => VideoReplyPanel(
+            //           key: const PageStorageKey<String>('评论'),
             //           bvid: videoDetailController.bvid,
             //           oid: videoDetailController.oid.value,
             //         ),
@@ -1069,7 +1075,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               height: context.height -
                   (removeSafeArea ? 0 : MediaQuery.of(context).padding.top),
               child: TabBarView(
-                physics: const BouncingScrollPhysics(),
+                physics: const CustomTabBarViewScrollPhysics(),
                 controller: videoDetailController.tabCtr,
                 children: <Widget>[
                   if (videoDetailController.videoType == SearchType.video)
@@ -1080,6 +1086,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     ),
                   Obx(
                     () => VideoReplyPanel(
+                      key: const PageStorageKey<String>('评论'),
                       bvid: videoDetailController.bvid,
                       oid: videoDetailController.oid.value,
                       heroTag: heroTag,

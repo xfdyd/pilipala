@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:saver_gallery/saver_gallery.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:PiliPalaX/common/widgets/spring_physics.dart';
 
 import 'controller.dart';
 
@@ -466,7 +467,7 @@ class _LoginPageState extends State<LoginPage> {
             return true;
           },
           child: TabBarView(
-            physics: const AlwaysScrollableScrollPhysics(),
+            physics: const CustomTabBarViewScrollPhysics(),
             controller: _loginPageCtr.tabController,
             children: [
               tabViewOuter(loginByPassword()),

@@ -4,6 +4,8 @@ import '../../common/widgets/network_img_layer.dart';
 import '../../models/video/reply/emote.dart';
 import 'controller.dart';
 
+import 'package:PiliPalaX/common/widgets/spring_physics.dart';
+
 class EmotePanel extends StatefulWidget {
   final Function onChoose;
   const EmotePanel({super.key, required this.onChoose});
@@ -42,6 +44,7 @@ class _EmotePanelState extends State<EmotePanel>
                 children: [
                   Expanded(
                       child: TabBarView(
+                    physics: const CustomTabBarViewScrollPhysics(),
                     controller: _emotePanelController.tabController,
                     children: emotePackage.map(
                       (e) {
@@ -82,7 +85,8 @@ class _EmotePanelState extends State<EmotePanel>
                                             src: e.emote![index].url!,
                                             width: size * 38,
                                             height: size * 38,
-                                            semanticsLabel: e.emote![index].text!,
+                                            semanticsLabel:
+                                                e.emote![index].text!,
                                             type: 'emote',
                                           ),
                                   ),

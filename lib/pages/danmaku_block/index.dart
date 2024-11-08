@@ -7,6 +7,7 @@ import 'package:PiliPalaX/utils/storage.dart';
 import '../../http/danmaku_block.dart';
 import '../../models/user/danmaku_block.dart';
 import '../../plugin/pl_player/controller.dart';
+import 'package:PiliPalaX/common/widgets/spring_physics.dart';
 
 class DanmakuBlockPage extends StatefulWidget {
   const DanmakuBlockPage({super.key});
@@ -125,6 +126,7 @@ class _DanmakuBlockPageState extends State<DanmakuBlockPage> {
             ]),
       ),
       body: TabBarView(
+        physics: const CustomTabBarViewScrollPhysics(),
         controller: _danmakuBlockController.tabController,
         children: [
           for (var i = 0; i < ruleLabels.length; i++)
