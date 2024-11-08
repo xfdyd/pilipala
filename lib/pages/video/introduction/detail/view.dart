@@ -171,19 +171,19 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   }
 
   // 视频介绍
-  showIntroDetail() {
-    if (loadingStatus) {
-      return;
-    }
-    feedBack();
-    showBottomSheet(
-      context: context,
-      enableDrag: true,
-      builder: (BuildContext context) {
-        return IntroDetail(videoDetail: widget.videoDetail!);
-      },
-    );
-  }
+  // showIntroDetail() {
+  //   if (loadingStatus) {
+  //     return;
+  //   }
+  //   feedBack();
+  //   showBottomSheet(
+  //     context: context,
+  //     enableDrag: true,
+  //     builder: (BuildContext context) {
+  //       return IntroDetail(videoDetail: widget.videoDetail!);
+  //     },
+  //   );
+  // }
 
   // 用户主页
   onPushMember() {
@@ -217,6 +217,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       builder: (BuildContext context, SliverConstraints constraints) {
         bool isHorizontal = constraints.crossAxisExtent >
             constraints.viewportMainAxisExtent * 1.25;
+        bool isExpanded = isHorizontal;
         return SliverPadding(
           padding: const EdgeInsets.only(
               left: StyleString.safeSpace,
@@ -285,13 +286,25 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   Expanded(child: actionGrid(context, videoIntroController)),
                 ]
               ]),
-              const SizedBox(height: 8),
-              GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: () => showIntroDetail(),
-                child: Row(children: [
-                  Expanded(
-                      child: Text(
+              ListTileTheme(
+                key: const PageStorageKey<String>('视频信息'),
+                contentPadding: EdgeInsets.zero,
+                dense: true,
+                horizontalTitleGap: 0.0,
+                minLeadingWidth: 0,
+                minVerticalPadding: 0,
+                child: ExpansionTile(
+                  initiallyExpanded: isHorizontal,
+                  collapsedShape: const RoundedRectangleBorder(),
+                  shape: const RoundedRectangleBorder(),
+                  showTrailingIcon: false,
+                  onExpansionChanged: (bool expanded) {
+                    feedBack();
+                    setState(() {
+                      isExpanded = expanded;
+                    });
+                  },
+                  title: Text(
                     widget.videoDetail?.title ?? videoItem['title'] ?? "",
                     // !loadingStatus
                     //     ? "${widget.videoDetail?.title}"
@@ -300,97 +313,88 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
-                    maxLines: 2,
+                    maxLines: isExpanded ? 999 : 2,
                     overflow: TextOverflow.ellipsis,
-                  )),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    size: 16,
-                    color: t.colorScheme.outline,
                   ),
-                ]),
-              ),
-              Stack(
-                children: [
-                  GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: () => showIntroDetail(),
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 7, bottom: 6),
-                      child: Row(
-                        children: <Widget>[
-                          StatView(
-                            theme: 'gray',
-                            view: !loadingStatus
-                                ? widget.videoDetail?.stat?.view ?? '-'
-                                : videoItem['stat']?.view ?? '-',
-                            size: 'medium',
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 7),
+                    child: Row(
+                      children: <Widget>[
+                        StatView(
+                          theme: 'gray',
+                          view: !loadingStatus
+                              ? widget.videoDetail?.stat?.view ?? '-'
+                              : videoItem['stat']?.view ?? '-',
+                          size: 'medium',
+                        ),
+                        const SizedBox(width: 10),
+                        StatDanMu(
+                          theme: 'gray',
+                          danmu: !loadingStatus
+                              ? widget.videoDetail?.stat?.danmu ?? '-'
+                              : videoItem['stat']?.danmu ?? '-',
+                          size: 'medium',
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          Utils.dateFormat(
+                              !loadingStatus
+                                  ? widget.videoDetail?.pubdate
+                                  : videoItem['pubdate'],
+                              formatType: 'detail'),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: t.colorScheme.outline,
                           ),
+                        ),
+                        if (MineController.anonymity) ...<Widget>[
                           const SizedBox(width: 10),
-                          StatDanMu(
-                            theme: 'gray',
-                            danmu: !loadingStatus
-                                ? widget.videoDetail?.stat?.danmu ?? '-'
-                                : videoItem['stat']?.danmu ?? '-',
-                            size: 'medium',
+                          Icon(
+                            MdiIcons.incognito,
+                            size: 15,
+                            color: t.colorScheme.outline,
+                            semanticLabel: '无痕',
                           ),
-                          const SizedBox(width: 10),
-                          Text(
-                            Utils.dateFormat(
-                                !loadingStatus
-                                    ? widget.videoDetail?.pubdate
-                                    : videoItem['pubdate'],
-                                formatType: 'detail'),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: t.colorScheme.outline,
-                            ),
-                          ),
-                          if (MineController.anonymity) ...<Widget>[
-                            const SizedBox(width: 10),
-                            Icon(
-                              MdiIcons.incognito,
-                              size: 15,
-                              color: t.colorScheme.outline,
-                              semanticLabel: '无痕',
-                            ),
-                          ],
-                          const SizedBox(width: 10),
-                          if (videoIntroController.isShowOnlineTotal)
-                            Obx(
-                              () => Text(
-                                '${videoIntroController.total.value}人在看',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: t.colorScheme.outline,
-                                ),
+                        ],
+                        const SizedBox(width: 10),
+                        if (videoIntroController.isShowOnlineTotal)
+                          Obx(
+                            () => Text(
+                              '${videoIntroController.total.value}人在看',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: t.colorScheme.outline,
                               ),
                             ),
-                        ],
-                      ),
+                          ),
+                        const Spacer(),
+                        if (enableAi)
+                          Semantics(
+                              label: 'AI总结',
+                              child: GestureDetector(
+                                onTap: () async {
+                                  final res =
+                                      await videoIntroController.aiConclusion();
+                                  if (res['status']) {
+                                    showAiBottomSheet();
+                                  }
+                                },
+                                child: Image.asset('assets/images/ai.png',
+                                    height: 22),
+                              )),
+                        const SizedBox(width: 10),
+                      ],
                     ),
                   ),
-                  if (enableAi)
-                    Positioned(
-                      right: 10,
-                      top: 6,
-                      child: Semantics(
-                          label: 'AI总结',
-                          child: GestureDetector(
-                            onTap: () async {
-                              final res =
-                                  await videoIntroController.aiConclusion();
-                              if (res['status']) {
-                                showAiBottomSheet();
-                              }
-                            },
-                            child:
-                                Image.asset('assets/images/ai.png', height: 22),
-                          )),
-                    )
-                ],
+                  children: [
+                    Row(children: [
+                      if (widget.videoDetail != null)
+                        Expanded(
+                            child: IntroDetail(videoDetail: widget.videoDetail))
+                    ]),
+                  ],
+                ),
               ),
-
               Obx(
                 () => videoIntroController.queryVideoIntroData.value["status"]
                     ? const SizedBox()
@@ -406,6 +410,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                         ),
                       ),
               ),
+              const SizedBox(height: 8),
               // 点赞收藏转发 布局样式1
               // SingleChildScrollView(
               //   padding: const EdgeInsets.only(top: 7, bottom: 7),
