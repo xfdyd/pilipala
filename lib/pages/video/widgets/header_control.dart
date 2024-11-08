@@ -1154,7 +1154,7 @@ class _HeaderControlState extends State<HeaderControl> {
                               danmakuController.updateOption(updatedOption);
                             } catch (_) {}
                           },
-                          text: "海量模式",
+                          text: "允许重叠",
                           selectStatus: massiveMode,
                         ),
                         const SizedBox(width: 10),
