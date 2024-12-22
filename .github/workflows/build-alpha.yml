@@ -39,7 +39,7 @@ jobs:
           last_tag=$(git tag --sort=committerdate | tail -1)
 
           if (echo $last_tag | grep -v "+"); then
-            echo "Illegal tag!"
+            echo "Illegal tag! ($last_tag)"
             exit 1
           elif (echo $last_tag | grep -v $version_name); then
             echo "No tags for current version in the repo, please add one manually."
