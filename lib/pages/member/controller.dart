@@ -42,9 +42,9 @@ class MemberController extends GetxController with GetTickerProviderStateMixin {
     super.onInit();
     mid = mid ?? int.parse(Get.parameters['mid']!);
     userInfo = userInfoCache.get('userInfoCache');
-    ownerMid = userInfo != null ? userInfo.mid : -1;
-    face.value = Get.arguments['face'] ?? '';
-    heroTag = Get.arguments['heroTag'] ?? '';
+    ownerMid = userInfo?.mid ?? -1;
+    face.value = Get.arguments?['face'] ?? '';
+    heroTag = Get.arguments?['heroTag'] ?? '';
     tabController = TabController(length: 3, vsync: this);
     relationSearch();
   }
@@ -272,16 +272,16 @@ class MemberController extends GetxController with GetTickerProviderStateMixin {
     return res;
   }
 
-  // 跳转查看动态
-  void pushDynamicsPage() => Get.toNamed('/memberDynamics?mid=$mid');
-
-  // 跳转查看投稿
-  void pushArchivesPage() => Get.toNamed('/memberArchive?mid=$mid');
-
-  // 跳转查看专栏
-  void pushSeasonsPage() {}
-  // 跳转查看最近投币
-  void pushRecentCoinsPage() async {
-    if (recentCoinsList.isNotEmpty) {}
-  }
+  // // 跳转查看动态
+  // void pushDynamicsPage() => Get.toNamed('/memberDynamics?mid=$mid');
+  //
+  // // 跳转查看投稿
+  // void pushArchivesPage() => Get.toNamed('/memberArchive?mid=$mid');
+  //
+  // // 跳转查看专栏
+  // void pushSeasonsPage() {}
+  // // 跳转查看最近投币
+  // void pushRecentCoinsPage() async {
+  //   if (recentCoinsList.isNotEmpty) {}
+  // }
 }

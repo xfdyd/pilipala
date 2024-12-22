@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:PiliPalaX/plugin/pl_player/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -72,7 +73,6 @@ class VideoIntroController extends GetxController {
   Timer? timer;
   bool isPaused = false;
   String heroTag = '';
-  late ModelResult modelResult;
   Rx<Map<String, dynamic>> queryVideoIntroData =
       Rx<Map<String, dynamic>>({"status": true});
 
@@ -115,9 +115,7 @@ class VideoIntroController extends GetxController {
     queryVideoIntro();
 
     videoDetail.listen((value) {
-
       if ((value.pages?.length ?? 0) > 1) {
-
         final VideoDetailController videoDetailCtr =
             Get.find<VideoDetailController>(tag: heroTag);
         final cid = videoDetailCtr.cid.value;
@@ -129,17 +127,19 @@ class VideoIntroController extends GetxController {
             value.title ?? "",
             Duration(seconds: current?.duration ?? 0),
             value.pic ?? "");
-
       } else {
-
         videoPlayerServiceHandler.onVideoDetailChange(
             value.title ?? "",
             value.owner?.name ?? "",
             Duration(seconds: value.duration ?? 0),
             value.pic ?? "");
-
       }
     });
+  }
+
+  void openVideoDetail() {
+    Get.toNamed('/video?bvid=$bvid&cid=${lastPlayCid.value}&resume=true',
+        arguments: {'heroTag': heroTag});
   }
 
   // 获取视频简介&分p
@@ -551,13 +551,10 @@ class VideoIntroController extends GetxController {
     final int currentIndex =
         episodes.indexWhere((e) => e.cid == lastPlayCid.value);
     int prevIndex = currentIndex - 1;
-    final VideoDetailController videoDetailCtr =
-        Get.find<VideoDetailController>(tag: heroTag);
-    final PlayRepeat platRepeat = videoDetailCtr.plPlayerController!.playRepeat;
-
+    PlayRepeat playRepeat = PlPlayerController.getInstance().playRepeat;
     // 列表循环
     if (prevIndex < 0) {
-      if (platRepeat == PlayRepeat.listCycle) {
+      if (playRepeat == PlayRepeat.listCycle) {
         prevIndex = episodes.length - 1;
       } else {
         return false;
@@ -568,6 +565,32 @@ class VideoIntroController extends GetxController {
     final int rAid = isPages ? IdUtils.bv2av(bvid) : episodes[prevIndex].aid!;
     changeSeasonOrbangu(rBvid, cid, rAid);
     return true;
+  }
+
+  // 是否有下一集（必须存在分p、分集）
+  bool hasNextEpisode() {
+    final List episodes = [];
+    if (videoDetail.value.ugcSeason != null) {
+      final UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
+      final List<SectionItem> sections = ugcSeason.sections!;
+      for (int i = 0; i < sections.length; i++) {
+        final List<EpisodeItem> episodesList = sections[i].episodes!;
+        episodes.addAll(episodesList);
+      }
+    } else if (videoDetail.value.pages != null) {
+      final List<Part> pages = videoDetail.value.pages!;
+      episodes.addAll(pages);
+    }
+    if (episodes.isEmpty) {
+      return false;
+    }
+    PlayRepeat playRepeat = PlPlayerController.getInstance().playRepeat;
+    if (playRepeat == PlayRepeat.listCycle) {
+      return true;
+    }
+    final int currentIndex =
+        episodes.indexWhere((e) => e.cid == lastPlayCid.value);
+    return currentIndex < episodes.length - 1;
   }
 
   /// 列表循环或者顺序播放时，自动播放下一个
@@ -586,15 +609,7 @@ class VideoIntroController extends GetxController {
       final List<Part> pages = videoDetail.value.pages!;
       episodes.addAll(pages);
     }
-    late VideoDetailController videoDetailCtr;
-    PlayRepeat playRepeat = PlayRepeat.listCycle;
-    try {
-      videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
-      playRepeat = videoDetailCtr.plPlayerController!.playRepeat;
-    } catch (_) {
-      return false;
-    }
-
+    PlayRepeat playRepeat = PlPlayerController.getInstance().playRepeat;
     if (episodes.isEmpty) {
       if (playRepeat == PlayRepeat.autoPlayRelated) {
         return playRelated();
@@ -668,17 +683,18 @@ class VideoIntroController extends GetxController {
 
   // ai总结
   Future aiConclusion() async {
-    SmartDialog.showLoading(msg: '正在生产ai总结');
+    SmartDialog.showLoading(msg: '正在查询AI总结');
     final res = await VideoHttp.aiConclusion(
       bvid: bvid,
       cid: lastPlayCid.value,
       upMid: videoDetail.value.owner!.mid!,
     );
     SmartDialog.dismiss();
-    if (res['status']) {
-      modelResult = res['data'].modelResult;
-    } else {
-      SmartDialog.showToast("当前视频可能暂不支持AI视频总结");
+    if (!res['status']) {
+      SmartDialog.showNotify(
+          msg: "当前视频暂未生产AI视频总结",
+          notifyType: NotifyType.warning,
+          displayTime: const Duration(seconds: 1));
     }
     return res;
   }

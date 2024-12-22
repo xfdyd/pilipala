@@ -43,7 +43,8 @@ class ActionItem extends StatelessWidget {
                   // const SizedBox(height: 2),
                   Icon(
                     selectStatus ? selectIcon!.icon! : icon!.icon!,
-                    size: 18,
+                    size: 22,
+                    opticalSize: 1,
                     color: selectStatus
                         ? Theme.of(context).colorScheme.primary
                         : Theme.of(context).colorScheme.outline,

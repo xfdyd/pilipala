@@ -180,6 +180,8 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
             );
           }
           return RefreshIndicator(
+              displacement: 10.0,
+              edgeOffset: 10.0,
               onRefresh: _whisperDetailController.querySessionMsg,
               child: ListView.builder(
                 itemCount: messageList.length,

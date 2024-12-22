@@ -210,6 +210,8 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
         // actions: _detailModel != null ? appBarAction() : [],
       ),
       body: RefreshIndicator(
+        displacement: 10.0,
+        edgeOffset: 10.0,
         onRefresh: () async {
           await _dynamicDetailController.queryReplyList(reqType: 'init');
         },

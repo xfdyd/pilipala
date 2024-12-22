@@ -44,8 +44,10 @@ class _LoginPageState extends State<LoginPage> {
         const Text('使用 bilibili 官方 App 扫码登录'),
         const SizedBox(height: 20),
         Obx(() => Text('剩余有效时间: ${_loginPageCtr.qrCodeLeftTime} 秒',
-            style:
-                const TextStyle(fontFeatures: [FontFeature.tabularFigures()]))),
+            style: TextStyle(
+                fontFeatures: const [FontFeature.tabularFigures()],
+                color: Theme.of(context).colorScheme.primaryFixedDim))),
+        const SizedBox(height: 5),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -89,29 +91,57 @@ class _LoginPageState extends State<LoginPage> {
           ],
         ),
         RepaintBoundary(
-            key: globalKey,
-            child: Obx(() => QrImageView(
-                  backgroundColor: Theme.of(context).colorScheme.surface,
-                  eyeStyle: QrEyeStyle(
-                    eyeShape: QrEyeShape.square,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  dataModuleStyle: QrDataModuleStyle(
-                    dataModuleShape: QrDataModuleShape.square,
-                    color: Theme.of(context).colorScheme.secondary,
-                  ),
-                  data: _loginPageCtr.codeInfo.value['data']?['url'] ?? "",
-                  size: 200,
-                  semanticsLabel: '二维码',
-                ))),
+          key: globalKey,
+          child: Obx(() {
+            if (_loginPageCtr.codeInfo.value['data']?['url'] == null) {
+              return const SizedBox(
+                  height: 200,
+                  width: 200,
+                  child: Center(
+                      child: CircularProgressIndicator(
+                    semanticsLabel: '二维码加载中',
+                  )));
+            }
+            final theme = Theme.of(context).colorScheme;
+            final isDarkMode = theme.brightness == Brightness.dark;
+
+            final bgColor = isDarkMode ? theme.onSurface : theme.surface;
+            final dataColor = isDarkMode ? theme.onSecondary : theme.secondary;
+            final eyeColor = isDarkMode ? theme.onPrimary : theme.primary;
+
+            return QrImageView(
+              backgroundColor: bgColor,
+              eyeStyle: QrEyeStyle(
+                eyeShape: QrEyeShape.square,
+                color: eyeColor,
+              ),
+              dataModuleStyle: QrDataModuleStyle(
+                dataModuleShape: QrDataModuleShape.square,
+                color: dataColor,
+              ),
+              data: _loginPageCtr.codeInfo.value['data']!['url']!,
+              size: 200,
+              semanticsLabel: '二维码',
+            );
+          }),
+        ),
         const SizedBox(height: 10),
-        Obx(() => Text(_loginPageCtr.statusQRCode.value)),
+        Obx(() => Text(
+              _loginPageCtr.statusQRCode.value,
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.secondaryFixedDim),
+            )),
         Obx(() => GestureDetector(
               onTap: () {
                 //以外部方式打开此链接
-                launchUrlString(
-                    _loginPageCtr.codeInfo.value['data']?['url'] ?? "",
-                    mode: LaunchMode.externalApplication);
+                // launchUrlString(
+                //     _loginPageCtr.codeInfo.value['data']?['url'] ?? "",
+                //     mode: LaunchMode.externalApplication);
+                // 复制到剪贴板
+                Clipboard.setData(ClipboardData(
+                    text: _loginPageCtr.codeInfo.value['data']?['url'] ?? ""));
+                SmartDialog.showToast('已复制到剪贴板，可粘贴至已登录的app私信处发送，然后点击已发送的链接打开',
+                    displayTime: const Duration(seconds: 5));
               },
               child: Padding(
                 padding:
@@ -254,7 +284,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
         OutlinedButton.icon(
           onPressed: _loginPageCtr.loginByPassword,
-          icon: const Icon(Icons.login_outlined),
+          icon: const Icon(Icons.login),
           label: const Text('登录'),
         ),
         const SizedBox(height: 20),
@@ -366,7 +396,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: TextField(
                       controller: _loginPageCtr.smsCodeTextController,
                       decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.key),
+                        prefixIcon: Icon(Icons.email),
                         border: InputBorder.none,
                         labelText: '验证码',
                       ),
@@ -391,7 +421,7 @@ class _LoginPageState extends State<LoginPage> {
         const SizedBox(height: 20),
         OutlinedButton.icon(
           onPressed: _loginPageCtr.loginBySmsCode,
-          icon: const Icon(Icons.login_outlined),
+          icon: const Icon(Icons.login),
           label: const Text('登录'),
         ),
         const SizedBox(height: 20),
@@ -430,17 +460,23 @@ class _LoginPageState extends State<LoginPage> {
                 dividerHeight: 0,
                 tabs: const [
                   Tab(
-                      child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [Icon(Icons.lock), Text(' 密码')])),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [Icon(Icons.lock), Text(' 密码')],
+                    ),
+                  ),
                   Tab(
-                      child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [Icon(Icons.key), Text(' 短信')])),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [Icon(Icons.email), Text(' 短信')],
+                    ),
+                  ),
                   Tab(
-                      child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [Icon(Icons.qr_code), Text(' 扫码')])),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [Icon(Icons.qr_code), Text(' 扫码')],
+                    ),
+                  ),
                 ],
                 controller: _loginPageCtr.tabController,
               ))
@@ -450,7 +486,7 @@ class _LoginPageState extends State<LoginPage> {
               ? TabBar(
                   tabs: const [
                     Tab(icon: Icon(Icons.lock), text: '密码'),
-                    Tab(icon: Icon(Icons.key), text: '短信'),
+                    Tab(icon: Icon(Icons.email), text: '短信'),
                     Tab(icon: Icon(Icons.qr_code), text: '扫码'),
                   ],
                   controller: _loginPageCtr.tabController,

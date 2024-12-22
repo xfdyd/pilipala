@@ -56,7 +56,7 @@ flutter --version
 Android相关版本：
 > JDK: 21.0.4
 > gradle: 8.10.2
-> kotlin: 1.9.22
+> kotlin: 2.0.20
 > minSdk: 21
 > targetSdk: 34
 > compileSdk: 34

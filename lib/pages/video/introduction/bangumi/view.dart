@@ -16,6 +16,7 @@ import 'package:PiliPalaX/pages/video/introduction/widgets/fav_panel.dart';
 import 'package:PiliPalaX/utils/feed_back.dart';
 
 import 'package:PiliPalaX/utils/utils.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'controller.dart';
 import '../widgets/bangumi_intro_detail.dart';
 
@@ -381,8 +382,8 @@ class _BangumiInfoState extends State<BangumiInfo> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
                 Obx(() => ActionItem(
-                      icon: const Icon(FontAwesomeIcons.thumbsUp),
-                      selectIcon: const Icon(FontAwesomeIcons.solidThumbsUp),
+                  icon: const Icon(Icons.thumb_up_outlined),
+                  selectIcon: const Icon(Icons.thumb_up),
                       onTap:
                           handleState(bangumiIntroController.actionLikeVideo),
                       selectStatus: bangumiIntroController.hasLike.value,
@@ -395,8 +396,8 @@ class _BangumiInfoState extends State<BangumiInfo> {
                     )),
                 Obx(
                   () => ActionItem(
-                      icon: const Icon(FontAwesomeIcons.b),
-                      selectIcon: const Icon(FontAwesomeIcons.b),
+                      icon: const Icon(Icons.offline_bolt_outlined),
+                      selectIcon: const Icon(Icons.offline_bolt),
                       onTap:
                           handleState(bangumiIntroController.actionCoinVideo),
                       selectStatus: bangumiIntroController.hasCoin.value,
@@ -409,8 +410,8 @@ class _BangumiInfoState extends State<BangumiInfo> {
                 ),
                 Obx(
                   () => ActionItem(
-                      icon: const Icon(FontAwesomeIcons.star),
-                      selectIcon: const Icon(FontAwesomeIcons.solidStar),
+                      icon: Icon(MdiIcons.starPlusOutline),
+                      selectIcon: Icon(MdiIcons.star),
                       onTap: () => showFavBottomSheet(),
                       selectStatus: bangumiIntroController.hasFav.value,
                       loadingStatus: false,
@@ -421,8 +422,8 @@ class _BangumiInfoState extends State<BangumiInfo> {
                           : Utils.numFormat(bangumiItem!.stat!['favorite']!)),
                 ),
                 ActionItem(
-                  icon: const Icon(FontAwesomeIcons.comment),
-                  selectIcon: const Icon(FontAwesomeIcons.reply),
+                  icon: Icon(MdiIcons.chatOutline),
+                  selectIcon: Icon(MdiIcons.reply),
                   onTap: () => videoDetailCtr.tabCtr.animateTo(1),
                   selectStatus: false,
                   loadingStatus: false,
@@ -432,7 +433,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
                       : Utils.numFormat(bangumiItem!.stat!['reply']!),
                 ),
                 ActionItem(
-                    icon: const Icon(FontAwesomeIcons.shareFromSquare),
+                    icon: const Icon(Icons.share_outlined),
                     onTap: () => bangumiIntroController.actionShareVideo(),
                     selectStatus: false,
                     loadingStatus: false,

@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:PiliPalaX/services/service_locator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_floating/floating/manager/floating_manager.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 import 'package:PiliPalaX/plugin/pl_player/index.dart';
@@ -29,7 +31,8 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
     super.initState();
     videoSourceInit();
     _futureBuilderFuture = _liveRoomController.queryLiveInfo();
-    plPlayerController!.autoEnterFullscreen();
+    plPlayerController!.autoEnterFullScreen();
+    floatingManager.closeFloating(globalId);
   }
 
   Future<void> videoSourceInit() async {

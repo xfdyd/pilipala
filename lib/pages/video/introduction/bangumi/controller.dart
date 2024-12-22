@@ -1,3 +1,4 @@
+import 'package:PiliPalaX/plugin/pl_player/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -27,6 +28,7 @@ class BangumiIntroController extends GetxController {
   var epId = Get.parameters['epId'] != null
       ? int.tryParse(Get.parameters['epId']!)
       : null;
+  String heroTag = Get.arguments['heroTag'];
 
   // 是否预渲染 骨架屏
   bool preRender = false;
@@ -61,6 +63,9 @@ class BangumiIntroController extends GetxController {
   // 关注状态 默认未关注
   RxMap followStatus = {}.obs;
   int _tempThemeValue = -1;
+  RxInt lastPlayCid = Get.parameters['cid'] != null
+      ? int.tryParse(Get.parameters['cid']!)!.obs
+      : 0.obs;
   var userInfo;
 
   @override
@@ -91,7 +96,7 @@ class BangumiIntroController extends GetxController {
     userLogin = userInfo != null;
     bangumiDetail.listen((value) {
       final VideoDetailController videoDetailCtr =
-          Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
+          Get.find<VideoDetailController>(tag: heroTag);
       final cid = videoDetailCtr.cid.value;
       final current =
           value.episodes?.firstWhere((element) => element.cid == cid);
@@ -103,6 +108,11 @@ class BangumiIntroController extends GetxController {
         value.cover ?? "",
       );
     });
+  }
+
+  void openVideoDetail() {
+    Get.toNamed(
+        '/video?bvid=$bvid&cid=${lastPlayCid.value}&seasonId=$seasonId&epId=$epId&resume=true');
   }
 
   // 获取番剧简介&选集
@@ -296,18 +306,19 @@ class BangumiIntroController extends GetxController {
   Future changeSeasonOrbangu(bvid, cid, aid) async {
     // 重新获取视频资源
     VideoDetailController videoDetailCtr =
-        Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
+        Get.find<VideoDetailController>(tag: heroTag);
     videoDetailCtr.bvid = bvid;
     videoDetailCtr.cid.value = cid;
     videoDetailCtr.danmakuCid.value = cid;
     videoDetailCtr.queryVideoUrl();
+    lastPlayCid.value = cid;
     // 触发媒体通知更新
     bangumiDetail.refresh();
     // 重新请求评论
     try {
       /// 未渲染回复组件时可能异常
       VideoReplyController videoReplyCtr =
-          Get.find<VideoReplyController>(tag: Get.arguments['heroTag']);
+          Get.find<VideoReplyController>(tag: heroTag);
       videoReplyCtr.aid = aid;
       videoReplyCtr.queryReplyList(type: 'init');
     } catch (_) {}
@@ -341,14 +352,11 @@ class BangumiIntroController extends GetxController {
     if (bangumiDetail.value.episodes != null) {
       episodes = bangumiDetail.value.episodes!;
     }
-    VideoDetailController videoDetailCtr =
-        Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
-    int currentIndex =
-        episodes.indexWhere((e) => e.cid == videoDetailCtr.cid.value);
+    int currentIndex = episodes.indexWhere((e) => e.cid == lastPlayCid.value);
     int prevIndex = currentIndex - 1;
-    PlayRepeat platRepeat = videoDetailCtr.plPlayerController!.playRepeat;
+    PlayRepeat playRepeat = PlPlayerController.getInstance().playRepeat;
     if (prevIndex < 0) {
-      if (platRepeat == PlayRepeat.listCycle) {
+      if (playRepeat == PlayRepeat.listCycle) {
         prevIndex = episodes.length - 1;
       } else {
         return false;
@@ -361,28 +369,39 @@ class BangumiIntroController extends GetxController {
     return true;
   }
 
+  bool hasNextEpisode() {
+    late List episodes;
+    if (bangumiDetail.value.episodes == null) {
+      return false;
+    }
+    episodes = bangumiDetail.value.episodes!;
+    PlayRepeat playRepeat = PlPlayerController.getInstance().playRepeat;
+    if (playRepeat == PlayRepeat.listCycle) {
+      return true;
+    }
+    int currentIndex = episodes.indexWhere((e) => e.cid == lastPlayCid.value);
+    return currentIndex < episodes.length - 1;
+  }
+
   /// 列表循环或者顺序播放时，自动播放下一个；自动连播时，播放相关视频
   bool nextPlay() {
     late List episodes;
-    VideoDetailController videoDetailCtr =
-        Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
-    PlayRepeat platRepeat = videoDetailCtr.plPlayerController!.playRepeat;
+    PlayRepeat playRepeat = PlPlayerController.getInstance().playRepeat;
 
     if (bangumiDetail.value.episodes != null) {
       episodes = bangumiDetail.value.episodes!;
     } else {
-      if (platRepeat == PlayRepeat.autoPlayRelated) {
+      if (playRepeat == PlayRepeat.autoPlayRelated) {
         return playRelated();
       }
     }
-    int currentIndex =
-        episodes.indexWhere((e) => e.cid == videoDetailCtr.cid.value);
+    int currentIndex = episodes.indexWhere((e) => e.cid == lastPlayCid.value);
     int nextIndex = currentIndex + 1;
     // 列表循环
     if (nextIndex == episodes.length - 1) {
-      if (platRepeat == PlayRepeat.listCycle) {
+      if (playRepeat == PlayRepeat.listCycle) {
         nextIndex = 0;
-      } else if (platRepeat == PlayRepeat.autoPlayRelated) {
+      } else if (playRepeat == PlayRepeat.autoPlayRelated) {
         return playRelated();
       } else {
         return false;

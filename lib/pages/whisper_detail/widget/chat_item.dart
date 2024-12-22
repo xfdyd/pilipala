@@ -365,6 +365,72 @@ class ChatItem extends StatelessWidget {
                   ],
                 ],
               ));
+        case MsgType.article_card:
+          return GestureDetector(
+            onTap: () async {
+              Get.toNamed('/htmlRender', parameters: {
+                'url': "https://www.bilibili.com/read/cv${content['rid']}/",
+                // 'url': url.startsWith('//') ? url.split('//').last : url,
+                'title': content['title'] ?? "",
+                'id': "cv${content['rid']}",
+                'dynamicType': "read" //content['template_id'] ?? "",
+              });
+              return;
+              try {
+                SmartDialog.showLoading();
+                var bvid = content["bvid"];
+                final int cid = await SearchHttp.ab2c(bvid: bvid);
+                final String heroTag = Utils.makeHeroTag(bvid);
+                SmartDialog.dismiss<dynamic>().then(
+                  (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
+                      arguments: <String, String?>{
+                        'pic': content['cover'],
+                        'heroTag': heroTag,
+                      }),
+                );
+              } catch (err) {
+                SmartDialog.dismiss();
+                SmartDialog.showToast(err.toString());
+              }
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    for (var i in content['image_urls'])
+                      NetworkImgLayer(
+                        width: 130,
+                        height: 130 * 9 / 16,
+                        src: i,
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                SelectableText(
+                  content['title'] ?? "",
+                  style: TextStyle(
+                    letterSpacing: 0.6,
+                    height: 1.5,
+                    color: textColor(context),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 1),
+                SelectableText(
+                  content['summary'] ?? "",
+                  style: TextStyle(
+                    letterSpacing: 0.6,
+                    height: 1.5,
+                    color: textColor(context).withOpacity(0.6),
+                    fontSize: 12,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  maxLines: 2,
+                ),
+              ],
+            ),
+          );
         default:
           return Text(
             content != null && content != ''

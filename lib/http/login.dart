@@ -107,7 +107,7 @@ class LoginHttp {
     int timestamp = DateTime.now().millisecondsSinceEpoch;
     var data = {
       'appkey': Constants.appKey,
-      'build': '1462100',
+      'build': '2001100',
       'buvid': buvid,
       'c_locale': 'zh_CN',
       'channel': 'yingyongbao',
@@ -160,7 +160,7 @@ class LoginHttp {
   //   dynamic publicKey = RSAKeyParser().parse(key);
   //   var params = {
   //     'appkey': Constants.appKey,
-  //     'build': '1462100',
+  //     'build': '2001100',
   //     'buvid': buvid,
   //     'c_locale': 'zh_CN',
   //     'channel': 'yingyongbao',
@@ -214,7 +214,7 @@ class LoginHttp {
     Map<String, dynamic> data = {
       'appkey': Constants.appKey,
       'bili_local_id': deviceId,
-      'build': '1462100',
+      'build': '2001100',
       'buvid': buvid,
       'c_locale': 'zh_CN',
       'channel': 'yingyongbao',
@@ -291,7 +291,7 @@ class LoginHttp {
     Map<String, dynamic> data = {
       'appkey': Constants.appKey,
       'bili_local_id': deviceId,
-      'build': '1462100',
+      'build': '2001100',
       'buvid': buvid,
       'c_locale': 'zh_CN',
       'captcha_key': captchaKey,
@@ -390,20 +390,20 @@ class LoginHttp {
   static Future safeCenterSmsCode({
     String? smsType,
     required String tmpCode,
-    required String geeChallenge,
-    required String geeSeccode,
-    required String geeValidate,
-    required String recaptchaToken,
+    String? geeChallenge,
+    String? geeSeccode,
+    String? geeValidate,
+    String? recaptchaToken,
     required String refererUrl,
   }) async {
     Map<String, dynamic> data = {
       'disable_rcmd': '0',
       'sms_type': smsType ?? 'loginTelCheck',
       'tmp_code': tmpCode,
-      'gee_challenge': geeChallenge,
-      'gee_seccode': geeSeccode,
-      'gee_validate': geeValidate,
-      'recaptcha_token': recaptchaToken,
+      if (geeChallenge != null) 'gee_challenge': geeChallenge,
+      if (geeSeccode != null) 'gee_seccode': geeSeccode,
+      if (geeValidate != null) 'gee_validate': geeValidate,
+      if (recaptchaToken != null) 'recaptcha_token': recaptchaToken,
     };
     String sign = Utils.appSign(
       data,
@@ -411,6 +411,7 @@ class LoginHttp {
       Constants.appSec,
     );
     data['sign'] = sign;
+    print(data);
     var res = await Request().post(
       Api.safeCenterSmsCode,
       data: data,
@@ -483,7 +484,7 @@ class LoginHttp {
   }) async {
     Map<String, dynamic> data = {
       'appkey': Constants.appKey,
-      'build': '1462100',
+      'build': '2001100',
       'buvid': buvid,
       // 'c_locale': 'zh_CN',
       // 'channel': 'yingyongbao',

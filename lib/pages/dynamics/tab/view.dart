@@ -82,6 +82,8 @@ class _DynamicsTabPageState extends State<DynamicsTabPage>
     super.build(context);
     // print(widget.dynamicsType + widget.mid.value.toString());
     return RefreshIndicator(
+        displacement: 10.0,
+        edgeOffset: 10.0,
         // key:
         //     ValueKey<String>(widget.dynamicsType + widget.mid.value.toString()),
         onRefresh: () async {

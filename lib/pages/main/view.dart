@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:PiliPalaX/models/common/side_bar_position.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -29,7 +30,8 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   int? _lastSelectTime; //上次点击时间
   Box setting = GStorage.setting;
   late bool enableMYBar;
-  late bool useSideBar;
+  // late bool useSideBar;
+  late SideBarPosition sideBarPosition;
   late bool enableGradientBg;
 
   @override
@@ -39,7 +41,10 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     _mainController.pageController =
         PageController(initialPage: _mainController.selectedIndex);
     enableMYBar = setting.get(SettingBoxKey.enableMYBar, defaultValue: true);
-    useSideBar = setting.get(SettingBoxKey.useSideBar, defaultValue: false);
+    // useSideBar = setting.get(SettingBoxKey.useSideBar, defaultValue: false);
+    sideBarPosition = SideBarPositionCode.fromCode(setting.get(
+        SettingBoxKey.sideBarPosition,
+        defaultValue: SideBarPosition.none.code))!;
     enableGradientBg =
         setting.get(SettingBoxKey.enableGradientBg, defaultValue: true);
   }
@@ -101,13 +106,128 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() async {
-    await GStorage.close();
-    EventBus().off(EventName.loginEvent);
+    // await GStorage.close();
+    // EventBus().off(EventName.loginEvent);
     super.dispose();
   }
 
+  Widget sideBar() => SizedBox(
+        width: context.width * 0.0387 +
+            36.801 +
+            MediaQuery.of(context).padding.left,
+        child: NavigationRail(
+          groupAlignment: 1,
+          minWidth: context.width * 0.0286 + 28.56,
+          backgroundColor: Colors.transparent,
+          selectedIndex: _mainController.selectedIndex,
+          onDestinationSelected: (value) => setIndex(value),
+          labelType: NavigationRailLabelType.none,
+          leading: UserAndSearchVertical(ctr: _homeController),
+          destinations: _mainController.navigationBars
+              .map(
+                (e) => NavigationRailDestination(
+                  icon: Badge(
+                    label: _mainController.dynamicBadgeType ==
+                            DynamicBadgeMode.number
+                        ? Text(e['count'].toString())
+                        : null,
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    isLabelVisible: _mainController.dynamicBadgeType !=
+                            DynamicBadgeMode.hidden &&
+                        e['count'] > 0,
+                    child: e['icon'],
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    textColor: Theme.of(context).colorScheme.onInverseSurface,
+                  ),
+                  selectedIcon: e['selectIcon'],
+                  label: Text(e['label']),
+                  padding:
+                      EdgeInsets.symmetric(vertical: 0.01 * context.height),
+                ),
+              )
+              .toList(),
+          trailing: SizedBox(height: 0.1 * context.height),
+        ),
+      );
+
+  Widget verticalDivider() => VerticalDivider(
+        width: 1,
+        indent: MediaQuery.of(context).padding.top,
+        endIndent: MediaQuery.of(context).padding.bottom,
+        color: Theme.of(context).colorScheme.outline.withOpacity(0.06),
+      );
+
+  Widget navigationBar() => NavigationBar(
+        // backgroundColor: Theme.of(context)
+        //     .colorScheme
+        //     .onInverseSurface,
+        onDestinationSelected: (value) => setIndex(value),
+        selectedIndex: _mainController.selectedIndex,
+        destinations: _mainController.navigationBars.map((e) {
+          return NavigationDestination(
+            icon: Badge(
+              label: _mainController.dynamicBadgeType == DynamicBadgeMode.number
+                  ? Text(e['count'].toString())
+                  : null,
+              padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
+              isLabelVisible:
+                  _mainController.dynamicBadgeType != DynamicBadgeMode.hidden &&
+                      e['count'] > 0,
+              child: e['icon'],
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              textColor: Theme.of(context).colorScheme.onInverseSurface,
+            ),
+            selectedIcon: e['selectIcon'],
+            label: e['label'],
+          );
+        }).toList(),
+      );
+
+  Widget bottomNavigationBar() => BottomNavigationBar(
+        // backgroundColor: Theme.of(context)
+        //     .colorScheme
+        //     .onInverseSurface,
+        currentIndex: _mainController.selectedIndex,
+        onTap: (value) => setIndex(value),
+        iconSize: 16,
+        selectedFontSize: 12,
+        unselectedFontSize: 12,
+        type: BottomNavigationBarType.fixed,
+        // selectedItemColor:
+        //     Theme.of(context).colorScheme.primary, // 选中项的颜色
+        // unselectedItemColor:
+        //     Theme.of(context).colorScheme.onSurface,
+        items: _mainController.navigationBars.map((e) {
+          return BottomNavigationBarItem(
+            icon: Badge(
+              label: _mainController.dynamicBadgeType == DynamicBadgeMode.number
+                  ? Text(e['count'].toString())
+                  : null,
+              padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
+              isLabelVisible:
+                  _mainController.dynamicBadgeType != DynamicBadgeMode.hidden &&
+                      e['count'] > 0,
+              child: e['icon'],
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              textColor: Theme.of(context).colorScheme.onInverseSurface,
+            ),
+            activeIcon: e['selectIcon'],
+            label: e['label'],
+          );
+        }).toList(),
+      );
+
   @override
   Widget build(BuildContext context) {
+    bool usingLeftSideBar() =>
+        sideBarPosition == SideBarPosition.leftFixed ||
+        sideBarPosition == SideBarPosition.leftHorizontal &&
+            MediaQuery.of(context).orientation == Orientation.landscape;
+
+    bool usingRightSideBar() =>
+        sideBarPosition == SideBarPosition.rightFixed ||
+        sideBarPosition == SideBarPosition.rightHorizontal &&
+            MediaQuery.of(context).orientation == Orientation.landscape;
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (bool didPop, Object? result) async {
@@ -157,55 +277,8 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (useSideBar)
-                  SizedBox(
-                    width: context.width * 0.0387 +
-                        36.801 +
-                        MediaQuery.of(context).padding.left,
-                    child: NavigationRail(
-                      groupAlignment: 1,
-                      minWidth: context.width * 0.0286 + 28.56,
-                      backgroundColor: Colors.transparent,
-                      selectedIndex: _mainController.selectedIndex,
-                      onDestinationSelected: (value) => setIndex(value),
-                      labelType: NavigationRailLabelType.none,
-                      leading: UserAndSearchVertical(ctr: _homeController),
-                      destinations: _mainController.navigationBars
-                          .map((e) => NavigationRailDestination(
-                                icon: Badge(
-                                  label: _mainController.dynamicBadgeType ==
-                                          DynamicBadgeMode.number
-                                      ? Text(e['count'].toString())
-                                      : null,
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 4),
-                                  isLabelVisible:
-                                      _mainController.dynamicBadgeType !=
-                                              DynamicBadgeMode.hidden &&
-                                          e['count'] > 0,
-                                  child: e['icon'],
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.primary,
-                                  textColor: Theme.of(context)
-                                      .colorScheme
-                                      .onInverseSurface,
-                                ),
-                                selectedIcon: e['selectIcon'],
-                                label: Text(e['label']),
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 0.01 * context.height),
-                              ))
-                          .toList(),
-                      trailing: SizedBox(height: 0.1 * context.height),
-                    ),
-                  ),
-                VerticalDivider(
-                  width: 1,
-                  indent: MediaQuery.of(context).padding.top,
-                  endIndent: MediaQuery.of(context).padding.bottom,
-                  color:
-                      Theme.of(context).colorScheme.outline.withOpacity(0.06),
-                ),
+                if (usingLeftSideBar()) ...[sideBar(), verticalDivider()],
+                if (usingRightSideBar()) SizedBox(width: context.width * 0.004),
                 Expanded(
                   child: PageView(
                     physics: const NeverScrollableScrollPhysics(),
@@ -217,11 +290,12 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                     children: _mainController.pages,
                   ),
                 ),
-                if (useSideBar) SizedBox(width: context.width * 0.004),
+                if (usingLeftSideBar()) SizedBox(width: context.width * 0.004),
+                if (usingRightSideBar()) ...[sideBar(), verticalDivider()],
               ],
             )
           ]),
-          bottomNavigationBar: useSideBar
+          bottomNavigationBar: usingLeftSideBar() || usingRightSideBar()
               ? null
               : StreamBuilder(
                   stream: _mainController.hideTabBar
@@ -233,78 +307,8 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                       curve: Curves.easeInOutCubicEmphasized,
                       duration: const Duration(milliseconds: 500),
                       offset: Offset(0, snapshot.data ? 0 : 1),
-                      child: enableMYBar
-                          ? NavigationBar(
-                              backgroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .onInverseSurface,
-                              onDestinationSelected: (value) => setIndex(value),
-                              selectedIndex: _mainController.selectedIndex,
-                              destinations:
-                                  _mainController.navigationBars.map((e) {
-                                return NavigationDestination(
-                                  icon: Badge(
-                                    label: _mainController.dynamicBadgeType ==
-                                            DynamicBadgeMode.number
-                                        ? Text(e['count'].toString())
-                                        : null,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(6, 0, 6, 0),
-                                    isLabelVisible:
-                                        _mainController.dynamicBadgeType !=
-                                                DynamicBadgeMode.hidden &&
-                                            e['count'] > 0,
-                                    child: e['icon'],
-                                    backgroundColor:
-                                        Theme.of(context).colorScheme.primary,
-                                    textColor: Theme.of(context)
-                                        .colorScheme
-                                        .onInverseSurface,
-                                  ),
-                                  selectedIcon: e['selectIcon'],
-                                  label: e['label'],
-                                );
-                              }).toList(),
-                            )
-                          : BottomNavigationBar(
-                              backgroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .onInverseSurface,
-                              currentIndex: _mainController.selectedIndex,
-                              onTap: (value) => setIndex(value),
-                              iconSize: 16,
-                              selectedFontSize: 12,
-                              unselectedFontSize: 12,
-                              type: BottomNavigationBarType.fixed,
-                              // selectedItemColor:
-                              //     Theme.of(context).colorScheme.primary, // 选中项的颜色
-                              // unselectedItemColor:
-                              //     Theme.of(context).colorScheme.onSurface,
-                              items: _mainController.navigationBars.map((e) {
-                                return BottomNavigationBarItem(
-                                  icon: Badge(
-                                    label: _mainController.dynamicBadgeType ==
-                                            DynamicBadgeMode.number
-                                        ? Text(e['count'].toString())
-                                        : null,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(6, 0, 6, 0),
-                                    isLabelVisible:
-                                        _mainController.dynamicBadgeType !=
-                                                DynamicBadgeMode.hidden &&
-                                            e['count'] > 0,
-                                    child: e['icon'],
-                                    backgroundColor:
-                                        Theme.of(context).colorScheme.primary,
-                                    textColor: Theme.of(context)
-                                        .colorScheme
-                                        .onInverseSurface,
-                                  ),
-                                  activeIcon: e['selectIcon'],
-                                  label: e['label'],
-                                );
-                              }).toList(),
-                            ),
+                      child:
+                          enableMYBar ? navigationBar() : bottomNavigationBar(),
                     );
                   },
                 ),

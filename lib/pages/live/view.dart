@@ -81,6 +81,8 @@ class _LivePageState extends State<LivePage>
         borderRadius: BorderRadius.all(StyleString.imgRadius),
       ),
       child: RefreshIndicator(
+        displacement: 10.0,
+        edgeOffset: 10.0,
         onRefresh: () async {
           return await _liveController.onRefresh();
         },

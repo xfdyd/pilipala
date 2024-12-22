@@ -173,6 +173,8 @@ class _HistoryPageState extends State<HistoryPage> {
         ),
       ),
       body: RefreshIndicator(
+        displacement: 10.0,
+        edgeOffset: 10.0,
         onRefresh: () async {
           await _historyController.onRefresh();
           return;

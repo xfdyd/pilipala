@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:PiliPalaX/models/common/side_bar_position.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -59,7 +60,12 @@ class _HomePageState extends State<HomePage>
       ),
       body: Column(
         children: [
-          if (!_homeController.useSideBar)
+          if (_homeController.sideBarPosition == SideBarPosition.none ||
+              ((_homeController.sideBarPosition ==
+                          SideBarPosition.leftHorizontal ||
+                      _homeController.sideBarPosition ==
+                          SideBarPosition.rightHorizontal) &&
+                  MediaQuery.of(context).orientation == Orientation.portrait))
             CustomAppBar(
               stream: _homeController.hideSearchBar
                   ? stream

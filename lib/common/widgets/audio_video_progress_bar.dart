@@ -5,6 +5,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+import '../../utils/utils.dart';
+
 /// This is where the current time and total time labels should appear in
 /// relation to the progress bar.
 enum TimeLabelLocation {
@@ -1102,7 +1104,9 @@ class _RenderProgressBar extends RenderBox {
     // description
     config.textDirection = TextDirection.ltr;
     config.label = '进度条'; //'Progress bar';
-    config.value = '${(_thumbValue * 100).round()}%';
+    config.value = '${(_thumbValue * 100).round()}%，'
+        '已播放${Utils.durationReadFormat(Utils.timeFormat(progress.inSeconds))}，'
+        '共${Utils.durationReadFormat(Utils.timeFormat(total.inSeconds))}';
 
     // increase action
     config.onIncrease = increaseAction;

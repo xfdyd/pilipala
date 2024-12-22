@@ -79,7 +79,7 @@ class VideoHttp {
               '')
           : '',
       'appkey': Constants.appKey,
-      'build': '1462100',
+      'build': '2001100',
       'c_locale': 'zh_CN',
       'channel': 'yingyongbao',
       'column': '4',
@@ -793,6 +793,32 @@ class VideoHttp {
       }
     } catch (err) {
       return {'status': false, 'data': [], 'msg': err};
+    }
+  }
+
+  // 视频分区
+  static Future getRegionVideoList(int tid, int pn, int ps) async {
+    var res = await Request().get(Api.getRegionApi, data: {
+      'rid': tid,
+      'pn': pn,
+      'ps': ps,
+    });
+    print("getRegionVideoList: $res");
+    if (res.data['code'] == 0) {
+      List<HotVideoItemModel> list = [];
+      List<int> blackMidsList = localCache
+          .get(LocalCacheKey.blackMidsList, defaultValue: [-1])
+          .map<int>((e) => e as int)
+          .toList();
+      print(res.data['data']['archives']);
+      for (var i in res.data['data']['archives']) {
+        if (!blackMidsList.contains(i['owner']['mid'])) {
+          list.add(HotVideoItemModel.fromJson(i));
+        }
+      }
+      return {'status': true, 'data': list};
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 }

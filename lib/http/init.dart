@@ -11,6 +11,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 // import 'package:dio_http2_adapter/dio_http2_adapter.dart';
 import 'package:hive/hive.dart';
 import 'package:PiliPalaX/utils/id_utils.dart';
+import '../utils/login.dart';
 import '../utils/storage.dart';
 import '../utils/utils.dart';
 import 'api.dart';
@@ -79,6 +80,23 @@ class Request {
       token = cookies.firstWhere((e) => e.name == 'bili_jct').value;
     }
     return token;
+  }
+
+  static Future<String> getBUVID() async {
+    List<Cookie> cookies = await cookieManager.cookieJar
+        .loadForRequest(Uri.parse(HttpString.apiBaseUrl));
+    // String token = '';
+    print("cookies $cookies");
+    if (cookies.where((e) => e.name == 'Buvid').isNotEmpty) {
+      return cookies.firstWhere((e) => e.name == 'Buvid').value;
+    }
+    return LoginUtils.buvid();
+  }
+
+  static String getRandomSessionId() {
+    // 返回8位随机16进制数
+    return List.generate(8, (index) => Random().nextInt(16).toRadixString(16))
+        .join();
   }
 
   static setOptionsHeaders(userInfo, bool status) {

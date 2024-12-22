@@ -53,7 +53,7 @@ class _DynamicsPageState extends State<DynamicsPage>
         });
       }
     });
-    upPanelPosition = UpPanelPosition.values[setting.get(
+    upPanelPosition = UpPanelPosition.values[GStorage.setting.get(
         SettingBoxKey.upPanelPosition,
         defaultValue: UpPanelPosition.leftFixed.code)];
     print('upPanelPosition: $upPanelPosition');

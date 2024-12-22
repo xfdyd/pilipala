@@ -74,6 +74,8 @@ class _BangumiPageState extends State<BangumiPage>
   Widget build(BuildContext context) {
     super.build(context);
     return RefreshIndicator(
+      displacement: 10.0,
+      edgeOffset: 10.0,
       onRefresh: () async {
         await _bangumiController.queryBangumiListFeed();
         return _bangumiController.queryBangumiFollow();

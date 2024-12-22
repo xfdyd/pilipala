@@ -16,13 +16,5 @@ extension PlayRepeatExtension on PlayRepeat {
   ];
   String get description => _descList[index];
 
-  static final List<double> _valueList = [
-    1,
-    2,
-    3,
-    4,
-    5,
-  ];
-  double get value => _valueList[index];
-  double get defaultValue => _valueList[1];
+  int get value => index + 1; //兼容历史配置
 }

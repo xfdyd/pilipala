@@ -47,16 +47,21 @@ class VideoCustomActions {
         }
         if (videoItem is RecVideoItemAppModel) {
           RecVideoItemAppModel v = videoItem as RecVideoItemAppModel;
-          ThreePoint? tp = v.threePoint;
-          if (tp == null) {
-            SmartDialog.showToast("未能获取threePoint");
+          // ThreePoint? tp = v.threePoint;
+          // if (tp == null) {
+          //   SmartDialog.showToast("未能获取threePoint");
+          //   return;
+          // }
+          // if (tp.dislikeReasons == null && tp.feedbacks == null) {
+          //   SmartDialog.showToast("未能获取dislikeReasons或feedbacks");
+          //   return;
+          // }
+          if (v.dislikeReasons == null) {
+            SmartDialog.showToast("未能获取dislikeReasons");
             return;
           }
-          if (tp.dislikeReasons == null && tp.feedbacks == null) {
-            SmartDialog.showToast("未能获取dislikeReasons或feedbacks");
-            return;
-          }
-          Widget actionButton(DislikeReason? r, FeedbackReason? f) {
+          Widget actionButton(DislikeReason? r) {
+            //, FeedbackReason? f) {
             return ElevatedButton(
               style: ElevatedButton.styleFrom(
                 padding:
@@ -66,16 +71,17 @@ class VideoCustomActions {
                 SmartDialog.showLoading(msg: '正在提交');
                 var res = await VideoHttp.feedDislike(
                   reasonId: r?.id,
-                  feedbackId: f?.id,
+                  // feedbackId: f?.id,
                   id: v.param!,
                   goto: v.goto!,
                 );
                 SmartDialog.dismiss();
-                SmartDialog.showToast(
-                    res['status'] ? (r?.toast ?? f?.toast) : res['msg']);
+                SmartDialog.showToast(res['status'] ? (r?.toast) : res['msg']);
+                // res['status'] ? (r?.toast ?? f?.toast) : res['msg']);
                 Get.back();
               },
-              child: Text(r?.name ?? f?.name ?? '未知'),
+              child: Text(r?.name ?? '未知'),
+              // child: Text(r?.name ?? f?.name ?? '未知'),
             );
           }
 
@@ -87,32 +93,32 @@ class VideoCustomActions {
                 content: SingleChildScrollView(
                   child: Column(
                     children: [
-                      if (tp.dislikeReasons != null)
+                      if (v.dislikeReasons != null)
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 8.0),
                           child: Text('我不想看'),
                         ),
-                      if (tp.dislikeReasons != null)
+                      if (v.dislikeReasons != null)
                         Wrap(
                           spacing: 5.0,
                           runSpacing: 2.0,
-                          children: tp.dislikeReasons!.map((item) {
-                            return actionButton(item, null);
+                          children: v.dislikeReasons!.map((item) {
+                            return actionButton(item);
                           }).toList(),
                         ),
-                      if (tp.feedbacks != null)
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text('反馈'),
-                        ),
-                      if (tp.feedbacks != null)
-                        Wrap(
-                          spacing: 5.0,
-                          runSpacing: 2.0,
-                          children: tp.feedbacks!.map((item) {
-                            return actionButton(null, item);
-                          }).toList(),
-                        ),
+                      // if (tp.feedbacks != null)
+                      //   const Padding(
+                      //     padding: EdgeInsets.symmetric(vertical: 8.0),
+                      //     child: Text('反馈'),
+                      //   ),
+                      // if (tp.feedbacks != null)
+                      //   Wrap(
+                      //     spacing: 5.0,
+                      //     runSpacing: 2.0,
+                      //     children: tp.feedbacks!.map((item) {
+                      //       return actionButton(null, item);
+                      //     }).toList(),
+                      //   ),
                       //分割线
                       const Divider(),
                       ElevatedButton(

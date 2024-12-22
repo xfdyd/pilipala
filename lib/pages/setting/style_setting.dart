@@ -13,6 +13,7 @@ import 'package:PiliPalaX/utils/global_data.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 
 import '../../models/common/dynamic_badge_mode.dart';
+import '../../models/common/side_bar_position.dart';
 import '../../models/common/up_panel_position.dart';
 import '../../plugin/pl_player/utils/fullscreen.dart';
 import '../../models/common/nav_bar_config.dart';
@@ -36,6 +37,7 @@ class _StyleSettingState extends State<StyleSetting> {
   late ThemeType _tempThemeValue;
   late double maxRowWidth;
   late UpPanelPosition upPanelPosition;
+  late SideBarPosition sideBarPosition;
 
   @override
   void initState() {
@@ -47,6 +49,9 @@ class _StyleSettingState extends State<StyleSetting> {
     upPanelPosition = UpPanelPosition.values[setting.get(
         SettingBoxKey.upPanelPosition,
         defaultValue: UpPanelPosition.leftFixed.code)];
+    sideBarPosition = SideBarPositionCode.fromCode(setting.get(
+        SettingBoxKey.sideBarPosition,
+        defaultValue: SideBarPosition.none.code))!;
   }
 
   @override
@@ -82,13 +87,41 @@ class _StyleSettingState extends State<StyleSetting> {
                   SmartDialog.showToast('已关闭横屏适配');
                 }
               }),
-          const SetSwitchItem(
-            title: '改用侧边栏',
-            subTitle: '开启后底栏与顶栏被替换，且相关设置失效',
-            leading: Icon(Icons.chrome_reader_mode_outlined),
-            setKey: SettingBoxKey.useSideBar,
-            defaultVal: false,
-            needReboot: true,
+          // const SetSwitchItem(
+          //   title: '改用侧边栏',
+          //   subTitle: '开启后底栏与顶栏被替换，且相关设置失效',
+          //   leading: Icon(Icons.chrome_reader_mode_outlined),
+          //   setKey: SettingBoxKey.useSideBar,
+          //   defaultVal: false,
+          //   needReboot: true,
+          // ),
+          ListTile(
+            dense: false,
+            title: Text('主页侧栏布局', style: titleStyle),
+            leading: const Icon(Icons.chrome_reader_mode_outlined),
+            subtitle: Text(
+                '当前主页侧边栏位置：${sideBarPosition.labels}，开启后底栏与顶栏将被替换为侧栏，横屏或折叠屏推荐使用',
+                style: subTitleStyle),
+            onTap: () async {
+              SideBarPosition? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SelectDialog<SideBarPosition>(
+                    title: '侧边栏显示位置',
+                    value: sideBarPosition,
+                    values: SideBarPosition.values.map((e) {
+                      return {'title': e.labels, 'value': e};
+                    }).toList(),
+                  );
+                },
+              );
+              if (result != null) {
+                sideBarPosition = result;
+                setting.put(SettingBoxKey.sideBarPosition, result.code);
+                SmartDialog.showToast('重启生效');
+                setState(() {});
+              }
+            },
           ),
           const SetSwitchItem(
             title: 'MD3样式底栏',

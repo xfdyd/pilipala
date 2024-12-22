@@ -70,6 +70,8 @@ class _MemberSeasonsAndSeriesPageState
         return true;
       },
       child: RefreshIndicator(
+        displacement: 10.0,
+        edgeOffset: 10.0,
         onRefresh: _ctr.onRefresh,
         child: CustomScrollView(
           physics: const ClampingScrollPhysics(),

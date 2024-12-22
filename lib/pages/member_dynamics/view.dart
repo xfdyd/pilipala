@@ -61,6 +61,8 @@ class _MemberDynamicsPageState extends State<MemberDynamicsPage> {
         return true;
       },
       child: RefreshIndicator(
+        displacement: 10.0,
+        edgeOffset: 10.0,
         onRefresh: _memberDynamicController.onRefresh, // 下拉刷新时触发的异步操作
         child: CustomScrollView(
           physics: const ClampingScrollPhysics(),

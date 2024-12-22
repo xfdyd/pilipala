@@ -41,6 +41,8 @@ class _AtMePageState extends State<AtMePage> {
         title: const Text('@我的'),
       ),
       body: RefreshIndicator(
+        displacement: 10.0,
+        edgeOffset: 10.0,
         onRefresh: () async {
           await _atMeController.onRefresh();
         },

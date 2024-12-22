@@ -104,6 +104,8 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
           ),
           Expanded(
             child: RefreshIndicator(
+              displacement: 10.0,
+              edgeOffset: 10.0,
               onRefresh: () async {
                 setState(() {});
                 _videoReplyReplyController.currentPage = 0;

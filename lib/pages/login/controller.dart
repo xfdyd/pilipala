@@ -305,7 +305,6 @@ class LoginPageController extends GetxController
         SmartDialog.showToast(data['message']);
         // return;
         //{"code":0,"message":"0","ttl":1,"data":{"status":2,"message":"本次登录环境存在风险, 需使用手机号进行验证或绑定","url":"https://passport.bilibili.com/h5-app/passport/risk/verify?tmp_token=9e785433940891dfa78f033fb7928181&request_id=e5a6d6480df04097870be56c6e60f7ef&source=risk","token_info":null,"cookie_info":null,"sso":null,"is_new":false,"is_tourist":false}}
-        //todo: 后续登录流程：https://ivan.hanloth.cn/archives/530/
         String url = data['url']!;
         Uri currentUri = Uri.parse(url);
         var safeCenterRes = await LoginHttp.safeCenterGetInfo(
@@ -353,14 +352,18 @@ class LoginPageController extends GetxController
               child: const Text("发送验证码 "),
               onPressed: () async {
                 var preCaptureRes = await LoginHttp.preCapture();
-                if (!preCaptureRes['status']) {
+                if (!preCaptureRes['status'] || preCaptureRes['data'] == null) {
                   SmartDialog.showToast("获取验证码失败，请尝试其它登录方式\n"
-                      "(${preCaptureRes['code']}) ${preCaptureRes['msg']}");
+                      "(${preCaptureRes['code']}) ${preCaptureRes['msg']} ${preCaptureRes['data']}");
+                }
+                String? geeGt = preCaptureRes['data']['gee_gt'];
+                String? geeChallenge = preCaptureRes['data']['gee_challenge'];
+                captchaData.token = preCaptureRes['data']['recaptcha_token'];
+                if (!isGeeArgumentValid(geeGt, geeChallenge)) {
+                  SmartDialog.showToast("获取极验参数为空，请尝试其它登录方式\n"
+                      "(${preCaptureRes['code']}) ${preCaptureRes['msg']} ${preCaptureRes['data']}");
                   return;
                 }
-                String geeGt = preCaptureRes['data']['gee_gt']!;
-                String geeChallenge = preCaptureRes['data']['gee_challenge'];
-                captchaData.token = preCaptureRes['data']['recaptcha_token']!;
 
                 getCaptcha(geeGt, geeChallenge, () async {
                   print("captchaData");
@@ -372,9 +375,9 @@ class LoginPageController extends GetxController
                       await LoginHttp.safeCenterSmsCode(
                     tmpCode: currentUri.queryParameters['tmp_token']!,
                     geeChallenge: geeChallenge,
-                    geeSeccode: captchaData.seccode!,
-                    geeValidate: captchaData.validate!,
-                    recaptchaToken: captchaData.token!,
+                    geeSeccode: captchaData.seccode,
+                    geeValidate: captchaData.validate,
+                    recaptchaToken: captchaData.token,
                     refererUrl: url,
                   );
                   if (!safeCenterSendSmsCodeRes['status']) {
@@ -538,87 +541,111 @@ class LoginPageController extends GetxController
     //     guestId = guestIdRes['data']['guest_id'];
     //   }
     // }
-    var preCaptureRes = await LoginHttp.preCapture();
-    if (!preCaptureRes['status']) {
-      SmartDialog.showToast("获取验证码失败，请尝试其它登录方式\n"
-          "(${preCaptureRes['code']}) ${preCaptureRes['msg']}");
-      return;
-    }
-    String geeGt = preCaptureRes['data']['gee_gt']!;
-    String geeChallenge = preCaptureRes['data']['gee_challenge'];
-    captchaData.token = preCaptureRes['data']['recaptcha_token']!;
+    // var preCaptureRes = await LoginHttp.preCapture();
+    // if (!preCaptureRes['status']) {
+    //   SmartDialog.showToast("获取验证码失败，请尝试其它登录方式\n"
+    //       "(${preCaptureRes['code']}) ${preCaptureRes['msg']}");
+    //   return;
+    // }
+    // String geeGt = preCaptureRes['data']['gee_gt']!;
+    // String geeChallenge = preCaptureRes['data']['gee_challenge'];
+    // captchaData.token = preCaptureRes['data']['recaptcha_token']!;
 
-    getCaptcha(geeGt, geeChallenge, () async {
-      // print("captchaData");
-      // print(captchaData);
-      // print(currentUri.queryParameters['tmp_token']!);
-      // print(geeChallenge);
-      //
-      // var safeCenterSendSmsCodeRes =
-      // await LoginHttp.safeCenterSmsCode(
-      //   tmpCode: currentUri.queryParameters['tmp_token']!,
-      //   geeChallenge: geeChallenge,
-      //   geeSeccode: captchaData.seccode!,
-      //   geeValidate: captchaData.validate!,
-      //   recaptchaToken: captchaData.token!,
-      //   refererUrl: url,
-      // );
-      // if (!safeCenterSendSmsCodeRes['status']) {
-      //   SmartDialog.showToast("发送短信验证码失败，请尝试其它登录方式\n"
-      //       "(${safeCenterSendSmsCodeRes['code']}) ${safeCenterSendSmsCodeRes['msg']}");
-      //   return;
-      // }
-      // SmartDialog.showToast("短信验证码已发送，请查收");
-      // captchaKey = safeCenterSendSmsCodeRes['data']['captcha_key'];
+    // getCaptcha(geeGt, geeChallenge, () async {
+    // print("captchaData");
+    // print(captchaData);
+    // print(currentUri.queryParameters['tmp_token']!);
+    // print(geeChallenge);
+    //
+    // var safeCenterSendSmsCodeRes =
+    // await LoginHttp.safeCenterSmsCode(
+    //   tmpCode: currentUri.queryParameters['tmp_token']!,
+    //   geeChallenge: geeChallenge,
+    //   geeSeccode: captchaData.seccode!,
+    //   geeValidate: captchaData.validate!,
+    //   recaptchaToken: captchaData.token!,
+    //   refererUrl: url,
+    // );
+    // if (!safeCenterSendSmsCodeRes['status']) {
+    //   SmartDialog.showToast("发送短信验证码失败，请尝试其它登录方式\n"
+    //       "(${safeCenterSendSmsCodeRes['code']}) ${safeCenterSendSmsCodeRes['msg']}");
+    //   return;
+    // }
+    // SmartDialog.showToast("短信验证码已发送，请查收");
+    // captchaKey = safeCenterSendSmsCodeRes['data']['captcha_key'];
 
-      var res = await LoginHttp.sendSmsCode(
-        tel: telTextController.text,
-        cid: selectedCountryCodeId['country_id'],
-        // deviceTouristId: guestId,
-        gee_validate: captchaData.validate!,
-        gee_seccode: captchaData.seccode!,
-        gee_challenge: geeChallenge,
-        recaptcha_token: captchaData.token!,
-      );
-      print(res);
-      if (res['status']) {
-        SmartDialog.showToast('发送成功');
-        smsSendTimestamp = DateTime.now().millisecondsSinceEpoch;
-        smsSendCooldown.value = 60;
-        captchaKey = res['data']['captcha_key'];
-        smsSendCooldownTimer =
-            Timer.periodic(const Duration(seconds: 1), (timer) {
-          smsSendCooldown.value = 60 - timer.tick;
-          if (smsSendCooldown <= 0) {
-            smsSendCooldownTimer?.cancel();
-            smsSendCooldown.value = 0;
+    var res = await LoginHttp.sendSmsCode(
+      tel: telTextController.text,
+      cid: selectedCountryCodeId['country_id'],
+      // deviceTouristId: guestId,
+      gee_validate: captchaData.validate,
+      gee_seccode: captchaData.seccode,
+      gee_challenge: captchaData.geetest?.challenge,
+      recaptcha_token: captchaData.token,
+    );
+    print(res);
+    if (res['status']) {
+      SmartDialog.showToast('发送成功');
+      smsSendTimestamp = DateTime.now().millisecondsSinceEpoch;
+      smsSendCooldown.value = 60;
+      captchaKey = res['data']['captcha_key'];
+      smsSendCooldownTimer =
+          Timer.periodic(const Duration(seconds: 1), (timer) {
+        smsSendCooldown.value = 60 - timer.tick;
+        if (smsSendCooldown <= 0) {
+          smsSendCooldownTimer?.cancel();
+          smsSendCooldown.value = 0;
+        }
+      });
+    } else {
+      // handle login result
+      switch (res['code']) {
+        case 0:
+        case -105:
+          String? captureUrl = res['data']?['recaptcha_url'];
+          String? geeGt;
+          String? geeChallenge;
+          if (captureUrl != null && captureUrl.isNotEmpty) {
+            Uri captureUri = Uri.parse(captureUrl);
+            captchaData.token = captureUri.queryParameters['recaptcha_token'];
+            geeGt = captureUri.queryParameters['gee_gt'];
+            geeChallenge = captureUri.queryParameters['gee_challenge'];
           }
-        });
-      } else {
-        // handle login result
-        switch (res['code']) {
-          case 0:
-          case -105:
-            String captureUrl = res['data']?['recaptcha_url'] ?? "";
-            if (captureUrl == "") {
-              SmartDialog.showToast(
-                  '验证信息错误：${res["msg"]}\n返回内容：${res["data"]}');
+
+          if (!isGeeArgumentValid(geeGt, geeChallenge)) {
+            print('验证信息错误：${res["msg"]}\n返回内容：${res["data"]}，尝试另一个验证码接口');
+            var preCaptureRes = await LoginHttp.preCapture();
+            if (!preCaptureRes['status'] || preCaptureRes['data'] == null) {
+              SmartDialog.showToast("获取验证码失败，请尝试其它登录方式\n"
+                  "(${preCaptureRes['code']}) ${preCaptureRes['msg']} ${preCaptureRes['data']}");
               return;
             }
-            Uri captureUri = Uri.parse(captureUrl);
-            captchaData.token = captureUri.queryParameters['recaptcha_token']!;
-            String geeGt = captureUri.queryParameters['gee_gt']!;
-            String geeChallenge = captureUri.queryParameters['gee_challenge']!;
-            getCaptcha(geeGt, geeChallenge, () {
-              sendSmsCode();
-            });
-            break;
-          default:
-            SmartDialog.showToast(res['msg']);
-            // login failed
-            break;
-        }
+            geeGt = preCaptureRes['data']['gee_gt'];
+            geeChallenge = preCaptureRes['data']['gee_challenge'];
+            captchaData.token = preCaptureRes['data']['recaptcha_token'];
+          }
+
+          if (!isGeeArgumentValid(geeGt, geeChallenge)) {
+            SmartDialog.showToast("获取验证码失败，请尝试其它登录方式\n");
+            return;
+          }
+
+          getCaptcha(geeGt, geeChallenge, () {
+            sendSmsCode();
+          });
+          break;
+        default:
+          SmartDialog.showToast(res['msg']);
+          // login failed
+          break;
       }
-    });
+    }
+    // });
+  }
+
+  bool isGeeArgumentValid(String? geeGt, String? geeChallenge) {
+    return geeGt?.isNotEmpty == true &&
+        geeChallenge?.isNotEmpty == true &&
+        captchaData.token?.isNotEmpty == true;
   }
 }

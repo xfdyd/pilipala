@@ -37,7 +37,7 @@ class _MemberPageState extends State<MemberPage>
   void initState() {
     super.initState();
     mid = int.parse(Get.parameters['mid']!);
-    heroTag = Get.arguments['heroTag'] ?? Utils.makeHeroTag(mid);
+    heroTag = Get.arguments?['heroTag'] ?? Utils.makeHeroTag(mid);
     _memberController = Get.put(MemberController(), tag: heroTag);
     _futureBuilderFuture = _memberController.getInfo();
     // _memberSeasonsFuture = _memberController.getMemberSeasons();

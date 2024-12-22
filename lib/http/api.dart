@@ -223,7 +223,7 @@ class Api {
       'https://s.search.bilibili.com/main/suggest';
 
   // 分类搜索
-  static const String searchByType = '/x/web-interface/search/type';
+  static const String searchByType = '/x/web-interface/wbi/search/type';
 
   // 记录视频播放进度
   // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/report.md
@@ -613,6 +613,9 @@ class Api {
 
   /// 排行榜
   static const String getRankApi = "/x/web-interface/ranking/v2";
+
+  /// 分区视频
+  static const String getRegionApi = "/x/web-interface/dynamic/region";
 
   /// 取消订阅-合集
   static const String unfavSeason = '/x/v3/fav/season/unfav';

@@ -103,7 +103,7 @@ class _BottomControlState extends State<BottomControl> {
                   // } else {}
                 },
                 icon: const Icon(
-                  Icons.picture_in_picture_outlined,
+                  Icons.picture_in_picture_alt,
                   size: 18,
                   color: Colors.white,
                 ),

@@ -51,6 +51,8 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
         return true;
       },
       child: RefreshIndicator(
+        displacement: 10.0,
+        edgeOffset: 10.0,
         onRefresh: _memberArchivesController.onRefresh, // 下拉刷新时触发的异步操作
         child: CustomScrollView(
           physics: const ClampingScrollPhysics(),

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:PiliPalaX/plugin/pl_player/index.dart';
 import 'package:PiliPalaX/utils/storage.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 Future<VideoPlayerServiceHandler> initAudioService() async {
   return await AudioService.init(
@@ -59,11 +60,11 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
 
   Future<void> setMediaItem(MediaItem newMediaItem) async {
     if (!enableBackgroundPlay) return;
-    print("此时调用栈为：");
-    print(newMediaItem);
-    print(newMediaItem.title);
-    debugPrint(StackTrace.current.toString());
-    print(Get.currentRoute);
+    // print("此时调用栈为：");
+    // print(newMediaItem);
+    // print(newMediaItem.title);
+    // debugPrint(StackTrace.current.toString());
+    // print(Get.currentRoute);
     // if (!Get.currentRoute.startsWith('/video') && !Get.currentRoute.startsWith('/live')) {
     //   return;
     // }
@@ -72,7 +73,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
 
   Future<void> setPlaybackState(PlayerStatus status, bool isBuffering) async {
     if (!enableBackgroundPlay) return;
-
+    // print("isBuffering2: $isBuffering");
     final AudioProcessingState processingState;
     final playing = status == PlayerStatus.playing;
     if (status == PlayerStatus.disabled) {
@@ -80,20 +81,22 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     } else if (status == PlayerStatus.completed) {
       processingState = AudioProcessingState.completed;
     } else if (isBuffering) {
-      processingState = AudioProcessingState.buffering;
+      // tmp_fix: 手动播放前媒体通知无限buffer状态
+      // processingState = AudioProcessingState.buffering;
+      processingState = AudioProcessingState.ready;
     } else {
       processingState = AudioProcessingState.ready;
     }
+    print("processingState: $processingState");
 
     playbackState.add(playbackState.value.copyWith(
-      processingState:
-          isBuffering ? AudioProcessingState.buffering : processingState,
+      processingState: processingState,
       controls: [
-        MediaControl.rewind,
-        // .copyWith(androidIcon: 'drawable/ic_baseline_replay_10_24'),
+        MediaControl.rewind
+            .copyWith(androidIcon: 'drawable/ic_baseline_replay_10_24'),
         if (playing) MediaControl.pause else MediaControl.play,
-        MediaControl.fastForward,
-        // .copyWith(androidIcon: 'drawable/ic_baseline_forward_10_24'),
+        MediaControl.fastForward
+            .copyWith(androidIcon: 'drawable/ic_baseline_forward_10_24'),
       ],
       playing: playing,
       systemActions: const {
@@ -104,7 +107,11 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
 
   onStatusChange(PlayerStatus status, bool isBuffering) {
     if (!enableBackgroundPlay) return;
+    // print("此时调用栈为：");
+    // debugPrint(StackTrace.current.toString());
+    // print("isBuffering: $isBuffering");
     // if (_item.isEmpty) return;
+    // isBuffering = false;
     setPlaybackState(status, isBuffering);
   }
 
@@ -114,6 +121,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     // print('当前调用栈为：');
     // print(StackTrace.current);
     if (!PlPlayerController.instanceExists()) return;
+    print("artUri: $artUri");
     MediaItem mediaItem = MediaItem(
       id: UniqueKey().toString(),
       title: title ?? "",

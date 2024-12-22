@@ -42,6 +42,8 @@ class _LikeMePageState extends State<LikeMePage> {
         title: const Text('收到的赞'),
       ),
       body: RefreshIndicator(
+        displacement: 10.0,
+        edgeOffset: 10.0,
         onRefresh: () async {
           await _likeMeController.onRefresh();
         },

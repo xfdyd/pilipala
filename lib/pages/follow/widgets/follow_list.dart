@@ -49,6 +49,8 @@ class _FollowListState extends State<FollowList> {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
+      displacement: 10.0,
+      edgeOffset: 10.0,
       onRefresh: () async => await widget.ctr.queryFollowings('init'),
       child: FutureBuilder(
         future: _futureBuilderFuture,

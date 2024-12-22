@@ -68,6 +68,8 @@ class _SearchPanelState extends State<SearchPanel>
   Widget build(BuildContext context) {
     super.build(context);
     return RefreshIndicator(
+      displacement: 10.0,
+      edgeOffset: 10.0,
       onRefresh: () async {
         await _searchPanelController.onRefresh();
       },

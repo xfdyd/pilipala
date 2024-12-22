@@ -3,8 +3,10 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:PiliPalaX/services/service_locator.dart';
 import 'package:auto_orientation/auto_orientation.dart';
 import 'package:fl_pip/fl_pip.dart';
+// import 'package:fl_pip/fl_pip.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -27,6 +29,8 @@ import 'package:PiliPalaX/utils/storage.dart';
 import '../../../services/shutdown_timer_service.dart';
 import 'widgets/header_control.dart';
 import 'package:PiliPalaX/common/widgets/spring_physics.dart';
+import 'package:flutter_floating/floating/floating.dart';
+import 'package:flutter_floating/floating/manager/floating_manager.dart';
 
 class VideoDetailPage extends StatefulWidget {
   const VideoDetailPage({super.key});
@@ -54,7 +58,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late Future _futureBuilderFuture;
   // 自动退出全屏
   late bool autoExitFullscreen;
-  late bool autoPlayEnable;
   late bool horizontalScreen;
   late bool enableVerticalExpand;
   late bool autoPiP;
@@ -76,6 +79,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       heroTag = Get.arguments['heroTag'];
     }
     videoDetailController = Get.put(VideoDetailController(), tag: heroTag);
+    if (!videoDetailController.autoPlay.value &&
+        floatingManager.containsFloating(globalId)) {
+      PlPlayerController.pauseIfExists();
+    }
     videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
     // videoIntroController.videoDetail.listen((value) {
     //   if (!context.mounted) return;
@@ -97,8 +104,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         setting.get(SettingBoxKey.enableAutoExit, defaultValue: true);
     horizontalScreen =
         setting.get(SettingBoxKey.horizontalScreen, defaultValue: false);
-    autoPlayEnable =
-        setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
     autoPiP = setting.get(SettingBoxKey.autoPiP, defaultValue: false);
     pipNoDanmaku = setting.get(SettingBoxKey.pipNoDanmaku, defaultValue: true);
     enableVerticalExpand =
@@ -109,6 +114,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         SettingBoxKey.videoPlayerShowStatusBarBackgroundColor,
         defaultValue: false);
     if (removeSafeArea) hideStatusBar();
+    floatingManager.closeFloating(globalId);
     videoSourceInit();
     appbarStreamListen();
     // lifecycleListener();
@@ -146,31 +152,42 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       plPlayerController = videoDetailController.plPlayerController;
       plPlayerController!.addStatusLister(playerListener);
       listenFullScreenStatus();
-      await plPlayerController!.autoEnterFullscreen();
-      Future.wait([_futureBuilderFuture]).then((result) {
-        autoEnterPip();
+      await plPlayerController!.autoEnterFullScreen();
+      // Future.wait([_futureBuilderFuture]).then((result) {
+      //   autoEnterPip();
+      // });
+    } else {
+      _futureBuilderFuture.then((value) async {
+        if (value['status']) {
+          // fix: 手动播放首个视频前媒体通知不完整
+          videoPlayerServiceHandler.onStatusChange(PlayerStatus.paused, false);
+          videoDetailController.playerInit(autoplay: false);
+          plPlayerController = videoDetailController.plPlayerController;
+          plPlayerController!.addStatusLister(playerListener);
+          listenFullScreenStatus();
+        }
       });
     }
   }
 
-  void autoEnterPip() {
-    String top = Get.currentRoute;
-    if (autoPiP && (top.startsWith('/video') || top.startsWith('/live'))) {
-      FlPiP().enable(
-          ios: FlPiPiOSConfig(
-              enabledWhenBackground: true,
-              videoPath: videoDetailController.videoUrl,
-              audioPath: videoDetailController.audioUrl,
-              packageName: null),
-          android: FlPiPAndroidConfig(
-            enabledWhenBackground: true,
-            aspectRatio: Rational(
-              videoDetailController.data.dash!.video!.first.width!,
-              videoDetailController.data.dash!.video!.first.height!,
-            ),
-          ));
-    }
-  }
+  // void autoEnterPip() {
+  //   String top = Get.currentRoute;
+  //   if (autoPiP && (top.startsWith('/video') || top.startsWith('/live') || floatingManager.containsFloating(globalId))) {
+  //     FlPiP().enable(
+  //         ios: FlPiPiOSConfig(
+  //             enabledWhenBackground: true,
+  //             videoPath: videoDetailController.videoUrl,
+  //             audioPath: videoDetailController.audioUrl,
+  //             packageName: null),
+  //         android: FlPiPAndroidConfig(
+  //           enabledWhenBackground: true,
+  //           aspectRatio: Rational(
+  //             videoDetailController.data.dash!.video!.first.width!,
+  //             videoDetailController.data.dash!.video!.first.height!,
+  //           ),
+  //         ));
+  //   }
+  // }
 
   // 流
   appbarStreamListen() {
@@ -180,39 +197,51 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // 播放器状态监听
   void playerListener(PlayerStatus? status) async {
     playerStatus = status!;
-    if (status == PlayerStatus.completed) {
-      shutdownTimerService.handleWaitingFinished();
-      bool notExitFlag = false;
-
-      /// 顺序播放 列表循环
-      if (plPlayerController!.playRepeat != PlayRepeat.pause &&
-          plPlayerController!.playRepeat != PlayRepeat.singleCycle) {
-        if (videoDetailController.videoType == SearchType.video) {
-          notExitFlag = videoIntroController.nextPlay();
+    switch (status) {
+      case PlayerStatus.playing:
+        if (videoDetailController.isShowCover.value) {
+          videoDetailController.isShowCover.value = false;
         }
-        if (videoDetailController.videoType == SearchType.media_bangumi) {
-          notExitFlag = bangumiIntroController.nextPlay();
+        break;
+      case PlayerStatus.completed:
+        shutdownTimerService.handleWaitingFinished();
+        bool notExitFlag = false;
+
+        /// 顺序播放 列表循环
+        if (plPlayerController!.playRepeat != PlayRepeat.pause &&
+            plPlayerController!.playRepeat != PlayRepeat.singleCycle) {
+          if (videoDetailController.videoType == SearchType.video) {
+            notExitFlag = videoIntroController.nextPlay();
+          }
+          if (videoDetailController.videoType == SearchType.media_bangumi) {
+            notExitFlag = bangumiIntroController.nextPlay();
+          }
         }
-      }
 
-      /// 单个循环
-      if (plPlayerController!.playRepeat == PlayRepeat.singleCycle) {
-        notExitFlag = true;
-        plPlayerController!.play(repeat: true);
-      }
+        /// 单个循环
+        if (plPlayerController!.playRepeat == PlayRepeat.singleCycle) {
+          notExitFlag = true;
+          plPlayerController!.play(repeat: true);
+        }
 
-      // 结束播放退出全屏
-      if (!notExitFlag && autoExitFullscreen) {
-        plPlayerController!.triggerFullScreen(status: false);
-      }
-      // 播放完展示控制栏
-      // if (videoDetailController.floating != null && !notExitFlag) {
-      //   PiPStatus currentStatus =
-      //       await videoDetailController.floating!.pipStatus;
-      //   if (currentStatus == PiPStatus.disabled) {
-      //     plPlayerController!.onLockControl(false);
-      //   }
-      // }
+        // 结束播放退出全屏
+        if (!notExitFlag && autoExitFullscreen) {
+          plPlayerController!.triggerFullScreen(status: false);
+        }
+        // 播放完展示控制栏
+        // if (videoDetailController.floating != null && !notExitFlag) {
+        //   PiPStatus currentStatus =
+        //       await videoDetailController.floating!.pipStatus;
+        //   if (currentStatus == PiPStatus.disabled) {
+        //     plPlayerController!.onLockControl(false);
+        //   }
+        // }
+        break;
+      case PlayerStatus.paused:
+        break;
+      case PlayerStatus.disabled:
+        videoDetailController.isShowCover.value = true;
+        break;
     }
   }
 
@@ -223,14 +252,14 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   /// 未开启自动播放时触发播放
   Future<void> handlePlay() async {
-    videoDetailController.isShowCover.value = false;
-    await videoDetailController.playerInit();
-    plPlayerController = videoDetailController.plPlayerController;
-    plPlayerController!.addStatusLister(playerListener);
-    listenFullScreenStatus();
-    await plPlayerController!.autoEnterFullscreen();
+    if (plPlayerController == null) {
+      SmartDialog.showToast('播放器初始化失败，请重新进入本页面');
+      return;
+    }
+    plPlayerController!.play();
+    await plPlayerController!.autoEnterFullScreen();
     videoDetailController.autoPlay.value = true;
-    autoEnterPip();
+    // autoEnterPip();
   }
 
   // // 生命周期监听
@@ -262,9 +291,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         // hideStatusBar();
       }
       isFullScreen.value = status;
-      if (mounted) {
-        setState(() {});
-      }
+      // if (mounted) {
+      //   setState(() {});
+      // }
       // if (!status) {
       // showStatusBar();
       // if (horizontalScreen) {
@@ -280,8 +309,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   void dispose() {
     // floating.dispose();
     // videoDetailController.floating?.dispose();
-    videoIntroController.videoDetail.close();
-    bangumiIntroController.bangumiDetail.close();
     videoDetailController.cid.close();
     if (!horizontalScreen) {
       AutoOrientation.portraitUpMode();
@@ -289,10 +316,14 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     shutdownTimerService.handleWaitingFinished();
     // _bufferedListener?.cancel();
     if (plPlayerController != null) {
-      plPlayerController!.removeStatusLister(playerListener);
-      fullScreenStatusListener.cancel();
-      plPlayerController!.disable();
-      // plPlayerController!.dispose();
+      if (!floatingManager.containsFloating(globalId)) {
+        videoIntroController.videoDetail.close();
+        bangumiIntroController.bangumiDetail.close();
+        plPlayerController!.removeStatusLister(playerListener);
+        fullScreenStatusListener.cancel();
+        plPlayerController!.disable();
+        // plPlayerController!.dispose();
+      }
     }
     // videoPlayerServiceHandler.onVideoDetailDispose();
     VideoDetailPage.routeObserver.unsubscribe(this);
@@ -306,11 +337,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // 离开当前页面时
   void didPushNext() async {
     // _bufferedListener?.cancel();
-
-    /// 开启
-    if (plPlayerController != null) {
+    if (!triggerFloatingWindowWhenLeaving() &&
+        !floatingManager.containsFloating(globalId)) {
       videoDetailController.defaultST = plPlayerController!.position.value;
       videoIntroController.isPaused = true;
+      plPlayerController!.pause();
       plPlayerController!.removeStatusLister(playerListener);
       fullScreenStatusListener.cancel();
       plPlayerController!.disable();
@@ -330,6 +361,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     //   setState(() => {});
     // }
     videoDetailController.isFirstTime = false;
+    if (!videoDetailController.autoPlay.value &&
+        floatingManager.containsFloating(globalId)) {
+      PlPlayerController.pauseIfExists();
+    }
+    floatingManager.closeFloating(globalId);
     // final bool autoplay = autoPlayEnable;
     videoDetailController.playerInit(
         autoplay: videoDetailController.autoPlay.value);
@@ -377,6 +413,15 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     super.didPopNext();
   }
 
+  bool triggerFloatingWindowWhenLeaving() {
+    if (GStorage.setting.get('autoMiniPlayer', defaultValue: false) &&
+        plPlayerController?.playerStatus.status.value == PlayerStatus.playing) {
+      return plPlayerController!
+          .triggerFloatingWindow(videoIntroController, bangumiIntroController);
+    }
+    return false;
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -422,7 +467,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.hasData && snapshot.data['status']) {
           return Obx(
-            () => !videoDetailController.autoPlay.value ||
+            () => (!videoDetailController.autoPlay.value &&
+                        videoDetailController.isShowCover.value) ||
                     plPlayerController == null ||
                     plPlayerController!.videoController == null
                 ? nil
@@ -526,6 +572,13 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 ),
           body: Column(
             children: [
+              // const SizedBox(
+              //   height: 300,
+              //   child:
+              //     TextButton(onPressed: (){
+              //
+              //     })
+              // ),
               Obx(
                 () {
                   double videoHeight = context.width * 9 / 16;
@@ -577,6 +630,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                   Orientation.landscape &&
                               !horizontalScreen) {
                             verticalScreenForTwoSeconds();
+                          }
+                          if (didPop) {
+                            triggerFloatingWindowWhenLeaving();
                           }
                         },
                         child: Stack(
@@ -711,6 +767,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                       !horizontalScreen) {
                     verticalScreenForTwoSeconds();
                   }
+                  if (didPop) {
+                    triggerFloatingWindowWhenLeaving();
+                  }
                 },
                 child: Stack(children: <Widget>[
                   // if (isShowing) plPlayer,
@@ -806,6 +865,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     !horizontalScreen) {
                   verticalScreenForTwoSeconds();
                 }
+                if (didPop) {
+                  triggerFloatingWindowWhenLeaving();
+                }
               },
               child: Stack(children: <Widget>[
                 // if (isShowing) plPlayer,
@@ -900,6 +962,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                           Orientation.landscape &&
                       !horizontalScreen) {
                     verticalScreenForTwoSeconds();
+                  }
+                  if (didPop) {
+                    triggerFloatingWindowWhenLeaving();
                   }
                 },
                 child: Stack(
@@ -1002,6 +1067,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                             Orientation.landscape &&
                         !horizontalScreen) {
                       verticalScreenForTwoSeconds();
+                    }
+                    if (didPop) {
+                      triggerFloatingWindowWhenLeaving();
                     }
                   },
                   child: Stack(
@@ -1188,6 +1256,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               ),
       );
   Widget autoChoose(Widget childWhenDisabled) {
+    if (!Platform.isAndroid) {
+      return childWhenDisabled;
+    }
     return PiPBuilder(builder: (PiPStatusInfo? statusInfo) {
       print("PiPStatusInfo${statusInfo?.status}");
       switch (statusInfo?.status) {
@@ -1201,6 +1272,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           return childWhenDisabled;
       }
     });
+    // return childWhenDisabled;
     // if (Platform.isAndroid) {
     //   return PiPSwitcher(
     //     childWhenDisabled: childWhenDisabled,

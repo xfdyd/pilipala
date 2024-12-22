@@ -36,7 +36,7 @@ class AppBarAni extends StatelessWidget implements PreferredSizeWidget {
                   end: Alignment.topCenter,
                   colors: <Color>[
                     Colors.transparent,
-                    Colors.black54,
+                    Colors.black87,
                   ],
                   tileMode: TileMode.mirror,
                 )
@@ -45,12 +45,12 @@ class AppBarAni extends StatelessWidget implements PreferredSizeWidget {
                   end: Alignment.bottomCenter,
                   colors: <Color>[
                     Colors.transparent,
-                    Colors.black54,
+                    Colors.black87,
                   ],
                   tileMode: TileMode.mirror,
                 ),
         ),
-        child: SafeArea(bottom: false, child: child),
+        child: SafeArea(bottom: false, left: false, child: child),
       ),
     );
   }

@@ -131,6 +131,8 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   Widget build(BuildContext context) {
     super.build(context);
     return RefreshIndicator(
+      displacement: 10.0,
+      edgeOffset: 10.0,
       onRefresh: () async {
         await _videoReplyController.queryReplyList(type: 'init');
       },

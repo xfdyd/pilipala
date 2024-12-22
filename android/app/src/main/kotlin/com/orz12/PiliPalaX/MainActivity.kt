@@ -3,7 +3,7 @@ package com.orz12.PiliPalaX
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 //import io.flutter.plugin.common.MethodChannel
-//import com.ryanheise.audioservice.AudioServiceActivity
+import com.ryanheise.audioservice.AudioServiceActivity
 import com.ryanheise.audioservice.AudioServicePlugin
 import android.os.Build
 import android.os.Bundle
@@ -13,7 +13,7 @@ import android.content.Context
 import androidx.annotation.NonNull
 
 //class AudioServiceActivity : FlPiPActivity() {
-class MainActivity : FlPiPActivity() {
+class MainActivity: FlPiPActivity() {
 //    private lateinit var methodChannel: MethodChannel
 
     override fun provideFlutterEngine(context: Context): FlutterEngine {

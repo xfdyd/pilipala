@@ -36,6 +36,7 @@ class VideoCardV extends StatelessWidget {
 
   void onPushDetail(heroTag) async {
     String goto = videoItem.goto;
+    print("goto $goto");
     switch (goto) {
       case 'bangumi':
         if (videoItem.bangumiBadge == '电影') {
@@ -63,12 +64,17 @@ class VideoCardV extends StatelessWidget {
         }
         break;
       case 'av':
+        print("currentRoute: ${Get.currentRoute}");
         String bvid = videoItem.bvid ?? IdUtils.av2bv(videoItem.aid);
-        Get.toNamed('/video?bvid=$bvid&cid=${videoItem.cid}', arguments: {
-          // 'videoItem': videoItem,
-          'pic': videoItem.pic,
-          'heroTag': heroTag,
-        });
+        Get.toNamed(
+          '/video?bvid=$bvid&cid=${videoItem.cid}',
+          arguments: {
+            // 'videoItem': videoItem,
+            'pic': videoItem.pic,
+            'heroTag': heroTag,
+          },
+          // preventDuplicates: false,
+        );
         break;
       // 动态
       case 'picture':

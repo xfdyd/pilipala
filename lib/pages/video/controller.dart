@@ -26,6 +26,8 @@ class VideoDetailController extends GetxController
   /// 路由传参
   String bvid = Get.parameters['bvid']!;
   RxInt cid = int.parse(Get.parameters['cid']!).obs;
+  // 用于小窗返回
+  bool resumePlay = Get.parameters['resume']?.toLowerCase() == 'true';
   RxInt danmakuCid = 0.obs;
   String heroTag = Get.arguments['heroTag'];
   // 视频详情
@@ -55,7 +57,7 @@ class VideoDetailController extends GetxController
   RxBool isShowCover = true.obs;
   // 硬解
   RxBool enableHA = true.obs;
-  RxString hwdec = 'auto-safe'.obs;
+  RxString hwdec = 'auto'.obs;
 
   /// 本地存储
   Box userInfoCache = GStorage.userInfo;
@@ -115,7 +117,7 @@ class VideoDetailController extends GetxController
         setting.get(SettingBoxKey.defaultShowComment, defaultValue: false);
     tabCtr = TabController(
         length: 2, vsync: this, initialIndex: defaultShowComment ? 1 : 0);
-    autoPlay.value =
+    autoPlay.value = resumePlay ||
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
     if (autoPlay.value) {
       isShowCover.value = false;
@@ -140,7 +142,7 @@ class VideoDetailController extends GetxController
     }
     enableHA.value = setting.get(SettingBoxKey.enableHA, defaultValue: true);
     hwdec.value = setting.get(SettingBoxKey.hardwareDecoding,
-        defaultValue: Platform.isAndroid ? 'auto-safe' : 'auto');
+        defaultValue: 'auto'); //Platform.isAndroid ? 'auto-safe' : 'auto');
     if (userInfo == null ||
         localCache.get(LocalCacheKey.historyPause) == true) {
       enableHeart = false;
@@ -280,44 +282,47 @@ class VideoDetailController extends GetxController
     bool autoplay = true,
   }) async {
     /// 设置/恢复 屏幕亮度
-    if (brightness != null) {
-      ScreenBrightness().setScreenBrightness(brightness!);
-    }
+    // if (brightness != null) {
+    //   ScreenBrightness().setScreenBrightness(brightness!);
+    // }
     plPlayerController ??= PlPlayerController.getInstance();
     headerControl ??= HeaderControl(
       controller: plPlayerController,
       videoDetailCtr: this,
       heroTag: heroTag,
     );
-    await plPlayerController!.setDataSource(
-      DataSource(
-        videoSource: video ?? videoUrl,
-        audioSource: audio ?? audioUrl,
-        type: DataSourceType.network,
-        httpHeaders: {
-          'user-agent':
-              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
-          'referer': HttpString.baseUrl
-        },
-      ),
-      // 硬解
-      enableHA: enableHA.value,
-      hwdec: hwdec.value,
-      seekTo: seekToTime ?? defaultST,
-      duration: duration ?? data.timeLength == null
-          ? null
-          : Duration(milliseconds: data.timeLength!),
-      // 宽>高 水平 否则 垂直
-      direction: firstVideo.width != null && firstVideo.height != null
-          ? ((firstVideo.width! - firstVideo.height!) > 0
-              ? 'horizontal'
-              : 'vertical')
-          : null,
-      bvid: bvid,
-      cid: cid.value,
-      enableHeart: enableHeart,
-      autoplay: autoplay,
-    );
+    print("resumePlay:${resumePlay},isFirstTime:${isFirstTime}");
+    if (!resumePlay) {
+      await plPlayerController!.setDataSource(
+        DataSource(
+          videoSource: video ?? videoUrl,
+          audioSource: audio ?? audioUrl,
+          type: DataSourceType.network,
+          httpHeaders: {
+            'user-agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+            'referer': HttpString.baseUrl
+          },
+        ),
+        // 硬解
+        enableHA: enableHA.value,
+        hwdec: hwdec.value,
+        seekTo: seekToTime ?? defaultST,
+        duration: duration ?? data.timeLength == null
+            ? null
+            : Duration(milliseconds: data.timeLength!),
+        // 宽>高 水平 否则 垂直
+        direction: firstVideo.width != null && firstVideo.height != null
+            ? ((firstVideo.width! - firstVideo.height!) > 0
+                ? 'horizontal'
+                : 'vertical')
+            : null,
+        bvid: bvid,
+        cid: cid.value,
+        enableHeart: enableHeart,
+        autoplay: autoplay,
+      );
+    }
 
     /// 开启自动全屏时，在player初始化完成后立即传入headerControl
     plPlayerController!.headerControl = headerControl;
