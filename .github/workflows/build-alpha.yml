@@ -49,7 +49,7 @@ jobs:
           fi
 
           version_code=$(echo $last_tag | cut -d "+" -f 2)
-          datetime=$(date +%m%d%H%M)
+          datetime=$(date -u -d "8 hours" +%m%d%H%M)
           echo "new_version=${version_name}-alpha.${datetime}+${version_code}" >> $GITHUB_OUTPUT
 
   android:
