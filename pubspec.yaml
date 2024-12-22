@@ -134,21 +134,15 @@ dependencies:
     git:
       url: https://github.com/orz12/canvas_danmaku.git
       ref: main
-#  ns_danmaku:
-#    git:
-#      url: https://github.com/orz12/flutter_ns_danmaku.git
-#      ref: master
   # 状态栏图标控制
   status_bar_control: ^3.2.1
   # 代理
   system_proxy: ^0.1.0
   # 应用内悬浮窗
-  flutter_floating: ^1.0.8
-  # 安卓全局悬浮窗
-#  android_window:
-#    git:
-#      url: https://github.com/orz12/flutter-android-window.git
-#      ref: main
+  flutter_floating:
+    git:
+      url: https://github.com/orz12/flutter_floating.git
+      ref: master
   # pip
   fl_pip: ^3.2.0
   # html解析
