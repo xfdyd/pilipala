@@ -25,6 +25,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with: 
+          fetch-tags: 'true'
 
       - name: 获取最后一次提交
         id: get-last-commit
