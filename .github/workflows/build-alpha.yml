@@ -26,7 +26,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with: 
-          fetch-tags: 'true'
+          fetch-depth: 0
 
       - name: 获取最后一次提交
         id: get-last-commit
