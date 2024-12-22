@@ -571,10 +571,11 @@ packages:
   fl_pip:
     dependency: "direct main"
     description:
-      name: fl_pip
-      sha256: "9c9553c58cf37adb3f8566aa92e5767fb1f11e4c28e107e0967602f59b1016a4"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
+      path: "."
+      ref: main
+      resolved-ref: "7cff2b6429dad70171019dc10d99aa6ca66d540a"
+      url: "https://github.com/Wayaer/fl_pip.git"
+    source: git
     version: "3.2.0"
   flex_seed_scheme:
     dependency: "direct main"
