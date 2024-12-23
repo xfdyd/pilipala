@@ -205,7 +205,7 @@ jobs:
         with:
           bot_token: ${{ secrets.BOT_TOKEN }}
           chat_id: ${{ secrets.CHAT_ID }}
-          large_file: false
+          large_file: true
           method: sendFile
           path: PiliPalaX-alpha/*
           parse_mode: Markdown
