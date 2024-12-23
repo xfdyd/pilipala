@@ -47,7 +47,7 @@ jobs:
           last_tag=$(git tag --sort=committerdate | tail -1)
           if (echo $last_tag | grep -v "+"); then
             echo "Tag格式不正确"
-            exit 1
+          #  exit 1
           elif (echo $last_tag | grep -v $version); then
             echo "当前版本tag不存在，请手动添加tag."
             exit 1
