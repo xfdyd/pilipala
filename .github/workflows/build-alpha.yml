@@ -181,6 +181,7 @@ jobs:
     needs:
       - update_version
       - iOS
+      - android
     steps:
 
       - uses: actions/download-artifact@v3
