@@ -116,8 +116,8 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
                 child: IconButton(
                   tooltip: '返回',
                   style: ButtonStyle(
-                    padding: MaterialStateProperty.all(EdgeInsets.zero),
-                    backgroundColor: MaterialStateProperty.resolveWith(
+                    padding: WidgetStateProperty.all(EdgeInsets.zero),
+                    backgroundColor: WidgetStateProperty.resolveWith(
                         (Set<MaterialState> states) {
                       return Theme.of(context)
                           .colorScheme
@@ -180,6 +180,8 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
             );
           }
           return RefreshIndicator(
+              displacement: 10.0,
+              edgeOffset: 10.0,
               onRefresh: _whisperDetailController.querySessionMsg,
               child: ListView.builder(
                 itemCount: messageList.length,

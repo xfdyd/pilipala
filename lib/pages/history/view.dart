@@ -173,6 +173,8 @@ class _HistoryPageState extends State<HistoryPage> {
         ),
       ),
       body: RefreshIndicator(
+        displacement: 10.0,
+        edgeOffset: 10.0,
         onRefresh: () async {
           await _historyController.onRefresh();
           return;
@@ -260,8 +262,8 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     required this.child1,
     required this.child2,
     required this.visible,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final PreferredSizeWidget child1;
   final PreferredSizeWidget child2;

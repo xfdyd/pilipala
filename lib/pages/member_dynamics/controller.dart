@@ -1,21 +1,14 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/http/member.dart';
 import 'package:PiliPalaX/models/dynamics/result.dart';
 
 class MemberDynamicsController extends GetxController {
-  final ScrollController scrollController = ScrollController();
-  late int mid;
+  MemberDynamicsController({required this.mid});
+  final int mid;
   String offset = '';
   int count = 0;
   bool hasMore = true;
   RxList<DynamicItemModel> dynamicsList = <DynamicItemModel>[].obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    mid = int.parse(Get.parameters['mid']!);
-  }
 
   Future getMemberDynamic(type) async {
     if (type == 'onRefresh') {
@@ -39,6 +32,10 @@ class MemberDynamicsController extends GetxController {
 
   // 上拉加载
   Future onLoad() async {
-    getMemberDynamic('onLoad');
+    await getMemberDynamic('onLoad');
+  }
+
+  Future onRefresh() async {
+    await getMemberDynamic('onRefresh');
   }
 }

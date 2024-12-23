@@ -309,7 +309,48 @@ class Utils {
 
   // 版本对比
   static bool needUpdate(localVersion, remoteVersion) {
-    return localVersion != remoteVersion;
+    // 1.0.22-alpha.13+174 is newer then 1.0.22-beta.12+174
+    // 1.0.22-beta.13+174 is newer then 1.0.22-alpha.13+174
+    // 1.0.23+174 is newer than 1.0.22-beta.13+174
+    print('localVersion: $localVersion, remoteVersion: $remoteVersion');
+    if (localVersion == remoteVersion) {
+      return false;
+    }
+    List<String> localVersionList0 = localVersion.split('+');
+    List<String> remoteVersionList0 = remoteVersion.split('+');
+    // 如果version code不同，则直接返回
+    if (localVersionList0[1] != remoteVersionList0[1]) {
+      return int.parse(localVersionList0[1]) < int.parse(remoteVersionList0[1]);
+    }
+    // 判断version name
+    List<String> localVersionList = localVersionList0[0].split('-');
+    List<String> remoteVersionList = remoteVersionList0[0].split('-');
+    if (localVersionList[0] != remoteVersionList[0]) {
+      List<String> localVersionParts = localVersionList[0].split('.');
+      List<String> remoteVersionParts = remoteVersionList[0].split('.');
+      int len = min(localVersionParts.length, remoteVersionParts.length);
+      for (int i = 0; i < len; i++) {
+        if (int.parse(localVersionParts[i]) !=
+            int.parse(remoteVersionParts[i])) {
+          return int.parse(localVersionParts[i]) <
+              int.parse(remoteVersionParts[i]);
+        }
+      }
+      return localVersionParts.length < remoteVersionParts.length;
+    } else if (localVersionList.length == 1 || remoteVersionList.length == 1) {
+      return localVersionList.length < remoteVersionList.length;
+    } else {
+      List<String> localVersionParts = localVersionList[1].split('.');
+      List<String> remoteVersionParts = remoteVersionList[1].split('.');
+      if (localVersionParts.length > 1 && remoteVersionParts.length > 1) {
+        if (localVersionParts[1] != remoteVersionParts[1]) {
+          return int.parse(localVersionParts[1]) <
+              int.parse(remoteVersionParts[1]);
+        }
+        return localVersionParts[0].compareTo(remoteVersionParts[0]) < 0;
+      }
+      return localVersionParts[0].compareTo(remoteVersionParts[0]) < 0;
+    }
   }
 
   // 检查更新

@@ -79,6 +79,8 @@ class _RcmdPageState extends State<RcmdPage>
         borderRadius: BorderRadius.all(StyleString.imgRadius),
       ),
       child: RefreshIndicator(
+        displacement: 10.0,
+        edgeOffset: 10.0,
         onRefresh: () async {
           await _rcmdController.onRefresh();
           await Future.delayed(const Duration(milliseconds: 300));
@@ -106,7 +108,7 @@ class _RcmdPageState extends State<RcmdPage>
                       );
                     } else {
                       return HttpError(
-                        errMsg: data == null ? "" : data['msg'],
+                        errMsg: data['msg'],
                         fn: () {
                           setState(() {
                             _futureBuilderFuture =

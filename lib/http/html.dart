@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'index.dart';
@@ -57,7 +61,7 @@ class HtmlHttp {
         'avatar': avatar,
         'uname': uname,
         'updateTime': updateTime,
-        'content': (test ?? '') + opusContent,
+        'content': test + opusContent,
         'commentId': int.parse(commentId)
       };
     } catch (err) {
@@ -84,8 +88,9 @@ class HtmlHttp {
         .group(1)!
         .replaceAll(r'\u002F', '/')
         .split('@')[0];
-    // print(avatar);
+    print("avatar: $avatar");
     String uname = authorHeader.querySelector('.up-name')!.text.trim();
+    print("uname: $uname");
     // 动态详情
     Element opusDetail = appDom.querySelector('.article-content')!;
     // 发布时间
@@ -94,8 +99,7 @@ class HtmlHttp {
     // print(updateTime);
 
     //
-    String opusContent =
-        opusDetail.querySelector('#read-article-holder')?.innerHtml ?? '';
+    String opusContent = opusDetail.innerHtml ?? '';
     RegExp digitRegExp = RegExp(r'\d+');
     Iterable<Match> matches = digitRegExp.allMatches(id);
     String number = matches.first.group(0)!;

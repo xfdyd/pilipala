@@ -16,7 +16,7 @@ import 'package:PiliPalaX/pages/main/index.dart';
 import '../../utils/grid.dart';
 
 class HotPage extends StatefulWidget {
-  const HotPage({Key? key}) : super(key: key);
+  const HotPage({super.key});
 
   @override
   State<HotPage> createState() => _HotPageState();
@@ -73,6 +73,8 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
   Widget build(BuildContext context) {
     super.build(context);
     return RefreshIndicator(
+      displacement: 10.0,
+      edgeOffset: 10.0,
       onRefresh: () async {
         return await _hotController.onRefresh();
       },

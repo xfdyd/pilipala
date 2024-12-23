@@ -40,11 +40,13 @@ class LoginUtils {
     for (var i = 0; i < 6; i++) {
       var min = 0;
       var max = 0xff;
-      var num = (random.nextInt(max - min + 1) + min).toRadixString(16);
+      var num =
+          (random.nextInt(max - min + 1) + min).toRadixString(16).toUpperCase();
       mac.add(num);
     }
 
-    var md5Str = md5.convert(utf8.encode(mac.join(':'))).toString();
+    var md5Str =
+        md5.convert(utf8.encode(mac.join(':'))).toString().toUpperCase();
     var md5Arr = md5Str.split('');
     return 'XY${md5Arr[2]}${md5Arr[12]}${md5Arr[22]}$md5Str';
   }
@@ -67,11 +69,11 @@ class LoginUtils {
 
     final Random random = Random(); // Random.secure();
     final String randomHex32 =
-    List.generate(32, (index) => random.nextInt(16).toRadixString(16))
-        .join();
+        List.generate(32, (index) => random.nextInt(16).toRadixString(16))
+            .join();
     final String randomHex16 =
-    List.generate(16, (index) => random.nextInt(16).toRadixString(16))
-        .join();
+        List.generate(16, (index) => random.nextInt(16).toRadixString(16))
+            .join();
 
     final String deviceID = randomHex32 + yyyyMMddHHmmss + randomHex16;
 

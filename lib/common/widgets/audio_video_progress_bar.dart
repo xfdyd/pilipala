@@ -5,6 +5,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+import '../../utils/utils.dart';
+
 /// This is where the current time and total time labels should appear in
 /// relation to the progress bar.
 enum TimeLabelLocation {
@@ -74,7 +76,7 @@ class ProgressBar extends LeafRenderObjectWidget {
   /// When a user drags the thumb to a new location you can be notified
   /// by the [onSeek] callback so that you can update your audio/video player.
   const ProgressBar({
-    Key? key,
+    super.key,
     required this.progress,
     required this.total,
     this.buffered,
@@ -96,7 +98,7 @@ class ProgressBar extends LeafRenderObjectWidget {
     this.timeLabelType,
     this.timeLabelTextStyle,
     this.timeLabelPadding = 0.0,
-  }) : super(key: key);
+  });
 
   /// The elapsed playing time of the media.
   ///
@@ -274,7 +276,7 @@ class ProgressBar extends LeafRenderObjectWidget {
       thumbRadius: thumbRadius,
       thumbColor: thumbColor ?? primaryColor,
       thumbGlowColor:
-      thumbGlowColor ?? (thumbColor ?? primaryColor).withAlpha(80),
+          thumbGlowColor ?? (thumbColor ?? primaryColor).withAlpha(80),
       thumbGlowRadius: thumbGlowRadius,
       thumbCanPaintOutsideBar: thumbCanPaintOutsideBar,
       timeLabelLocation: timeLabelLocation ?? TimeLabelLocation.below,
@@ -958,7 +960,7 @@ class _RenderProgressBar extends RenderBox {
 
     // progress bar
     final barDy =
-    (isLabelBelow) ? 0.0 : _leftLabelSize.height + _timeLabelPadding;
+        (isLabelBelow) ? 0.0 : _leftLabelSize.height + _timeLabelPadding;
     _drawProgressBar(canvas, Offset(0, barDy), Size(barWidth, barHeight));
   }
 
@@ -1042,9 +1044,9 @@ class _RenderProgressBar extends RenderBox {
 
   void _drawBar(
       {required Canvas canvas,
-        required Size availableSize,
-        required double widthProportion,
-        required Color color}) {
+      required Size availableSize,
+      required double widthProportion,
+      required Color color}) {
     final strokeCap = (_barCapShape == BarCapShape.round)
         ? StrokeCap.round
         : StrokeCap.square;
@@ -1085,7 +1087,7 @@ class _RenderProgressBar extends RenderBox {
 
   String _getTimeString(Duration time) {
     final minutes =
-    time.inMinutes.remainder(Duration.minutesPerHour).toString();
+        time.inMinutes.remainder(Duration.minutesPerHour).toString();
     final seconds = time.inSeconds
         .remainder(Duration.secondsPerMinute)
         .toString()
@@ -1101,8 +1103,10 @@ class _RenderProgressBar extends RenderBox {
 
     // description
     config.textDirection = TextDirection.ltr;
-    config.label = '进度条';//'Progress bar';
-    config.value = '${(_thumbValue * 100).round()}%';
+    config.label = '进度条'; //'Progress bar';
+    config.value = '${(_thumbValue * 100).round()}%，'
+        '已播放${Utils.durationReadFormat(Utils.timeFormat(progress.inSeconds))}，'
+        '共${Utils.durationReadFormat(Utils.timeFormat(total.inSeconds))}';
 
     // increase action
     config.onIncrease = increaseAction;

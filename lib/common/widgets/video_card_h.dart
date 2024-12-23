@@ -245,7 +245,7 @@ class VideoContent extends StatelessWidget {
               Expanded(
                 flex: 0,
                 child: Text(
-                  "${pubdate} ${showOwner ? videoItem.owner.name : ''}",
+                  "$pubdate ${showOwner ? videoItem.owner.name : ''}",
                   maxLines: 1,
                   style: TextStyle(
                     fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,

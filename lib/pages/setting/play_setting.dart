@@ -8,8 +8,11 @@ import 'package:PiliPalaX/pages/setting/widgets/select_dialog.dart';
 import 'package:PiliPalaX/plugin/pl_player/index.dart';
 import 'package:PiliPalaX/services/service_locator.dart';
 import 'package:PiliPalaX/utils/storage.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-import '../../models/video/play/subtitle.dart';
+import 'package:PiliPalaX/plugin/pl_player/models/player_middle_gesture.dart';
+import 'package:PiliPalaX/plugin/pl_player/models/player_gesture_action.dart';
+import 'package:PiliPalaX/models/video/play/subtitle.dart';
 import 'widgets/switch_item.dart';
 
 class PlaySetting extends StatefulWidget {
@@ -24,6 +27,7 @@ class _PlaySettingState extends State<PlaySetting> {
   late String defaultSubtitlePreference;
   late int defaultFullScreenMode;
   late int defaultBtmProgressBehavior;
+  late Map<PlayerMiddleGesture, PlayerGestureAction> defaultMiddleGestureAction;
 
   @override
   void initState() {
@@ -67,7 +71,7 @@ class _PlaySettingState extends State<PlaySetting> {
             subTitle: '是否展示弹幕',
             leading: Icon(Icons.comment_outlined),
             setKey: SettingBoxKey.enableShowDanmaku,
-            defaultVal: false,
+            defaultVal: true,
           ),
           ListTile(
             dense: false,
@@ -84,10 +88,27 @@ class _PlaySettingState extends State<PlaySetting> {
             defaultVal: true,
           ),
           const SetSwitchItem(
-            title: '双击快退/快进',
+            title: '左右侧双击快退/快进',
             subTitle: '左侧双击快退/右侧双击快进，关闭则双击均为暂停/播放',
             leading: Icon(Icons.touch_app_outlined),
             setKey: SettingBoxKey.enableQuickDouble,
+            defaultVal: true,
+          ),
+          ListTile(
+            dense: false,
+            title: Text('中部上下滑动手势', style: titleStyle),
+            leading: Icon(MdiIcons.gestureSwipeVertical),
+            subtitle: Text(
+              '设置视频画面中间部分滑动手势对应的操作',
+              style: subTitleStyle,
+            ),
+            onTap: () => Get.toNamed('/gestureSetting'),
+          ),
+          SetSwitchItem(
+            title: '全屏时显示额外功能',
+            subTitle: '添加【锁定】与【截图】按钮',
+            leading: Icon(MdiIcons.oneUp),
+            setKey: SettingBoxKey.enableExtraButtonOnFullScreen,
             defaultVal: true,
           ),
           ListTile(
@@ -120,7 +141,7 @@ class _PlaySettingState extends State<PlaySetting> {
           ),
           const SetSwitchItem(
             title: '竖屏扩大展示',
-            subTitle: '小屏竖屏视频宽高比由16:9扩大至1:1（不支持收起）；横屏适配时，扩大至9:16',
+            subTitle: '半屏竖屏视频宽高比由16:9扩大至1:1（不支持收起）；横屏适配时，扩大至9:16',
             leading: Icon(Icons.expand_outlined),
             setKey: SettingBoxKey.enableVerticalExpand,
             defaultVal: false,
@@ -144,8 +165,7 @@ class _PlaySettingState extends State<PlaySetting> {
               subTitle: '开启后延长至30秒，便于屏幕阅读器滑动切换控件焦点',
               leading: Icon(Icons.timer_outlined),
               setKey: SettingBoxKey.enableLongShowControl,
-              defaultVal: false
-          ),
+              defaultVal: false),
           const SetSwitchItem(
             title: '全向旋转',
             subTitle: '小屏可受重力转为临时全屏，若系统锁定旋转仍触发请关闭，关闭会影响横屏适配',
@@ -153,18 +173,27 @@ class _PlaySettingState extends State<PlaySetting> {
             setKey: SettingBoxKey.allowRotateScreen,
             defaultVal: true,
           ),
-          const SetSwitchItem(
+          SetSwitchItem(
             title: '后台播放',
             subTitle: '进入后台时继续播放',
-            leading: Icon(Icons.motion_photos_pause_outlined),
+            leading: Icon(MdiIcons.locationExit),
             setKey: SettingBoxKey.continuePlayInBackground,
             defaultVal: false,
+            callFn: (val) {
+              SmartDialog.showToast('如果该设置未生效，请重启');
+            },
           ),
-          if (Platform.isAndroid)
+          const SetSwitchItem(
+              title: '应用内小窗',
+              subTitle: '离开播放页时，以小窗形式继续播放',
+              leading: Icon(Icons.tab_unselected_outlined),
+              setKey: SettingBoxKey.autoMiniPlayer,
+              defaultVal: false),
+          if (Platform.isAndroid || Platform.isIOS)
             SetSwitchItem(
                 title: '后台画中画',
                 subTitle: '进入后台时以小窗形式（PiP）播放',
-                leading: const Icon(Icons.picture_in_picture_outlined),
+                leading: const Icon(Icons.picture_in_picture_alt),
                 setKey: SettingBoxKey.autoPiP,
                 defaultVal: false,
                 callFn: (val) {
@@ -176,19 +205,26 @@ class _PlaySettingState extends State<PlaySetting> {
                 }),
           if (Platform.isAndroid)
             const SetSwitchItem(
-              title: '画中画不加载弹幕',
+              title: '后台画中画不加载弹幕',
               subTitle: '当弹幕开关开启时，小窗屏蔽弹幕以获得较好的体验',
               leading: Icon(Icons.comments_disabled_outlined),
               setKey: SettingBoxKey.pipNoDanmaku,
               defaultVal: true,
             ),
-          const SetSwitchItem(
-            title: '全屏手势反向',
-            subTitle: '默认播放器中部向上滑动进入全屏，向下退出\n开启后向下全屏，向上退出',
-            leading: Icon(Icons.swap_vert_outlined),
-            setKey: SettingBoxKey.fullScreenGestureReverse,
-            defaultVal: false,
-          ),
+          // const SetSwitchItem(
+          //   title: '全屏手势方向',
+          //   subTitle: '关闭时，在播放器中部向上滑动进入全屏，向下退出\n开启时，向下全屏，向上退出',
+          //   leading: Icon(Icons.swap_vert_outlined),
+          //   setKey: SettingBoxKey.fullScreenGestureReverse,
+          //   defaultVal: false,
+          // ),
+          // SetSwitchItem(
+          //   title: '启用应用内小窗手势',
+          //   subTitle: '与全屏手势相反方向滑动时，触发应用内小窗',
+          //   leading: Icon(MdiIcons.gestureSwipeVertical),
+          //   setKey: SettingBoxKey.enableFloatingWindowGesture,
+          //   defaultVal: true,
+          // ),
           const SetSwitchItem(
             title: '观看人数',
             subTitle: '展示同时在看人数',
@@ -249,6 +285,13 @@ class _PlaySettingState extends State<PlaySetting> {
                 setState(() {});
               }
             },
+          ),
+          const SetSwitchItem(
+            title: '调节系统亮度（需权限）',
+            subTitle: '若打开自动亮度，可能调节后无变化；关闭则调节应用内亮度（仅在本app生效，且生效期间可能会忽略系统亮度变化）',
+            leading: Icon(Icons.brightness_6_outlined),
+            setKey: SettingBoxKey.setSystemBrightness,
+            defaultVal: false,
           ),
           const SetSwitchItem(
             title: '后台音频服务',

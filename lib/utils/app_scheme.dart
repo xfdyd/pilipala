@@ -1,15 +1,15 @@
 import 'dart:async';
 
 import 'package:PiliPalaX/models/common/reply_type.dart';
-import 'package:PiliPalaX/pages/video/detail/reply/widgets/reply_item.dart';
+import 'package:PiliPalaX/pages/video/reply/widgets/reply_item.dart';
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart';
-import '../http/search.dart';
-import '../models/common/search_type.dart';
-import '../pages/video/detail/reply_reply/view.dart';
+import 'package:PiliPalaX/http/search.dart';
+import 'package:PiliPalaX/models/common/search_type.dart';
+import 'package:PiliPalaX/pages/video/reply_reply/view.dart';
 import 'id_utils.dart';
 import 'url_utils.dart';
 import 'utils.dart';
@@ -288,7 +288,7 @@ class PiliScheme {
     // https | m.bilibili.com | /bangumi/play/ss39708
     // final String scheme = value.scheme!;
     final String host = value.host;
-    final String? path = value.path;
+    final String path = value.path;
     Map<String, String>? query = value.queryParameters;
     RegExp regExp = RegExp(r'^((www\.)|(m\.))?bilibili\.com$');
     if (regExp.hasMatch(host)) {
@@ -385,7 +385,23 @@ class PiliScheme {
           break;
         case 'space':
           print('个人空间');
-          Get.toNamed('/member?mid=$area', arguments: {'face': ''});
+          Get.toNamed('/member?mid=${matchNum(path).first}',
+              arguments: {'face': ''});
+          break;
+        case 'medialist':
+          print('播放列表');
+          print(path);
+          // https://api.bilibili.com/x/v2/medialist/resource/list?mobi_app=web&type=1&biz_id=37663924&oid=&otype=2&ps=20&direction=false&desc=false&sort_field=1&tid=0&with_current=false
+          SmartDialog.showToast('即将播放列表：${pathPart[3]}，还没做完，先用网页版顶一下');
+          Get.toNamed(
+            '/webview',
+            parameters: {
+              'url': 'https://www.bilibili.com/list/${pathPart[3]}',
+              'type': 'url',
+              'pageTitle': '',
+              'uaType': 'pc'
+            },
+          );
           break;
         default:
           var res = IdUtils.matchAvorBv(input: area.split('?').first);

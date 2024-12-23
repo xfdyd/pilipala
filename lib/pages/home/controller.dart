@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:math';
 
+import 'package:PiliPalaX/models/common/side_bar_position.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -30,7 +30,8 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
   late List<String> tabbarSort;
   RxString defaultSearch = ''.obs;
   late bool enableGradientBg;
-  late bool useSideBar;
+  // late bool useSideBar;
+  late SideBarPosition sideBarPosition;
 
   @override
   void onInit() {
@@ -45,7 +46,10 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     }
     enableGradientBg =
         setting.get(SettingBoxKey.enableGradientBg, defaultValue: true);
-    useSideBar = setting.get(SettingBoxKey.useSideBar, defaultValue: false);
+    // useSideBar = setting.get(SettingBoxKey.useSideBar, defaultValue: false);
+    sideBarPosition = SideBarPositionCode.fromCode(setting.get(
+        SettingBoxKey.sideBarPosition,
+        defaultValue: SideBarPosition.none.code))!;
     // 进行tabs配置
     setTabConfig();
   }
@@ -129,6 +133,7 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
         context: context,
         useSafeArea: true,
         builder: (_) => const Dialog(
+              insetPadding: EdgeInsets.zero,
               child: MinePage(),
             ));
   }

@@ -209,7 +209,7 @@ class Api {
   static const String delHistory = '/x/v2/history/delete';
 
   // 搜索历史记录
-  static const String searchHistory = '/x/web-goblin/history/search';
+  static const String searchHistory = '/x/web-interface/history/search';
 
   // 热搜
   static const String hotSearchList =
@@ -223,7 +223,7 @@ class Api {
       'https://s.search.bilibili.com/main/suggest';
 
   // 分类搜索
-  static const String searchByType = '/x/web-interface/search/type';
+  static const String searchByType = '/x/web-interface/wbi/search/type';
 
   // 记录视频播放进度
   // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/report.md
@@ -298,6 +298,9 @@ class Api {
 
   // 用户动态
   static const String memberDynamic = '/x/polymer/web-dynamic/v1/feed/space';
+
+  // 用户图文
+  static const String memberOpus = '/x/polymer/web-dynamic/v1/opus/feed/space';
 
   // 稍后再看
   static const String toViewLater = '/x/v2/history/toview/add';
@@ -530,6 +533,9 @@ class Api {
   static const String safeCenterSmsVerify =
       '${HttpString.passBaseUrl}/x/safecenter/login/tel/verify';
 
+  static const String oauth2AccessToken =
+      '${HttpString.passBaseUrl}/x/passport-login/oauth2/access_token';
+
   /// 密码加密密钥
   /// disable_rcmd
   /// local_id
@@ -564,14 +570,15 @@ class Api {
   /// 最近追番
   static const getRecentBangumiApi = '/x/space/bangumi/follow/list';
 
-  /// 用户专栏
-  static const getMemberSeasonsApi = '/x/polymer/web-space/home/seasons_series';
+  /// 用户合集与视频列表
+  static const getMemberSeasonsAndSeriesApi =
+      '/x/polymer/web-space/seasons_series_list';
 
   /// 获赞数 播放数
   /// mid
   static const getMemberViewApi = '/x/space/upstat';
 
-  /// 查询某个专栏
+  /// 查询指定合集
   /// mid
   /// season_id
   /// sort_reverse
@@ -579,6 +586,9 @@ class Api {
   /// page_size
   static const getSeasonDetailApi =
       '/x/polymer/web-space/seasons_archives_list';
+
+  /// 查询指定视频列表
+  static const getSeriesDetailApi = '/x/series/archives';
 
   /// 获取未读动态数
   static const getUnreadDynamic = '/x/web-interface/dynamic/entrance';
@@ -603,6 +613,9 @@ class Api {
 
   /// 排行榜
   static const String getRankApi = "/x/web-interface/ranking/v2";
+
+  /// 分区视频
+  static const String getRegionApi = "/x/web-interface/dynamic/region";
 
   /// 取消订阅-合集
   static const String unfavSeason = '/x/v3/fav/season/unfav';

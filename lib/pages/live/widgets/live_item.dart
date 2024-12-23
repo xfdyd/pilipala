@@ -12,11 +12,11 @@ class LiveCardV extends StatelessWidget {
   final Function()? longPressEnd;
 
   const LiveCardV({
-    Key? key,
+    super.key,
     required this.liveItem,
     this.longPress,
     this.longPressEnd,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -60,18 +60,18 @@ class LiveCardV extends StatelessWidget {
                             height: maxHeight,
                           ),
                         ),
-                          Positioned(
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            child: AnimatedOpacity(
-                              opacity: 1,
-                              duration: const Duration(milliseconds: 200),
-                              child: VideoStat(
-                                liveItem: liveItem,
-                              ),
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: AnimatedOpacity(
+                            opacity: 1,
+                            duration: const Duration(milliseconds: 200),
+                            child: VideoStat(
+                              liveItem: liveItem,
                             ),
                           ),
+                        ),
                       ],
                     );
                   }),
@@ -88,9 +88,7 @@ class LiveCardV extends StatelessWidget {
 
 class LiveContent extends StatelessWidget {
   final dynamic liveItem;
-  const LiveContent(
-      {Key? key, required this.liveItem})
-      : super(key: key);
+  const LiveContent({super.key, required this.liveItem});
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -139,9 +137,9 @@ class VideoStat extends StatelessWidget {
   final LiveItemModel? liveItem;
 
   const VideoStat({
-    Key? key,
+    super.key,
     required this.liveItem,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -252,7 +252,7 @@ class MineController extends GetxController {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    Get.toNamed('/memberDynamics?mid=${userInfo.value.mid}',
+    Get.toNamed('/member?mid=${userInfo.value.mid}',
         preventDuplicates: false);
   }
 }

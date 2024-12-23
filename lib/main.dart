@@ -1,5 +1,10 @@
 import 'dart:io';
 
+// import 'package:PiliPalaX/plugin/pl_player/android_window.dart';
+import 'package:PiliPalaX/plugin/pl_player/view.dart';
+
+// import 'package:android_window/android_window.dart';
+// import 'package:android_window/main.dart' as android_window;
 import 'package:PiliPalaX/utils/cache_manage.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
@@ -14,7 +19,7 @@ import 'package:PiliPalaX/http/init.dart';
 import 'package:PiliPalaX/models/common/color_type.dart';
 import 'package:PiliPalaX/models/common/theme_type.dart';
 import 'package:PiliPalaX/pages/search/index.dart';
-import 'package:PiliPalaX/pages/video/detail/index.dart';
+import 'package:PiliPalaX/pages/video/index.dart';
 import 'package:PiliPalaX/router/app_pages.dart';
 import 'package:PiliPalaX/pages/main/view.dart';
 import 'package:PiliPalaX/services/service_locator.dart';
@@ -25,6 +30,29 @@ import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playl
 import 'package:PiliPalaX/utils/recommend_filter.dart';
 import 'package:catcher_2/catcher_2.dart';
 import './services/loggeer.dart';
+import 'package:flex_seed_scheme/flex_seed_scheme.dart';
+
+/// mainName must be the same as the method name
+// @pragma('vm:entry-point')
+// void androidWindow() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   MediaKit.ensureInitialized();
+//   await GStorage.init();
+//   await setupServiceLocator();
+//   Request();
+//   await Request.setCookie();
+//   runApp(
+//     ClipRRect(
+//       borderRadius: BorderRadius.circular(12),
+//       child: MaterialApp(
+//         debugShowCheckedModeBanner: false,
+//         theme: ThemeData.light(),
+//         darkTheme: ThemeData.dark(),
+//         home: const AndroidWindowApp(),
+//       ),
+//     ),
+//   );
+// }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -107,14 +135,18 @@ class MyApp extends StatelessWidget {
             ['color'];
     Color brandColor = defaultColor;
     // 主题模式
-    ThemeType currentThemeValue = ThemeType.values[setting
-        .get(SettingBoxKey.themeMode, defaultValue: ThemeType.system.code)];
+    ThemeMode currentThemeValue = ThemeType
+        .values[setting.get(SettingBoxKey.themeMode,
+            defaultValue: ThemeType.system.code)]
+        .toThemeMode;
     // 是否动态取色
     bool isDynamicColor =
         setting.get(SettingBoxKey.dynamicColor, defaultValue: true);
     // 字体缩放大小
     double textScale =
         setting.get(SettingBoxKey.defaultTextScale, defaultValue: 1.0);
+    FlexSchemeVariant variant = FlexSchemeVariant
+        .values[setting.get(SettingBoxKey.schemeVariant, defaultValue: 10)];
 
     // 强制设置高帧率
     if (Platform.isAndroid) {
@@ -142,13 +174,15 @@ class MyApp extends StatelessWidget {
           darkColorScheme = darkDynamic.harmonized();
         } else {
           // dynamic取色失败，采用品牌色
-          lightColorScheme = ColorScheme.fromSeed(
-            seedColor: brandColor,
+          lightColorScheme = SeedColorScheme.fromSeeds(
+            primaryKey: brandColor,
             brightness: Brightness.light,
+            variant: variant,
           );
-          darkColorScheme = ColorScheme.fromSeed(
-            seedColor: brandColor,
+          darkColorScheme = SeedColorScheme.fromSeeds(
+            primaryKey: brandColor,
             brightness: Brightness.dark,
+            variant: variant,
           );
         }
         // 图片缓存
@@ -156,41 +190,18 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           // showSemanticsDebugger: true,
           title: 'PiliPalaX',
-          theme: ThemeData(
-            // fontFamily: 'HarmonyOS',
-            colorScheme: currentThemeValue == ThemeType.dark
-                ? darkColorScheme
-                : lightColorScheme,
-            useMaterial3: true,
-            snackBarTheme: SnackBarThemeData(
-              actionTextColor: lightColorScheme.primary,
-              backgroundColor: lightColorScheme.secondaryContainer,
-              closeIconColor: lightColorScheme.secondary,
-              contentTextStyle: TextStyle(color: lightColorScheme.secondary),
-              elevation: 20,
-            ),
-            pageTransitionsTheme: const PageTransitionsTheme(
-              builders: <TargetPlatform, PageTransitionsBuilder>{
-                TargetPlatform.android: ZoomPageTransitionsBuilder(
-                  allowEnterRouteSnapshotting: false,
-                ),
-              },
-            ),
+          theme: _getThemeData(
+            colorScheme: lightColorScheme,
+            isDynamic: lightDynamic != null && isDynamicColor,
+            variant: variant,
           ),
-          darkTheme: ThemeData(
-            // fontFamily: 'HarmonyOS',
-            colorScheme: currentThemeValue == ThemeType.light
-                ? lightColorScheme
-                : darkColorScheme,
-            useMaterial3: true,
-            snackBarTheme: SnackBarThemeData(
-              actionTextColor: darkColorScheme.primary,
-              backgroundColor: darkColorScheme.secondaryContainer,
-              closeIconColor: darkColorScheme.secondary,
-              contentTextStyle: TextStyle(color: darkColorScheme.secondary),
-              elevation: 20,
-            ),
+          darkTheme: _getThemeData(
+            colorScheme: darkColorScheme,
+            isDynamic: darkDynamic != null && isDynamicColor,
+            isDark: true,
+            variant: variant,
           ),
+          themeMode: currentThemeValue,
           localizationsDelegates: const [
             GlobalCupertinoLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -219,4 +230,56 @@ class MyApp extends StatelessWidget {
       }),
     );
   }
+
+  ThemeData _getThemeData({
+    required ColorScheme colorScheme,
+    required bool isDynamic,
+    bool isDark = false,
+    required FlexSchemeVariant variant,
+  }) {
+    return ThemeData(
+      colorScheme: colorScheme,
+      useMaterial3: true,
+      appBarTheme: AppBarTheme(
+        elevation: 0,
+        titleSpacing: 0,
+        centerTitle: false,
+        scrolledUnderElevation: 0,
+        backgroundColor: isDynamic ? null : colorScheme.surface,
+        titleTextStyle: TextStyle(fontSize: 16, color: colorScheme.onSurface),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        surfaceTintColor: isDynamic ? colorScheme.onSurfaceVariant : null,
+      ),
+      snackBarTheme: SnackBarThemeData(
+        actionTextColor: colorScheme.primary,
+        backgroundColor: colorScheme.secondaryContainer,
+        closeIconColor: colorScheme.secondary,
+        contentTextStyle: TextStyle(color: colorScheme.secondary),
+        elevation: 20,
+      ),
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: <TargetPlatform, PageTransitionsBuilder>{
+          TargetPlatform.android: ZoomPageTransitionsBuilder(
+            allowEnterRouteSnapshotting: false,
+          ),
+        },
+      ),
+      popupMenuTheme: PopupMenuThemeData(
+        surfaceTintColor: isDynamic ? colorScheme.onSurfaceVariant : null,
+      ),
+      cardTheme: CardTheme(
+        elevation: 1,
+        surfaceTintColor: isDark ? colorScheme.onSurfaceVariant : null,
+        shadowColor: Colors.transparent,
+      ),
+      // dialogTheme: DialogTheme(
+      //   surfaceTintColor: isDark ? colorScheme.onSurfaceVariant : null,
+      // ),
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        refreshBackgroundColor: colorScheme.onSecondary,
+      ),
+    );
+  }
+
 }

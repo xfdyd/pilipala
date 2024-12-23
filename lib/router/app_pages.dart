@@ -29,13 +29,14 @@ import '../pages/live_room/view.dart';
 import '../pages/login/index.dart';
 import '../pages/media/index.dart';
 import '../pages/member/index.dart';
-import '../pages/member_archive/index.dart';
 import '../pages/member_coin/index.dart';
-import '../pages/member_dynamics/index.dart';
 import '../pages/member_like/index.dart';
 import '../pages/member_search/index.dart';
-import '../pages/member_seasons/index.dart';
+import '../pages/member_season/view.dart';
+import '../pages/member_series/view.dart';
 import '../pages/msg_feed_top/sys_msg/view.dart';
+import '../pages/rank/view.dart';
+import '../pages/rank/zone/view.dart';
 import '../pages/search/index.dart';
 import '../pages/search_result/index.dart';
 import '../pages/setting/extra_setting.dart';
@@ -43,6 +44,7 @@ import '../pages/setting/index.dart';
 import '../pages/setting/pages/color_select.dart';
 import '../pages/setting/pages/display_mode.dart';
 import '../pages/setting/pages/font_size_select.dart';
+import '../pages/setting/pages/gesture_select.dart';
 import '../pages/setting/pages/home_tabbar_set.dart';
 import '../pages/setting/pages/play_speed_set.dart';
 import '../pages/setting/recommend_setting.dart';
@@ -53,8 +55,8 @@ import '../pages/setting/style_setting.dart';
 import '../pages/setting/hidden_settings.dart';
 import '../pages/subscription/index.dart';
 import '../pages/subscription_detail/index.dart';
-import '../pages/video/detail/index.dart';
-import '../pages/video/detail/reply_reply/index.dart';
+import '../pages/video/index.dart';
+import '../pages/video/reply_reply/index.dart';
 import '../pages/webview/index.dart';
 import '../pages/whisper/index.dart';
 import '../pages/whisper_detail/index.dart';
@@ -129,6 +131,7 @@ class Routes {
     //
     CustomGetPage(name: '/blackListPage', page: () => const BlackListPage()),
     CustomGetPage(name: '/colorSetting', page: () => const ColorSelectPage()),
+    CustomGetPage(name: '/gestureSetting', page: () => const GestureSelectPage()),
     // 开发人员选项
     CustomGetPage(name: '/hiddenSetting', page: () => const HiddenSetting()),
     // 首页tabbar
@@ -165,18 +168,21 @@ class Routes {
     // 登录页面
     CustomGetPage(name: '/loginPage', page: () => const LoginPage()),
     // 用户动态
-    CustomGetPage(
-        name: '/memberDynamics', page: () => const MemberDynamicsPage()),
+    // CustomGetPage(
+    //     name: '/memberDynamics', page: () => const MemberDynamicsPage()),
     // 用户投稿
-    CustomGetPage(
-        name: '/memberArchive', page: () => const MemberArchivePage()),
+    // CustomGetPage(
+    //     name: '/memberArchive', page: () => const MemberArchivePage()),
     // 用户最近投币
     CustomGetPage(name: '/memberCoin', page: () => const MemberCoinPage()),
     // 用户最近喜欢
     CustomGetPage(name: '/memberLike', page: () => const MemberLikePage()),
     // 用户专栏
-    CustomGetPage(
-        name: '/memberSeasons', page: () => const MemberSeasonsPage()),
+    // CustomGetPage(
+    //     name: '/memberSeasons', page: () => const MemberSeasonsPage()),
+    CustomGetPage(name: '/memberSeason', page: () => const MemberSeasonPage()),
+
+    CustomGetPage(name: '/memberSeries', page: () => const MemberSeriesPage()),
     // 日志
     CustomGetPage(name: '/logs', page: () => const LogsPage()),
     // 搜索关注

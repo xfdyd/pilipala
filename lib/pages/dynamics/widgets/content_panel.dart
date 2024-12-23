@@ -171,7 +171,7 @@ class _ContentState extends State<Content> {
   Widget build(BuildContext context) {
     TextStyle authorStyle =
         TextStyle(color: Theme.of(context).colorScheme.primary);
-
+    InlineSpan? richNodes = richNode(widget.item, context);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
@@ -186,22 +186,23 @@ class _ContentState extends State<Content> {
               ),
             ),
           ],
-          IgnorePointer(
-            // 禁用SelectableRegion的触摸交互功能
-            ignoring: widget.source == 'detail' ? false : true,
-            child: SelectableRegion(
-              magnifierConfiguration: const TextMagnifierConfiguration(),
-              focusNode: FocusNode(),
-              selectionControls: MaterialTextSelectionControls(),
-              child: Text.rich(
-                /// fix 默认20px高度
-                style: const TextStyle(height: 0),
-                richNode(widget.item, context),
-                maxLines: 999,
-                overflow: TextOverflow.ellipsis,
+          if (richNodes != null)
+            IgnorePointer(
+              // 禁用SelectableRegion的触摸交互功能
+              ignoring: widget.source == 'detail' ? false : true,
+              child: SelectableRegion(
+                magnifierConfiguration: const TextMagnifierConfiguration(),
+                focusNode: FocusNode(),
+                selectionControls: MaterialTextSelectionControls(),
+                child: Text.rich(
+                  /// fix 默认20px高度
+                  //style: const TextStyle(height: 0),
+                  richNodes,
+                  maxLines: widget.source == 'detail' ? 999 : 6,
+                  overflow: TextOverflow.fade,
+                ),
               ),
             ),
-          ),
           if (hasPics) ...[
             Text.rich(
               picsNodes(),

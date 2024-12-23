@@ -5,11 +5,13 @@ import 'package:PiliPalaX/common/widgets/video_card_h.dart';
 import 'package:PiliPalaX/utils/utils.dart';
 import '../../common/constants.dart';
 import '../../common/widgets/http_error.dart';
+import '../../models/member/archive.dart';
 import '../../utils/grid.dart';
 import 'controller.dart';
 
 class MemberArchivePage extends StatefulWidget {
-  const MemberArchivePage({super.key});
+  const MemberArchivePage({super.key, required this.mid});
+  final int mid;
 
   @override
   State<MemberArchivePage> createState() => _MemberArchivePageState();
@@ -18,108 +20,109 @@ class MemberArchivePage extends StatefulWidget {
 class _MemberArchivePageState extends State<MemberArchivePage> {
   late MemberArchiveController _memberArchivesController;
   late Future _futureBuilderFuture;
-  late ScrollController scrollController;
   late int mid;
 
   @override
   void initState() {
     super.initState();
-    mid = int.parse(Get.parameters['mid']!);
+    mid = widget.mid;
     final String heroTag = Utils.makeHeroTag(mid);
     _memberArchivesController =
-        Get.put(MemberArchiveController(), tag: heroTag);
+        Get.put(MemberArchiveController(mid: mid), tag: heroTag);
     _futureBuilderFuture = _memberArchivesController.getMemberArchive('init');
-    scrollController = _memberArchivesController.scrollController;
-    scrollController.addListener(
-      () {
-        if (scrollController.position.pixels >=
-            scrollController.position.maxScrollExtent - 200) {
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return NotificationListener<ScrollNotification>(
+      onNotification: (scrollNotification) {
+        if ((scrollNotification is ScrollEndNotification &&
+                scrollNotification.metrics.extentAfter == 0) ||
+            (scrollNotification is ScrollUpdateNotification &&
+                scrollNotification.metrics.maxScrollExtent -
+                        scrollNotification.metrics.pixels <=
+                    200)) {
+          // 触发分页加载
           EasyThrottle.throttle(
               'member_archives', const Duration(milliseconds: 500), () {
             _memberArchivesController.onLoad();
           });
         }
+        return true;
       },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        titleSpacing: 0,
-        centerTitle: false,
-        title: Text('Ta的投稿', style: Theme.of(context).textTheme.titleMedium),
-        actions: [
-          Obx(
-            () => TextButton.icon(
-              icon: const Icon(Icons.sort, size: 20),
-              onPressed: _memberArchivesController.toggleSort,
-              label: Text(_memberArchivesController.currentOrder['label']!),
+      child: RefreshIndicator(
+        displacement: 10.0,
+        edgeOffset: 10.0,
+        onRefresh: _memberArchivesController.onRefresh, // 下拉刷新时触发的异步操作
+        child: CustomScrollView(
+          physics: const ClampingScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: Row(children: [
+                TextButton.icon(
+                  icon: const Icon(Icons.play_circle_outline, size: 20),
+                  onPressed: _memberArchivesController.episodicButton,
+                  label: Text(_memberArchivesController.episodicButtonText),
+                ),
+                const Spacer(),
+                Obx(
+                  () => TextButton.icon(
+                    icon: const Icon(Icons.sort, size: 20),
+                    onPressed: _memberArchivesController.toggleSort,
+                    label:
+                        Text(_memberArchivesController.currentOrder['label']!),
+                  ),
+                ),
+              ]),
             ),
-          ),
-          const SizedBox(width: 6),
-        ],
-      ),
-      body: CustomScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        controller: _memberArchivesController.scrollController,
-        slivers: [
-          SliverPadding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: StyleString.safeSpace),
-            sliver: FutureBuilder(
-              future: _futureBuilderFuture,
-              builder: (BuildContext context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.data != null) {
-                    Map data = snapshot.data as Map;
-                    List list = _memberArchivesController.archivesList;
-                    if (data['status']) {
-                      return Obx(
-                        () => list.isNotEmpty
-                            ? SliverGrid(
-                                gridDelegate:
-                                    SliverGridDelegateWithExtentAndRatio(
-                                        mainAxisSpacing: StyleString.safeSpace,
-                                        crossAxisSpacing: StyleString.safeSpace,
-                                        maxCrossAxisExtent:
-                                            Grid.maxRowWidth * 2,
-                                        childAspectRatio:
-                                            StyleString.aspectRatio * 2.4,
-                                        mainAxisExtent: 0),
-                                delegate: SliverChildBuilderDelegate(
-                                  (BuildContext context, index) {
-                                    return VideoCardH(
-                                      videoItem: list[index],
-                                      showOwner: false,
-                                      showPubdate: true,
-                                    );
-                                  },
-                                  childCount: list.length,
-                                ),
-                              )
-                            : const SliverToBoxAdapter(),
-                      );
-                    } else {
-                      return HttpError(
-                        errMsg: snapshot.data['msg'],
-                        fn: () {},
-                      );
-                    }
-                  } else {
-                    return HttpError(
-                      errMsg: "投稿页出现错误",
-                      fn: () {},
-                    );
+            SliverPadding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: StyleString.safeSpace),
+              sliver: FutureBuilder(
+                future: _futureBuilderFuture,
+                builder: (BuildContext context, snapshot) {
+                  if (snapshot.connectionState != ConnectionState.done) {
+                    return const SliverToBoxAdapter();
                   }
-                } else {
-                  return const SliverToBoxAdapter();
-                }
-              },
-            ),
-          )
-        ],
+                  if (snapshot.data == null) {
+                    return HttpError(
+                        errMsg: "投稿页出现错误",
+                        fn: _memberArchivesController.onRefresh);
+                  }
+                  Map data = snapshot.data as Map;
+                  List<VListItemModel> list =
+                      _memberArchivesController.archivesList;
+                  if (!data['status']) {
+                    return HttpError(
+                        errMsg: snapshot.data['msg'],
+                        fn: _memberArchivesController.onRefresh);
+                  }
+                  return Obx(() {
+                    if (list.isEmpty) return const SliverToBoxAdapter();
+                    return SliverGrid(
+                      gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                          mainAxisSpacing: StyleString.safeSpace,
+                          crossAxisSpacing: StyleString.safeSpace,
+                          maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                          childAspectRatio: StyleString.aspectRatio * 2.4,
+                          mainAxisExtent: 0),
+                      delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, index) {
+                          return VideoCardH(
+                            videoItem: list[index],
+                            showOwner: false,
+                            showPubdate: true,
+                          );
+                        },
+                        childCount: list.length,
+                      ),
+                    );
+                  });
+                },
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

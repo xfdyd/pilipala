@@ -67,6 +67,8 @@ class _BlackListPageState extends State<BlackListPage> {
         ),
       ),
       body: RefreshIndicator(
+        displacement: 10.0,
+        edgeOffset: 10.0,
         onRefresh: () async => await _blackListController.queryBlacklist(),
         child: FutureBuilder(
           future: _futureBuilderFuture,

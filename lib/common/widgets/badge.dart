@@ -68,7 +68,7 @@ class PBadge extends StatelessWidget {
         border: Border.all(color: borderColor),
       ),
       child: Text(
-        text ?? "",
+        text == "ketang" ? "课堂" : text ?? "",
         style: TextStyle(
           height: 1,
           fontSize: fs ?? fontSize,

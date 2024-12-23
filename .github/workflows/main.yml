@@ -23,7 +23,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: "zulu"
-          java-version: "17"
+          java-version: "21"
           token: ${{secrets.GIT_TOKEN}}
 
       - name: 检查缓存
@@ -37,7 +37,7 @@ jobs:
         if: steps.cache-flutter.outputs.cache-hit != 'true'
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.24.2
+          flutter-version: 3.24.4
           channel: any
 
       - name: 修复3.24的stable显示中文不正确问题
@@ -113,7 +113,7 @@ jobs:
         uses: subosito/flutter-action@v2.10.0
         with:
           cache: true
-          flutter-version: 3.24.2
+          flutter-version: 3.24.4
 
       - name: 获取版本号
         id: version

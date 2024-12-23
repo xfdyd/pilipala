@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart';
@@ -108,9 +107,10 @@ class LoginHttp {
     int timestamp = DateTime.now().millisecondsSinceEpoch;
     var data = {
       'appkey': Constants.appKey,
-      'build': '1462100',
+      'build': '2001100',
       'buvid': buvid,
       'c_locale': 'zh_CN',
+      'channel': 'yingyongbao',
       'cid': cid,
       // if (deviceTouristId != null) 'device_tourist_id': deviceTouristId,
       'disable_rcmd': '0',
@@ -160,7 +160,7 @@ class LoginHttp {
   //   dynamic publicKey = RSAKeyParser().parse(key);
   //   var params = {
   //     'appkey': Constants.appKey,
-  //     'build': '1462100',
+  //     'build': '2001100',
   //     'buvid': buvid,
   //     'c_locale': 'zh_CN',
   //     'channel': 'yingyongbao',
@@ -214,7 +214,7 @@ class LoginHttp {
     Map<String, dynamic> data = {
       'appkey': Constants.appKey,
       'bili_local_id': deviceId,
-      'build': '1462100',
+      'build': '2001100',
       'buvid': buvid,
       'c_locale': 'zh_CN',
       'channel': 'yingyongbao',
@@ -291,7 +291,7 @@ class LoginHttp {
     Map<String, dynamic> data = {
       'appkey': Constants.appKey,
       'bili_local_id': deviceId,
-      'build': '1462100',
+      'build': '2001100',
       'buvid': buvid,
       'c_locale': 'zh_CN',
       'captcha_key': captchaKey,
@@ -370,7 +370,7 @@ class LoginHttp {
     }
   }
 
-  // 风控验证手机前的验证码
+  // 风控验证手机前的极验验证码
   static Future preCapture() async {
     var res = await Request().post(Api.preCapture);
     print(res);
@@ -386,23 +386,40 @@ class LoginHttp {
     }
   }
 
-  // 风控验证手机
+  // 风控验证手机：发送短信验证码
   static Future safeCenterSmsCode({
     String? smsType,
     required String tmpCode,
-    required String geeChallenge,
-    required String geeSeccode,
-    required String geeValidate,
-    required String recaptchaToken,
+    String? geeChallenge,
+    String? geeSeccode,
+    String? geeValidate,
+    String? recaptchaToken,
+    required String refererUrl,
   }) async {
-    var res = await Request().post(Api.safeCenterSmsCode, data: {
+    Map<String, dynamic> data = {
+      'disable_rcmd': '0',
       'sms_type': smsType ?? 'loginTelCheck',
       'tmp_code': tmpCode,
-      'gee_challenge': geeChallenge,
-      'gee_seccode': geeSeccode,
-      'gee_validate': geeValidate,
-      'recaptcha_token': recaptchaToken,
-    });
+      if (geeChallenge != null) 'gee_challenge': geeChallenge,
+      if (geeSeccode != null) 'gee_seccode': geeSeccode,
+      if (geeValidate != null) 'gee_validate': geeValidate,
+      if (recaptchaToken != null) 'recaptcha_token': recaptchaToken,
+    };
+    String sign = Utils.appSign(
+      data,
+      Constants.appKey,
+      Constants.appSec,
+    );
+    data['sign'] = sign;
+    print(data);
+    var res = await Request().post(
+      Api.safeCenterSmsCode,
+      data: data,
+      options:
+          Options(contentType: Headers.formUrlEncodedContentType, headers: {
+        "Referer": refererUrl,
+      }),
+    );
     print(res);
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
@@ -416,21 +433,93 @@ class LoginHttp {
     }
   }
 
-  static Future safeCenterSmsVerify(
-      {String? type,
-      required String code,
-      required String tmpCode,
-      required String requestId,
-      required String source,
-      required String captchaKey}) async {
-    var res = await Request().post(Api.safeCenterSmsVerify, data: {
+  // 风控验证手机：提交短信验证码
+  static Future safeCenterSmsVerify({
+    String? type,
+    required String code,
+    required String tmpCode,
+    required String requestId,
+    required String source,
+    required String captchaKey,
+    required String refererUrl,
+  }) async {
+    Map<String, dynamic> data = {
       'type': type ?? 'loginTelCheck',
       'code': code,
       'tmp_code': tmpCode,
       'request_id': requestId,
       'source': source,
       'captcha_key': captchaKey,
+    };
+    String sign = Utils.appSign(
+      data,
+      Constants.appKey,
+      Constants.appSec,
+    );
+    data['sign'] = sign;
+    var res = await Request().post(
+      Api.safeCenterSmsVerify,
+      data: data,
+      options:
+          Options(contentType: Headers.formUrlEncodedContentType, headers: {
+        "Referer": refererUrl,
+      }),
+    );
+    print(res);
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {
+        'status': false,
+        'code': res.data['code'],
+        'msg': res.data['message'],
+        'data': res.data['data']
+      };
+    }
+  }
+
+  // 风控验证手机：用oauthCode换回accessToken
+  static Future oauth2AccessToken({
+    required String code,
+  }) async {
+    Map<String, dynamic> data = {
+      'appkey': Constants.appKey,
+      'build': '2001100',
+      'buvid': buvid,
+      // 'c_locale': 'zh_CN',
+      // 'channel': 'yingyongbao',
+      'code': code,
+      // 'device': 'phone',
+      // 'device_id': deviceId,
+      // 'device_name': 'vivo',
+      // 'device_platform': 'Android14vivo',
+      'disable_rcmd': '0',
+      'grant_type': 'authorization_code',
+      'local_id': buvid,
+      'mobi_app': 'android_hd',
+      'platform': 'android',
+      // 's_locale': 'zh_CN',
+      // 'statistics': Constants.statistics,
+      'ts': (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString(),
+    };
+    String sign = Utils.appSign(
+      data,
+      Constants.appKey,
+      Constants.appSec,
+    );
+    data['sign'] = sign;
+    data.map((key, value) {
+      print('$key: $value');
+      return MapEntry<String, dynamic>(key, value);
     });
+    var res = await Request().post(
+      Api.oauth2AccessToken,
+      data: data,
+      options: Options(
+        contentType: Headers.formUrlEncodedContentType,
+        headers: headers,
+      ),
+    );
     print(res);
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};

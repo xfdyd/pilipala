@@ -24,37 +24,39 @@
 
 ## 开发环境
 
-为临时修复高于3.22.3版本flutter中文字重的bug，使用flutter 3.24.2(stable)，然后在flutter自身的目录中执行
+为临时修复高于3.22.3版本flutter中文字重的bug，使用flutter 3.24.4(stable)，然后在flutter自身的目录中执行
 ```bash
 git cherry-pick d4124bd --strategy-option theirs
 flutter --version
 ```
-以更换Framework和Engine版本（之后flutter doctor就会显示为3.24.3-0.0.pre.1）如下：
+以更换Framework和Engine版本（之后flutter doctor就会显示为3.24.5-0.0.pre.1）如下：
 
 ```bash
-[√] Flutter (Channel stable, 3.24.3-0.0.pre.1, on Microsoft Windows [版本 10.0.19045.4842], locale zh-CN)
-    • Flutter version 3.24.3-0.0.pre.1 on channel stable at C:\others\flutter
+[√] Flutter (Channel stable, 3.24.5-0.0.pre.1, on Microsoft Windows [版本 10.0.19045.5073], locale zh-CN)
+    • Flutter version 3.24.5-0.0.pre.1 on channel stable at C:\others\flutter
     • Upstream repository https://github.com/flutter/flutter.git
-    • Framework revision 2d001dcb9d (7 weeks ago), 2024-07-24 00:10:30 -0400
+    • Framework revision 1d5ace7b10 (4 months ago), 2024-07-24 00:10:30 -0400
     • Engine revision 1572635432
     • Dart version 3.6.0 (build 3.6.0-75.0.dev)
     • DevTools version 2.37.1
-    • Pub download mirror https://mirrors.tuna.tsinghua.edu.cn/dart-pub
-    • Flutter download mirror https://mirrors.tuna.tsinghua.edu.cn/flutter
+    • Pub download mirror https://pub.flutter-io.cn
+    • Flutter download mirror https://storage.flutter-io.cn
+[√] Windows Version (Installed version of Windows is version 10 or higher)
 [✓] Android toolchain - develop for Android devices (Android SDK version 34.0.0)
 [✓] Xcode - develop for iOS and macOS (Xcode 15.1)
 [✓] Chrome - develop for the web
-[✓] Android Studio (version 2024.1)
-[✓] VS Code (version 1.92.2)
-[✓] Connected device (3 available)
+[✓] Android Studio (version 2024.2)
+[✓] VS Code (version 1.95.2)
+[✓] Connected device (4 available)
 [✓] Network resources
 
 ```
 注：Framework revision XXXXXX可能会不一致，但后续时间应该是一致的
 <br/>
 Android相关版本：
-> gradle: 7.6.3
-> kotlin: 1.9.22
+> JDK: 21.0.4
+> gradle: 8.10.2
+> kotlin: 2.0.20
 > minSdk: 21
 > targetSdk: 34
 > compileSdk: 34

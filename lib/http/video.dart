@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
 import '../common/constants.dart';
@@ -80,7 +79,7 @@ class VideoHttp {
               '')
           : '',
       'appkey': Constants.appKey,
-      'build': '1462100',
+      'build': '2001100',
       'c_locale': 'zh_CN',
       'channel': 'yingyongbao',
       'column': '4',
@@ -136,6 +135,7 @@ class VideoHttp {
         'bili-http-engine': 'cronet',
       }),
     );
+    log(res.data['data'].toString());
     if (res.data['code'] == 0) {
       List<RecVideoItemAppModel> list = [];
       List<int> blackMidsList = localCache
@@ -793,6 +793,32 @@ class VideoHttp {
       }
     } catch (err) {
       return {'status': false, 'data': [], 'msg': err};
+    }
+  }
+
+  // 视频分区
+  static Future getRegionVideoList(int tid, int pn, int ps) async {
+    var res = await Request().get(Api.getRegionApi, data: {
+      'rid': tid,
+      'pn': pn,
+      'ps': ps,
+    });
+    print("getRegionVideoList: $res");
+    if (res.data['code'] == 0) {
+      List<HotVideoItemModel> list = [];
+      List<int> blackMidsList = localCache
+          .get(LocalCacheKey.blackMidsList, defaultValue: [-1])
+          .map<int>((e) => e as int)
+          .toList();
+      print(res.data['data']['archives']);
+      for (var i in res.data['data']['archives']) {
+        if (!blackMidsList.contains(i['owner']['mid'])) {
+          list.add(HotVideoItemModel.fromJson(i));
+        }
+      }
+      return {'status': true, 'data': list};
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 }

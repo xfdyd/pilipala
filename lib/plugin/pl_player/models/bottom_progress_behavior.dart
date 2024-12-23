@@ -11,13 +11,11 @@ extension BtmProgresBehaviorDesc on BtmProgressBehavior {
 }
 
 extension BtmProgresBehaviorCode on BtmProgressBehavior {
-  static final List<int> _codeList = [0, 1, 2, 3];
-  int get code => _codeList[index];
+  int get code => index;
 
   static BtmProgressBehavior? fromCode(int code) {
-    final index = _codeList.indexOf(code);
-    if (index != -1) {
-      return BtmProgressBehavior.values[index];
+    if (code >= 0 && code < BtmProgressBehavior.values.length) {
+      return BtmProgressBehavior.values[code];
     }
     return null;
   }

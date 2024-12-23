@@ -16,9 +16,12 @@ import 'package:PiliPalaX/pages/rank/zone/index.dart';
 import '../../../utils/grid.dart';
 
 class ZonePage extends StatefulWidget {
-  const ZonePage({Key? key, required this.rid}) : super(key: key);
+  const ZonePage({super.key, this.rid, this.tid})
+      : assert(
+            rid != null || tid != null, 'Either rid or tid must be provided');
 
-  final int rid;
+  final int? rid;
+  final int? tid;
 
   @override
   State<ZonePage> createState() => _ZonePageState();
@@ -36,8 +39,10 @@ class _ZonePageState extends State<ZonePage>
   @override
   void initState() {
     super.initState();
-    _zoneController = Get.put(ZoneController(), tag: widget.rid.toString());
-    _futureBuilderFuture = _zoneController.queryRankFeed('init', widget.rid);
+    _zoneController =
+        Get.put(ZoneController(), tag: (widget.rid ?? widget.tid).toString());
+    _futureBuilderFuture =
+        _zoneController.queryRankFeed('init', widget.rid, widget.tid);
     scrollController = _zoneController.scrollController;
     StreamController<bool> mainStream =
         Get.find<MainController>().bottomBarStream;
@@ -76,6 +81,8 @@ class _ZonePageState extends State<ZonePage>
   Widget build(BuildContext context) {
     super.build(context);
     return RefreshIndicator(
+      displacement: 10.0,
+      edgeOffset: 10.0,
       onRefresh: () async {
         return await _zoneController.onRefresh();
       },
@@ -84,12 +91,12 @@ class _ZonePageState extends State<ZonePage>
         slivers: [
           SliverPadding(
             // 单列布局 EdgeInsets.zero
-            padding:
-                const EdgeInsets.fromLTRB(StyleString.cardSpace, StyleString.safeSpace, 0, 0),
+            padding: const EdgeInsets.fromLTRB(
+                StyleString.cardSpace, StyleString.safeSpace, 0, 0),
             sliver: FutureBuilder(
               future: _futureBuilderFuture,
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
                   Map data = snapshot.data as Map;
                   if (data['status']) {
                     return Obx(
@@ -121,8 +128,8 @@ class _ZonePageState extends State<ZonePage>
                       errMsg: data['msg'],
                       fn: () {
                         setState(() {
-                          _futureBuilderFuture =
-                              _zoneController.queryRankFeed('init', widget.rid);
+                          _futureBuilderFuture = _zoneController.queryRankFeed(
+                              'init', widget.rid, widget.tid);
                         });
                       },
                     );

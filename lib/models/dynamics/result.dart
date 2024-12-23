@@ -424,6 +424,7 @@ class DynamicMajorModel {
   DynamicLiveModel? liveRcmd;
   DynamicLive2Model? live;
   DynamicNoneModel? none;
+  DynamicCommonModel? common;
   // MAJOR_TYPE_DRAW 图片
   // MAJOR_TYPE_ARCHIVE 视频
   // MAJOR_TYPE_OPUS 图文/文章
@@ -448,6 +449,9 @@ class DynamicMajorModel {
         : null;
     live =
         json['live'] != null ? DynamicLive2Model.fromJson(json['live']) : null;
+    common = json['common'] != null
+        ? DynamicCommonModel.fromJson(json['common'])
+        : null;
     none =
         json['none'] != null ? DynamicNoneModel.fromJson(json['none']) : null;
     type = json['type'];
@@ -561,6 +565,42 @@ class DynamicOpusModel {
         : [];
     summary =
         json['summary'] != null ? SummaryModel.fromJson(json['summary']) : null;
+    title = json['title'];
+  }
+}
+
+class DynamicCommonModel {
+  DynamicCommonModel({
+    this.badge,
+    this.jumpUrl,
+    this.cover,
+    this.label,
+    this.desc,
+    this.id,
+    this.sketchId,
+    this.style,
+    this.title,
+  });
+
+  Map? badge;
+  String? jumpUrl;
+  String? cover;
+  String? label;
+  String? desc;
+  String? id;
+  String? sketchId;
+  int? style;
+  String? title;
+
+  DynamicCommonModel.fromJson(Map<String, dynamic> json) {
+    badge = json['badge'];
+    jumpUrl = json['jump_url'];
+    cover = json['cover'];
+    label = json['label'];
+    desc = json['desc'];
+    id = json['id'];
+    sketchId = json['sketch_id'];
+    style = json['style'];
     title = json['title'];
   }
 }

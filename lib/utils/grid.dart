@@ -1,10 +1,11 @@
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
 import 'storage.dart';
+
 class Grid {
-  static double maxRowWidth = GStorage.setting.get(SettingBoxKey.maxRowWidth, defaultValue: 240.0) as double;
+  static double maxRowWidth = GStorage.setting
+      .get(SettingBoxKey.maxRowWidth, defaultValue: 240.0) as double;
   //
   // static double calculateActualWidth(BuildContext context, double maxCrossAxisExtent, double crossAxisSpacing, {double? screenWidthOffset}) {
   //   double screenWidth = MediaQuery.of(context).size.width;
@@ -22,6 +23,7 @@ class Grid {
   //   return columnWidth;
   // }
 }
+
 class SliverGridDelegateWithExtentAndRatio extends SliverGridDelegate {
   /// Creates a delegate that makes grid layouts with tiles that have a maximum
   /// cross-axis extent.
@@ -35,7 +37,7 @@ class SliverGridDelegateWithExtentAndRatio extends SliverGridDelegate {
     this.crossAxisSpacing = 0.0,
     this.childAspectRatio = 1.0,
     this.mainAxisExtent = 0.0,
-  }) : assert(maxCrossAxisExtent > 0),
+  })  : assert(maxCrossAxisExtent > 0),
         assert(mainAxisSpacing >= 0),
         assert(crossAxisSpacing >= 0),
         assert(childAspectRatio > 0);
@@ -62,12 +64,9 @@ class SliverGridDelegateWithExtentAndRatio extends SliverGridDelegate {
   /// The ratio of the cross-axis to the main-axis extent of each child.
   final double childAspectRatio;
 
-
   /// The extent of each tile in the main axis. If provided, it would add
   /// after [childAspectRatio] is used.
   final double mainAxisExtent;
-
-
 
   bool _debugAssertIsValid(double crossAxisExtent) {
     assert(crossAxisExtent > 0.0);
@@ -81,7 +80,9 @@ class SliverGridDelegateWithExtentAndRatio extends SliverGridDelegate {
   @override
   SliverGridLayout getLayout(SliverConstraints constraints) {
     assert(_debugAssertIsValid(constraints.crossAxisExtent));
-    int crossAxisCount = ((constraints.crossAxisExtent - crossAxisSpacing) / (maxCrossAxisExtent + crossAxisSpacing)).ceil();
+    int crossAxisCount = ((constraints.crossAxisExtent - crossAxisSpacing) /
+            (maxCrossAxisExtent + crossAxisSpacing))
+        .ceil();
     // Ensure a minimum count of 1, can be zero and result in an infinite extent
     // below when the window size is 0.
     crossAxisCount = max(1, crossAxisCount);
@@ -90,7 +91,8 @@ class SliverGridDelegateWithExtentAndRatio extends SliverGridDelegate {
       constraints.crossAxisExtent - crossAxisSpacing * (crossAxisCount - 1),
     );
     final double childCrossAxisExtent = usableCrossAxisExtent / crossAxisCount;
-    final double childMainAxisExtent = childCrossAxisExtent / childAspectRatio + mainAxisExtent;
+    final double childMainAxisExtent =
+        childCrossAxisExtent / childAspectRatio + mainAxisExtent;
     return SliverGridRegularTileLayout(
       crossAxisCount: crossAxisCount,
       mainAxisStride: childMainAxisExtent + mainAxisSpacing,
@@ -103,10 +105,10 @@ class SliverGridDelegateWithExtentAndRatio extends SliverGridDelegate {
 
   @override
   bool shouldRelayout(SliverGridDelegateWithExtentAndRatio oldDelegate) {
-    return oldDelegate.maxCrossAxisExtent != maxCrossAxisExtent
-        || oldDelegate.mainAxisSpacing != mainAxisSpacing
-        || oldDelegate.crossAxisSpacing != crossAxisSpacing
-        || oldDelegate.childAspectRatio != childAspectRatio
-        || oldDelegate.mainAxisExtent != mainAxisExtent;
+    return oldDelegate.maxCrossAxisExtent != maxCrossAxisExtent ||
+        oldDelegate.mainAxisSpacing != mainAxisSpacing ||
+        oldDelegate.crossAxisSpacing != crossAxisSpacing ||
+        oldDelegate.childAspectRatio != childAspectRatio ||
+        oldDelegate.mainAxisExtent != mainAxisExtent;
   }
 }

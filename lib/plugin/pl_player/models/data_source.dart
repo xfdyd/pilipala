@@ -41,6 +41,7 @@ class DataSource {
     String? audioSource,
     String? subFiles,
     DataSourceType? type,
+    Duration? startAt,
     Map<String, String>? httpHeaders,
   }) {
     return DataSource(
@@ -51,5 +52,30 @@ class DataSource {
       type: type ?? this.type,
       httpHeaders: httpHeaders ?? this.httpHeaders,
     );
+  }
+
+  // from json
+  factory DataSource.fromJson(Map<String, dynamic> json) {
+    return DataSource(
+      file: json['file'],
+      videoSource: json['videoSource'],
+      audioSource: json['audioSource'],
+      subFiles: json['subFiles'],
+      type: DataSourceType.values.byName(json['type']),
+      httpHeaders: json['httpHeaders']?.map<String, String>(
+          (String key, dynamic value) => MapEntry(key, value!.toString())),
+    );
+  }
+
+  // toJson
+  Map<String, dynamic> toJson() {
+    return {
+      'file': file,
+      'videoSource': videoSource,
+      'audioSource': audioSource,
+      'subFiles': subFiles,
+      'type': type.name,
+      'httpHeaders': httpHeaders,
+    };
   }
 }

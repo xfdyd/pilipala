@@ -1,6 +1,5 @@
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 
@@ -42,6 +41,8 @@ class _AtMePageState extends State<AtMePage> {
         title: const Text('@我的'),
       ),
       body: RefreshIndicator(
+        displacement: 10.0,
+        edgeOffset: 10.0,
         onRefresh: () async {
           await _atMeController.onRefresh();
         },
@@ -63,8 +64,8 @@ class _AtMePageState extends State<AtMePage> {
                   itemBuilder: (_, int i) {
                     return ListTile(
                       onTap: () {
-                        String? nativeUri = _atMeController
-                                .msgFeedAtMeList[i].item?.nativeUri;
+                        String? nativeUri =
+                            _atMeController.msgFeedAtMeList[i].item?.nativeUri;
                         if (nativeUri != null) {
                           PiliScheme.routePush(Uri.parse(nativeUri));
                         }

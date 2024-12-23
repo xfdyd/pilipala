@@ -21,8 +21,8 @@ class SetSwitchItem extends StatefulWidget {
     this.callFn,
     this.needReboot,
     this.leading,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<SetSwitchItem> createState() => _SetSwitchItemState();
@@ -73,7 +73,7 @@ class _SetSwitchItemState extends State<SetSwitchItem> {
         alignment: Alignment.centerRight, // 缩放Switch的大小后保持右侧对齐, 避免右侧空隙过大
         scale: 0.8,
         child: Switch(
-          thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
+          thumbIcon: WidgetStateProperty.resolveWith<Icon?>(
               (Set<MaterialState> states) {
             if (states.isNotEmpty && states.first == MaterialState.selected) {
               return const Icon(Icons.done);

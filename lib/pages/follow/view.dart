@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'controller.dart';
 import 'widgets/follow_list.dart';
 import 'widgets/owner_follow_list.dart';
+import 'package:PiliPalaX/common/widgets/spring_physics.dart';
 
 class FollowPage extends StatefulWidget {
   const FollowPage({super.key});
@@ -84,6 +85,7 @@ class _FollowPageState extends State<FollowPage> {
                               ]),
                           Expanded(
                             child: TabBarView(
+                              physics: const CustomTabBarViewScrollPhysics(),
                               controller: _followController.tabController,
                               children: [
                                 for (var i = 0;

@@ -12,8 +12,7 @@ import 'package:PiliPalaX/utils/utils.dart';
 class UpPanel extends StatefulWidget {
   final FollowUpModel? upData;
   final ScrollController scrollController;
-  const UpPanel(this.upData, this.scrollController, {Key? key})
-      : super(key: key);
+  const UpPanel(this.upData, this.scrollController, {super.key});
 
   @override
   State<UpPanel> createState() => _UpPanelState();
@@ -49,7 +48,7 @@ class _UpPanelState extends State<UpPanel> {
               height: 45,
               child: TextButton(
                 style: ButtonStyle(
-                  padding: MaterialStateProperty.all(const EdgeInsets.only()),
+                  padding: WidgetStateProperty.all(const EdgeInsets.only()),
                 ),
                 child: Column(
                   children: [

@@ -11,6 +11,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 // import 'package:dio_http2_adapter/dio_http2_adapter.dart';
 import 'package:hive/hive.dart';
 import 'package:PiliPalaX/utils/id_utils.dart';
+import '../utils/login.dart';
 import '../utils/storage.dart';
 import '../utils/utils.dart';
 import 'api.dart';
@@ -81,6 +82,23 @@ class Request {
     return token;
   }
 
+  static Future<String> getBUVID() async {
+    List<Cookie> cookies = await cookieManager.cookieJar
+        .loadForRequest(Uri.parse(HttpString.apiBaseUrl));
+    // String token = '';
+    print("cookies $cookies");
+    if (cookies.where((e) => e.name == 'Buvid').isNotEmpty) {
+      return cookies.firstWhere((e) => e.name == 'Buvid').value;
+    }
+    return LoginUtils.buvid();
+  }
+
+  static String getRandomSessionId() {
+    // 返回8位随机16进制数
+    return List.generate(8, (index) => Random().nextInt(16).toRadixString(16))
+        .join();
+  }
+
   static setOptionsHeaders(userInfo, bool status) {
     if (status) {
       dio.options.headers['x-bili-mid'] = userInfo.mid.toString();
@@ -97,7 +115,7 @@ class Request {
     var html = await Request().get(Api.dynamicSpmPrefix);
     String spmPrefix = spmPrefixExp.firstMatch(html.data)!.group(1)!;
     Random rand = Random();
-    String rand_png_end = base64.encode(
+    String randPngEnd = base64.encode(
         List<int>.generate(32, (_) => rand.nextInt(256)) +
             List<int>.filled(4, 0) +
             [73, 69, 78, 68] +
@@ -108,7 +126,7 @@ class Request {
       '39c8': '$spmPrefix.fp.risk',
       '3c43': {
         'adca': 'Linux',
-        'bfe9': rand_png_end.substring(rand_png_end.length - 50),
+        'bfe9': randPngEnd.substring(randPngEnd.length - 50),
       },
     });
 

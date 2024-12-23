@@ -15,8 +15,8 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
   const BottomControl({
     this.controller,
     this.buildBottomControl,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);
@@ -26,11 +26,11 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
     Color colorTheme = Theme.of(context).colorScheme.primary;
     final _ = controller!;
     //阅读器限制
-    Timer? _accessibilityDebounce;
-    double _lastAnnouncedValue = -1;
+    Timer? accessibilityDebounce;
+    double lastAnnouncedValue = -1;
     return Container(
       color: Colors.transparent,
-      height: 90,
+      height: 70 + (_.isFullScreen.value ? Get.height * 0.08 : 0),
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -44,7 +44,10 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
                 return nil;
               }
               return Padding(
-                padding: const EdgeInsets.only(left: 10, right: 10, bottom: 7),
+                padding: EdgeInsets.only(
+                    left: 10,
+                    right: 10,
+                    bottom: 5 + (_.isFullScreen.value ? Get.height * 0.01 : 0)),
                 child: Semantics(
                     // label: '${(value / max * 100).round()}%',
                     value: '${(value / max * 100).round()}%',
@@ -56,7 +59,9 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
                       progressBarColor: colorTheme,
                       baseBarColor: Colors.white.withOpacity(0.2),
                       bufferedBarColor: colorTheme.withOpacity(0.4),
-                      timeLabelLocation: TimeLabelLocation.none,
+                      timeLabelLocation: TimeLabelLocation.sides,
+                      timeLabelTextStyle: const TextStyle(color: Colors.white),
+                      // timeLabelLocation: TimeLabelLocation.none,
                       thumbColor: colorTheme,
                       barHeight: 3.5,
                       thumbRadius: 7,
@@ -66,14 +71,14 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
                       },
                       onDragUpdate: (duration) {
                         double newProgress = duration.timeStamp.inSeconds / max;
-                        if ((newProgress - _lastAnnouncedValue).abs() > 0.02) {
-                          _accessibilityDebounce?.cancel();
-                          _accessibilityDebounce =
+                        if ((newProgress - lastAnnouncedValue).abs() > 0.02) {
+                          accessibilityDebounce?.cancel();
+                          accessibilityDebounce =
                               Timer(const Duration(milliseconds: 200), () {
                             SemanticsService.announce(
                                 "${(newProgress * 100).round()}%",
                                 TextDirection.ltr);
-                            _lastAnnouncedValue = newProgress;
+                            lastAnnouncedValue = newProgress;
                           });
                         }
                         _.onUpdatedSliderProgress(duration.timeStamp);
@@ -92,9 +97,11 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
             },
           ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [...buildBottomControl!],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 9),
+          if (_.isFullScreen.value) SizedBox(height: Get.height * 0.07),
         ],
       ),
     );

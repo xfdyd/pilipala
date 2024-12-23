@@ -20,8 +20,7 @@ class SearchPanel extends StatefulWidget {
   final SearchType? searchType;
   final String? tag;
   const SearchPanel(
-      {required this.keyword, required this.searchType, this.tag, Key? key})
-      : super(key: key);
+      {required this.keyword, required this.searchType, this.tag, super.key});
 
   @override
   State<SearchPanel> createState() => _SearchPanelState();
@@ -69,6 +68,8 @@ class _SearchPanelState extends State<SearchPanel>
   Widget build(BuildContext context) {
     super.build(context);
     return RefreshIndicator(
+      displacement: 10.0,
+      edgeOffset: 10.0,
       onRefresh: () async {
         await _searchPanelController.onRefresh();
       },

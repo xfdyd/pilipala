@@ -54,11 +54,11 @@ class ChatItem extends StatelessWidget {
     bool isOwner = item.senderUid == GStorage.userInfo.get('userInfoCache').mid;
 
     bool isPic = item.msgType == MsgType.pic.value; // 图片
-    bool isText = item.msgType == MsgType.text.value; // 文本
+    // bool isText = item.msgType == MsgType.text.value; // 文本
     // bool isArchive = item.msgType == 11; // 投稿
     // bool isArticle = item.msgType == 12; // 专栏
     bool isRevoke = item.msgType == MsgType.revoke.value; // 撤回消息
-    bool isShareV2 = item.msgType == MsgType.share_v2.value;
+    // bool isShareV2 = item.msgType == MsgType.share_v2.value;
     bool isSystem = item.msgType == MsgType.notify_text.value ||
         item.msgType == MsgType.notify_msg.value ||
         item.msgType == MsgType.pic_card.value ||
@@ -84,8 +84,7 @@ class ChatItem extends StatelessWidget {
             final String emojiKey = match[0]!;
             print(emojiKey);
             if (emojiMap.containsKey(emojiKey)) {
-              children.add(
-                  WidgetSpan(
+              children.add(WidgetSpan(
                 child: NetworkImgLayer(
                   width: 18,
                   height: 18,
@@ -218,7 +217,7 @@ class ChatItem extends StatelessWidget {
                     SmartDialog.dismiss<dynamic>().then(
                       (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
                           arguments: <String, String?>{
-                            'pic': content['thumb'],
+                            'pic': content['cover'],
                             'heroTag': heroTag,
                           }),
                     );
@@ -366,6 +365,72 @@ class ChatItem extends StatelessWidget {
                   ],
                 ],
               ));
+        case MsgType.article_card:
+          return GestureDetector(
+            onTap: () async {
+              Get.toNamed('/htmlRender', parameters: {
+                'url': "https://www.bilibili.com/read/cv${content['rid']}/",
+                // 'url': url.startsWith('//') ? url.split('//').last : url,
+                'title': content['title'] ?? "",
+                'id': "cv${content['rid']}",
+                'dynamicType': "read" //content['template_id'] ?? "",
+              });
+              return;
+              try {
+                SmartDialog.showLoading();
+                var bvid = content["bvid"];
+                final int cid = await SearchHttp.ab2c(bvid: bvid);
+                final String heroTag = Utils.makeHeroTag(bvid);
+                SmartDialog.dismiss<dynamic>().then(
+                  (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
+                      arguments: <String, String?>{
+                        'pic': content['cover'],
+                        'heroTag': heroTag,
+                      }),
+                );
+              } catch (err) {
+                SmartDialog.dismiss();
+                SmartDialog.showToast(err.toString());
+              }
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    for (var i in content['image_urls'])
+                      NetworkImgLayer(
+                        width: 130,
+                        height: 130 * 9 / 16,
+                        src: i,
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                SelectableText(
+                  content['title'] ?? "",
+                  style: TextStyle(
+                    letterSpacing: 0.6,
+                    height: 1.5,
+                    color: textColor(context),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 1),
+                SelectableText(
+                  content['summary'] ?? "",
+                  style: TextStyle(
+                    letterSpacing: 0.6,
+                    height: 1.5,
+                    color: textColor(context).withOpacity(0.6),
+                    fontSize: 12,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  maxLines: 2,
+                ),
+              ],
+            ),
+          );
         default:
           return Text(
             content != null && content != ''

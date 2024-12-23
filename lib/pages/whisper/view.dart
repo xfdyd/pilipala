@@ -61,6 +61,8 @@ class _WhisperPageState extends State<WhisperPage> {
         ],
       ),
       body: RefreshIndicator(
+        displacement: 10.0,
+        edgeOffset: 10.0,
         onRefresh: () async {
           await _whisperController.queryMsgFeedUnread();
           await _whisperController.onRefresh();

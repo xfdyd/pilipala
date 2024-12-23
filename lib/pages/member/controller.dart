@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:PiliPalaX/http/constants.dart';
+import 'package:PiliPalaX/http/init.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -10,10 +13,12 @@ import 'package:PiliPalaX/models/member/coin.dart';
 import 'package:PiliPalaX/models/member/info.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:html/dom.dart' as dom;
+import 'package:html/parser.dart' as html_parser;
 
-import '../video/detail/introduction/widgets/group_panel.dart';
+import 'package:PiliPalaX/pages/video/introduction/widgets/group_panel.dart';
 
-class MemberController extends GetxController {
+class MemberController extends GetxController with GetTickerProviderStateMixin {
   int? mid;
   MemberController({this.mid});
   Rx<MemberInfoModel> memberInfo = MemberInfoModel().obs;
@@ -29,15 +34,18 @@ class MemberController extends GetxController {
   RxInt attribute = (-1).obs;
   RxString attributeText = '关注'.obs;
   RxList<MemberCoinsDataModel> recentCoinsList = <MemberCoinsDataModel>[].obs;
+  String? wwebid;
+  late TabController tabController;
 
   @override
   void onInit() async {
     super.onInit();
     mid = mid ?? int.parse(Get.parameters['mid']!);
     userInfo = userInfoCache.get('userInfoCache');
-    ownerMid = userInfo != null ? userInfo.mid : -1;
-    face.value = Get.arguments['face'] ?? '';
-    heroTag = Get.arguments['heroTag'] ?? '';
+    ownerMid = userInfo?.mid ?? -1;
+    face.value = Get.arguments?['face'] ?? '';
+    heroTag = Get.arguments?['heroTag'] ?? '';
+    tabController = TabController(length: 3, vsync: this);
     relationSearch();
   }
 
@@ -45,12 +53,29 @@ class MemberController extends GetxController {
   Future<Map<String, dynamic>> getInfo() async {
     await getMemberStat();
     await getMemberView();
-    var res = await MemberHttp.memberInfo(mid: mid);
+    await getWwebid();
+    var res = await MemberHttp.memberInfo(mid: mid, wwebid: wwebid);
     if (res['status']) {
       memberInfo.value = res['data'];
       face.value = res['data'].face;
+    } else {
+      SmartDialog.showToast(res['msg']);
     }
     return res;
+  }
+
+  Future getWwebid() async {
+    try {
+      dynamic response =
+      await Request().get('${HttpString.spaceBaseUrl}/$mid/dynamic');
+      dom.Document document = html_parser.parse(response.data);
+      dom.Element? scriptElement =
+      document.querySelector('script#__RENDER_DATA__');
+      wwebid = jsonDecode(
+          Uri.decodeComponent(scriptElement?.text ?? ''))['access_id'];
+    } catch (e) {
+      print('failed to get wwebid: $e');
+    }
   }
 
   // 获取用户状态
@@ -85,10 +110,10 @@ class MemberController extends GetxController {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    if (memberInfo.value == null) {
-      SmartDialog.showToast('尚未获取到用户信息');
-      return;
-    }
+    // if (memberInfo.value == null) {
+    //   SmartDialog.showToast('尚未获取到用户信息');
+    //   return;
+    // }
     if (attribute.value == 128) {
       blockUser(context);
       return;
@@ -239,16 +264,6 @@ class MemberController extends GetxController {
     Share.share('${memberInfo.value.name} - https://space.bilibili.com/$mid');
   }
 
-  // 请求专栏
-  Future getMemberSeasons() async {
-    if (userInfo == null) return;
-    var res = await MemberHttp.getMemberSeasons(mid, 1, 10);
-    if (!res['status']) {
-      SmartDialog.showToast("用户专栏请求异常：${res['msg']}");
-    }
-    return res;
-  }
-
   // 请求投币视频
   Future getRecentCoinVideo() async {
     if (userInfo == null) return;
@@ -257,16 +272,16 @@ class MemberController extends GetxController {
     return res;
   }
 
-  // 跳转查看动态
-  void pushDynamicsPage() => Get.toNamed('/memberDynamics?mid=$mid');
-
-  // 跳转查看投稿
-  void pushArchivesPage() => Get.toNamed('/memberArchive?mid=$mid');
-
-  // 跳转查看专栏
-  void pushSeasonsPage() {}
-  // 跳转查看最近投币
-  void pushRecentCoinsPage() async {
-    if (recentCoinsList.isNotEmpty) {}
-  }
+  // // 跳转查看动态
+  // void pushDynamicsPage() => Get.toNamed('/memberDynamics?mid=$mid');
+  //
+  // // 跳转查看投稿
+  // void pushArchivesPage() => Get.toNamed('/memberArchive?mid=$mid');
+  //
+  // // 跳转查看专栏
+  // void pushSeasonsPage() {}
+  // // 跳转查看最近投币
+  // void pushRecentCoinsPage() async {
+  //   if (recentCoinsList.isNotEmpty) {}
+  // }
 }

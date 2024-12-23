@@ -40,25 +40,29 @@ class _MinePageState extends State<MinePage> {
     return IntrinsicWidth(
         child: Column(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      // mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const SizedBox(height: 8),
         Row(
-            mainAxisSize: MainAxisSize.min,
+            // mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const SizedBox(width: 12),
               Image.asset(
                 'assets/images/logo/logo_android_2.png',
-                width: 35,
+                width: 30,
               ),
               const SizedBox(width: 5),
               Text(
                 'PiliPalaX',
-                style: Theme.of(context).textTheme.titleMedium,
+                style: Theme.of(context).textTheme.titleSmall,
               ),
-              const SizedBox(width: 30),
+              const Expanded(
+                flex: 255,
+                child: SizedBox(
+                  width: 10,
+                ),
+              ),
               IconButton(
                 iconSize: 40.0,
                 padding: const EdgeInsets.all(8),
@@ -147,214 +151,249 @@ class _MinePageState extends State<MinePage> {
         fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
         color: Theme.of(context).colorScheme.primary,
         fontWeight: FontWeight.bold);
-    return Column(mainAxisSize: MainAxisSize.min, children: [
-      Row(
+    return Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const SizedBox(width: 20),
-          GestureDetector(
-            onTap: () => _mineController.onLogin(),
-            child: ClipOval(
-              child: Container(
-                width: 70,
-                height: 70,
-                color: Theme.of(context).colorScheme.onInverseSurface,
-                child: Center(
-                  child: _mineController.userInfo.value.face != null
-                      ? NetworkImgLayer(
-                          src: _mineController.userInfo.value.face,
-                          semanticsLabel: '头像',
-                          width: 70,
-                          height: 70)
-                      : Image.asset(
-                          'assets/images/noface.jpeg',
-                          semanticLabel: "默认头像",
-                        ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // const SizedBox(width: 20),
+              GestureDetector(
+                onTap: () => _mineController.onLogin(),
+                child: ClipOval(
+                  child: Container(
+                    width: 55,
+                    height: 55,
+                    color: Theme.of(context).colorScheme.onInverseSurface,
+                    child: Center(
+                      child: _mineController.userInfo.value.face != null
+                          ? NetworkImgLayer(
+                              src: _mineController.userInfo.value.face,
+                              semanticsLabel: '头像',
+                              width: 55,
+                              height: 55)
+                          : Image.asset(
+                              'assets/images/noface.jpeg',
+                              semanticLabel: "默认头像",
+                            ),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          IntrinsicWidth(
-              child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+              const SizedBox(width: 13),
+              IntrinsicWidth(
+                  child: Column(
                 mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    _mineController.userInfo.value.uname ?? '点击头像登录',
-                    style: Theme.of(context).textTheme.titleMedium,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _mineController.userInfo.value.uname ?? '点击头像登录',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(width: 4),
+                      Image.asset(
+                        'assets/images/lv/lv${_mineController.userInfo.value.levelInfo?.currentLevel ?? '0'}.png',
+                        height: 10,
+                        semanticLabel:
+                            '等级：${_mineController.userInfo.value.levelInfo?.currentLevel ?? '0'}',
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 4),
-                  Image.asset(
-                    'assets/images/lv/lv${_mineController.userInfo.value.levelInfo != null ? _mineController.userInfo.value.levelInfo!.currentLevel : '0'}.png',
-                    height: 10,
-                    semanticLabel:
-                        '等级：${_mineController.userInfo.value.levelInfo != null ? _mineController.userInfo.value.levelInfo!.currentLevel : '0'}',
+                  const SizedBox(height: 8),
+                  Text.rich(TextSpan(children: [
+                    TextSpan(
+                        text: '硬币',
+                        style: TextStyle(
+                            fontSize: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall!
+                                    .fontSize! -
+                                2,
+                            color: Theme.of(context).colorScheme.outline)),
+                    const WidgetSpan(
+                        alignment: PlaceholderAlignment.baseline,
+                        baseline: TextBaseline.alphabetic,
+                        child: SizedBox(width: 1.5)),
+                    TextSpan(
+                        text: (_mineController.userInfo.value.money ?? '-')
+                            .toString(),
+                        style: TextStyle(
+                            fontSize: Theme.of(context)
+                                .textTheme
+                                .labelSmall!
+                                .fontSize,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary)),
+                    const WidgetSpan(
+                        alignment: PlaceholderAlignment.baseline,
+                        baseline: TextBaseline.alphabetic,
+                        child: SizedBox(width: 5)),
+                    TextSpan(
+                        text: "经验",
+                        style: TextStyle(
+                            fontSize: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall!
+                                    .fontSize! -
+                                2,
+                            color: Theme.of(context).colorScheme.outline)),
+                    const WidgetSpan(
+                        alignment: PlaceholderAlignment.baseline,
+                        baseline: TextBaseline.alphabetic,
+                        child: SizedBox(width: 1.5)),
+                    TextSpan(
+                        text: "${levelInfo?.currentExp ?? '-'}",
+                        semanticsLabel: "当前${levelInfo?.currentExp ?? '-'}",
+                        style: TextStyle(
+                            fontSize: Theme.of(context)
+                                .textTheme
+                                .labelSmall!
+                                .fontSize,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary)),
+                    TextSpan(
+                        text: "/${levelInfo?.nextExp ?? '-'}",
+                        semanticsLabel: "升级需${levelInfo?.nextExp ?? '-'}",
+                        style: TextStyle(
+                            fontSize: Theme.of(context)
+                                .textTheme
+                                .labelSmall!
+                                .fontSize!,
+                            color: Theme.of(context).colorScheme.outline)),
+                  ])),
+                  // const SizedBox(height: 4),
+                  // Text.rich(TextSpan(children: [
+                  // ])),
+                  // Text.rich(
+                  //     textAlign: TextAlign.right,
+                  //     TextSpan(children: [
+                  //
+                  //     ])),
+                  const SizedBox(height: 4),
+                  SizedBox(
+                    width: 140,
+                    child: LinearProgressIndicator(
+                      minHeight: 2,
+                      value: levelInfo != null
+                          ? (levelInfo.currentExp! / levelInfo.nextExp!)
+                          : 0,
+                      backgroundColor:
+                          Theme.of(context).colorScheme.inversePrimary,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          Theme.of(context).colorScheme.primary),
+                    ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 8),
-              Text.rich(TextSpan(children: [
-                TextSpan(
-                    text: '硬币 ',
-                    style: TextStyle(
-                        fontSize:
-                            Theme.of(context).textTheme.labelSmall!.fontSize,
-                        color: Theme.of(context).colorScheme.outline)),
-                TextSpan(
-                    text: (_mineController.userInfo.value.money ?? '-')
-                        .toString(),
-                    style: TextStyle(
-                        fontSize:
-                            Theme.of(context).textTheme.labelSmall!.fontSize,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary)),
-                TextSpan(
-                    text: "  经验 ",
-                    style: TextStyle(
-                        fontSize:
-                            Theme.of(context).textTheme.labelSmall!.fontSize,
-                        color: Theme.of(context).colorScheme.outline)),
-                TextSpan(
-                    text: "${levelInfo?.currentExp ?? '-'}",
-                    semanticsLabel: "当前${levelInfo?.currentExp ?? '-'}",
-                    style: TextStyle(
-                        fontSize:
-                            Theme.of(context).textTheme.labelSmall!.fontSize,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary)),
-                TextSpan(
-                    text: "/${levelInfo?.nextExp ?? '-'}",
-                    semanticsLabel: "升级需${levelInfo?.nextExp ?? '-'}",
-                    style: TextStyle(
-                        fontSize:
-                            Theme.of(context).textTheme.labelSmall!.fontSize,
-                        color: Theme.of(context).colorScheme.outline)),
-              ])),
-              // const SizedBox(height: 4),
-              // Text.rich(TextSpan(children: [
-              // ])),
-              // Text.rich(
-              //     textAlign: TextAlign.right,
-              //     TextSpan(children: [
-              //
-              //     ])),
-              const SizedBox(height: 4),
-              LinearProgressIndicator(
-                minHeight: 2,
-                value: levelInfo != null
-                    ? (levelInfo.currentExp! / levelInfo.nextExp!)
-                    : 0,
-                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                    Theme.of(context).colorScheme.primary),
-              ),
+              )),
+              // const SizedBox(width: 20),
             ],
-          )),
-          const SizedBox(width: 20),
-        ],
-      ),
-      const SizedBox(height: 10),
-      Container(
-          width: 240,
-          height: 100,
-          child: GridView.count(
-            padding: EdgeInsets.zero,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 3,
-            children: [
-              InkWell(
-                onTap: () => _mineController.pushDynamic(),
-                borderRadius: StyleString.mdRadius,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 400),
-                      transitionBuilder:
-                          (Widget child, Animation<double> animation) {
-                        return ScaleTransition(scale: animation, child: child);
-                      },
-                      child: Text(
-                          (_mineController.userStat.value.dynamicCount ?? '-')
-                              .toString(),
-                          key: ValueKey<String>(_mineController
-                              .userStat.value.dynamicCount
-                              .toString()),
-                          style: style),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+              width: 240,
+              height: 100,
+              child: GridView.count(
+                padding: EdgeInsets.zero,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 3,
+                children: [
+                  InkWell(
+                    onTap: () => _mineController.pushDynamic(),
+                    borderRadius: StyleString.mdRadius,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 400),
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) {
+                            return ScaleTransition(
+                                scale: animation, child: child);
+                          },
+                          child: Text(
+                              (_mineController.userStat.value.dynamicCount ??
+                                      '-')
+                                  .toString(),
+                              key: ValueKey<String>(_mineController
+                                  .userStat.value.dynamicCount
+                                  .toString()),
+                              style: style),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '动态',
+                          style: Theme.of(context).textTheme.labelMedium,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '动态',
-                      style: Theme.of(context).textTheme.labelMedium,
+                  ),
+                  InkWell(
+                    onTap: () => _mineController.pushFollow(),
+                    borderRadius: StyleString.mdRadius,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 400),
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) {
+                            return ScaleTransition(
+                                scale: animation, child: child);
+                          },
+                          child: Text(
+                              (_mineController.userStat.value.following ?? '-')
+                                  .toString(),
+                              key: ValueKey<String>(_mineController
+                                  .userStat.value.following
+                                  .toString()),
+                              style: style),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '关注',
+                          style: Theme.of(context).textTheme.labelMedium,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              InkWell(
-                onTap: () => _mineController.pushFollow(),
-                borderRadius: StyleString.mdRadius,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 400),
-                      transitionBuilder:
-                          (Widget child, Animation<double> animation) {
-                        return ScaleTransition(scale: animation, child: child);
-                      },
-                      child: Text(
-                          (_mineController.userStat.value.following ?? '-')
-                              .toString(),
-                          key: ValueKey<String>(_mineController
-                              .userStat.value.following
-                              .toString()),
-                          style: style),
+                  ),
+                  InkWell(
+                    onTap: () => _mineController.pushFans(),
+                    borderRadius: StyleString.mdRadius,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 400),
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) {
+                            return ScaleTransition(
+                                scale: animation, child: child);
+                          },
+                          child: Text(
+                              (_mineController.userStat.value.follower ?? '-')
+                                  .toString(),
+                              key: ValueKey<String>(_mineController
+                                  .userStat.value.follower
+                                  .toString()),
+                              style: style),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '粉丝',
+                          style: Theme.of(context).textTheme.labelMedium,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '关注',
-                      style: Theme.of(context).textTheme.labelMedium,
-                    ),
-                  ],
-                ),
-              ),
-              InkWell(
-                onTap: () => _mineController.pushFans(),
-                borderRadius: StyleString.mdRadius,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 400),
-                      transitionBuilder:
-                          (Widget child, Animation<double> animation) {
-                        return ScaleTransition(scale: animation, child: child);
-                      },
-                      child: Text(
-                          (_mineController.userStat.value.follower ?? '-')
-                              .toString(),
-                          key: ValueKey<String>(_mineController
-                              .userStat.value.follower
-                              .toString()),
-                          style: style),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '粉丝',
-                      style: Theme.of(context).textTheme.labelMedium,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          )),
-    ]);
+                  ),
+                ],
+              )),
+        ]);
   }
 }
 
@@ -364,11 +403,11 @@ class ActionItem extends StatelessWidget {
   final String? text;
 
   const ActionItem({
-    Key? key,
+    super.key,
     this.icon,
     this.onTap,
     this.text,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

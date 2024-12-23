@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:PiliPalaX/http/user.dart';
@@ -11,13 +10,13 @@ class MediaController extends GetxController {
   Box userInfoCache = GStorage.userInfo;
   RxBool userLogin = false.obs;
   List list = [
-    {
-      'icon': Icons.file_download_outlined,
-      'title': '离线缓存',
-      'onTap': () {
-        SmartDialog.showToast('功能开发中');
-      },
-    },
+    // {
+    //   'icon': Icons.file_download_outlined,
+    //   'title': '离线缓存',
+    //   'onTap': () {
+    //     SmartDialog.showToast('功能开发中');
+    //   },
+    // },
     {
       'icon': Icons.history,
       'title': '观看记录',
@@ -35,12 +34,12 @@ class MediaController extends GetxController {
     },
     {
       'icon': Icons.create_outlined,
-      'title': '创作中心(web)',
+      'title': '创作中心',
       'onTap': () => Get.toNamed('/webview', parameters: {
-        'url': 'https://member.bilibili.com/platform/home',
-        'type': 'url',
-        'pageTitle': "创作中心（建议浏览器打开）",
-      }),
+            'url': 'https://member.bilibili.com/platform/home',
+            'type': 'url',
+            'pageTitle': "创作中心（建议浏览器打开）",
+          }),
     },
   ];
   var userInfo;

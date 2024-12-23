@@ -1,6 +1,5 @@
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 
@@ -43,6 +42,8 @@ class _ReplyMePageState extends State<ReplyMePage> {
         title: const Text('回复我的'),
       ),
       body: RefreshIndicator(
+        displacement: 10.0,
+        edgeOffset: 10.0,
         onRefresh: () async {
           await _replyMeController.onRefresh();
         },

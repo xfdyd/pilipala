@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import '../models/dynamics/result.dart';
 import '../models/follow/result.dart';
 import '../models/member/archive.dart';
@@ -5,6 +7,7 @@ import '../models/member/coin.dart';
 import '../models/member/info.dart';
 import '../models/member/seasons.dart';
 import '../models/member/tags.dart';
+import '../utils/storage.dart';
 import '../utils/utils.dart';
 import '../utils/wbi_sign.dart';
 import 'index.dart';
@@ -13,12 +16,14 @@ class MemberHttp {
   static Future memberInfo({
     int? mid,
     String token = '',
+    dynamic wwebid,
   }) async {
     Map params = await WbiSign().makSign({
       'mid': mid,
       'token': token,
       'platform': 'web',
       'web_location': 1550101,
+      'w_webid': wwebid,
     });
     var res = await Request().get(
       Api.memberInfo,
@@ -97,6 +102,7 @@ class MemberHttp {
       data: params,
       extra: {'ua': 'Mozilla/5.0'},
     );
+    log(res.toString());
     if (res.data['code'] == 0) {
       return {
         'status': true,
@@ -250,17 +256,27 @@ class MemberHttp {
     }
   }
 
-  // 获取uo专栏
-  static Future getMemberSeasons(int? mid, int? pn, int? ps) async {
-    var res = await Request().get(Api.getMemberSeasonsApi, data: {
+  // 获取up合集与视频列表
+  static Future getMemberSeasonsAndSeries(int? mid, int? pn, int? ps) async {
+    var data = {
       'mid': mid,
       'page_num': pn,
       'page_size': ps,
+      'web_location': "333.999",
+    };
+    Map params = await WbiSign().makSign(data);
+    var res = await Request().get(Api.getMemberSeasonsAndSeriesApi, data: {
+      ...data,
+      'w_rid': params['w_rid'],
+      'wts': params['wts'],
     });
+    // log(res.toString());
+    // print(res.data['data']['items_lists']);
     if (res.data['code'] == 0) {
       return {
         'status': true,
-        'data': MemberSeasonsDataModel.fromJson(res.data['data']['items_lists'])
+        'data': MemberSeasonsAndSeriesDataModel.fromJson(
+            res.data['data']['items_lists'])
       };
     } else {
       return {
@@ -324,7 +340,8 @@ class MemberHttp {
     if (res.data['code'] == 0) {
       return {
         'status': true,
-        'data': MemberSeasonsDataModel.fromJson(res.data['data']['items_lists'])
+        'data': MemberSeasonsAndSeriesDataModel.fromJson(
+            res.data['data']['items_lists'])
       };
     } else {
       return {
@@ -335,7 +352,7 @@ class MemberHttp {
     }
   }
 
-  // 查看某个专栏
+  // 查看某个合集
   static Future getSeasonDetail({
     required int mid,
     required int seasonId,
@@ -354,14 +371,46 @@ class MemberHttp {
       },
     );
     if (res.data['code'] == 0) {
-      try {
-        return {
-          'status': true,
-          'data': MemberSeasonsList.fromJson(res.data['data'])
-        };
-      } catch (err) {
-        print(err);
-      }
+      return {
+        'status': true,
+        'data': MemberSeasonsList.fromJson(res.data['data'])
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  //https://api.bilibili.com/x/series/archives?mid=39665558&series_id=534501&sort=asc&pn=1&ps=30&current_mid=1070915568
+  // 查看某个视频列表
+  static Future getSeriesDetail({
+    required int mid,
+    required int seriesId,
+    bool sortReverse = false,
+    required int pn,
+    required int ps,
+  }) async {
+    int? currentMid = GStorage.userInfo.get('userInfoCache')?.mid;
+    var res = await Request().get(
+      Api.getSeriesDetailApi,
+      data: {
+        'mid': mid,
+        'series_id': seriesId,
+        'sort': sortReverse ? 'desc' : 'asc',
+        'pn': pn,
+        'ps': ps,
+        if (currentMid != null) 'current_mid': currentMid,
+      },
+    );
+    print(res);
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': MemberSeriesList.fromJson(res.data['data'])
+      };
     } else {
       return {
         'status': false,

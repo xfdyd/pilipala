@@ -1,6 +1,5 @@
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 
@@ -43,6 +42,8 @@ class _LikeMePageState extends State<LikeMePage> {
         title: const Text('收到的赞'),
       ),
       body: RefreshIndicator(
+        displacement: 10.0,
+        edgeOffset: 10.0,
         onRefresh: () async {
           await _likeMeController.onRefresh();
         },
@@ -152,8 +153,8 @@ class LikeMeList extends StatelessWidget {
           title: Text(
             // "${msgFeedLikeMeList[i].users!.map((e) => e.nickname).join("/")}"
             "${msgFeedLikeMeList[i].users?[0].nickname}"
-            "${msgFeedLikeMeList[i].users!.length > 1 ? '、' + msgFeedLikeMeList[i].users![1].nickname.toString() + ' 等' : ''} "
-            "${msgFeedLikeMeList[i].counts! > 1 ? '共 ' + msgFeedLikeMeList[i].counts.toString() + ' 人' : ''}"
+            "${msgFeedLikeMeList[i].users!.length > 1 ? '、${msgFeedLikeMeList[i].users![1].nickname} 等' : ''} "
+            "${msgFeedLikeMeList[i].counts! > 1 ? '共 ${msgFeedLikeMeList[i].counts} 人' : ''}"
             "赞了我的${msgFeedLikeMeList[i].item?.business}",
             style: Theme.of(context).textTheme.titleSmall!.copyWith(
                 height: 1.5, color: Theme.of(context).colorScheme.primary),

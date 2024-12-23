@@ -19,11 +19,11 @@ class FavVideoCardH extends StatelessWidget {
   final int? searchType;
 
   const FavVideoCardH({
-    Key? key,
+    super.key,
     required this.videoItem,
     this.callFn,
     this.searchType,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -214,7 +214,7 @@ class VideoContent extends StatelessWidget {
                     child: IconButton(
                       tooltip: '取消收藏',
                       style: ButtonStyle(
-                        padding: MaterialStateProperty.all(EdgeInsets.zero),
+                        padding: WidgetStateProperty.all(EdgeInsets.zero),
                       ),
                       onPressed: () {
                         showDialog(

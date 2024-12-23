@@ -90,13 +90,15 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
             const SizedBox(height: 12),
             // 搜索建议
             _searchSuggest(),
+            // 搜索历史
+            _history(),
             // 热搜
             Visibility(
               visible: _searchController.enableHotKey,
               child: hotSearch(_searchController),
             ),
-            // 搜索历史
-            _history()
+
+            SizedBox(height: MediaQuery.of(context).padding.bottom + 50),
           ],
         ),
       ),
@@ -133,7 +135,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
 
   Widget hotSearch(ctr) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 14, 4, 0),
+      padding: const EdgeInsets.fromLTRB(10, 14, 4, 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -153,7 +155,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                   height: 34,
                   child: TextButton.icon(
                     style: ButtonStyle(
-                      padding: MaterialStateProperty.all(const EdgeInsets.only(
+                      padding: WidgetStateProperty.all(const EdgeInsets.only(
                           left: 10, top: 6, bottom: 6, right: 10)),
                     ),
                     onPressed: () => ctr.queryHotSearchList(),
@@ -227,8 +229,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
     return Obx(
       () => Container(
         width: double.infinity,
-        padding: EdgeInsets.fromLTRB(
-            10, 25, 6, MediaQuery.of(context).padding.bottom + 50),
+        padding: const EdgeInsets.fromLTRB(10, 0, 6, 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

@@ -41,6 +41,8 @@ class _SysMsgPageState extends State<SysMsgPage> {
         title: const Text('系统通知'),
       ),
       body: RefreshIndicator(
+        displacement: 10.0,
+        edgeOffset: 10.0,
         onRefresh: () async {
           await _sysMsgController.onRefresh();
         },

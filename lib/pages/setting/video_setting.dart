@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
 import 'package:PiliPalaX/models/video/play/quality.dart';
 import 'package:PiliPalaX/models/video/play/CDN.dart';
@@ -72,13 +73,6 @@ class _VideoSettingState extends State<VideoSetting> {
             defaultVal: true,
           ),
           const SetSwitchItem(
-            title: '亮度记忆',
-            subTitle: '返回时自动调整视频亮度',
-            leading: Icon(Icons.brightness_6_outlined),
-            setKey: SettingBoxKey.enableAutoBrightness,
-            defaultVal: false,
-          ),
-          const SetSwitchItem(
             title: '免登录1080P',
             subTitle: '免登录查看1080P视频',
             leading: Icon(Icons.hd_outlined),
@@ -86,26 +80,31 @@ class _VideoSettingState extends State<VideoSetting> {
             defaultVal: true,
           ),
           ListTile(
-            enabled: false,
-            onTap: null,
+            // enabled: false,
+            // onTap: null,
             title: Text("b站定向流量支持", style: titleStyle),
-            subtitle:
-                Text("若套餐含b站定向流量，则会自动使用。可查阅运营商的流量记录确认。", style: subTitleStyle),
+            subtitle: Text("若有b站定向流量且未使用代理等，则会自动使用。可查阅运营商的流量记录确认，此功能无法关闭。",
+                style: subTitleStyle),
             leading: const Icon(Icons.perm_data_setting_outlined),
             trailing: Transform.scale(
               alignment: Alignment.centerRight, // 缩放Switch的大小后保持右侧对齐, 避免右侧空隙过大
               scale: 0.8,
               child: Switch(
-                  thumbIcon: WidgetStateProperty.resolveWith<Icon?>(
-                      (Set<WidgetState> states) {
-                    if (states.isNotEmpty &&
-                        states.first == WidgetState.selected) {
-                      return const Icon(Icons.done);
-                    }
-                    return null; // All other states will use the default thumbIcon.
-                  }),
-                  value: true,
-                  onChanged: null),
+                thumbIcon: WidgetStateProperty.resolveWith<Icon?>(
+                    (Set<WidgetState> states) {
+                  if (states.isNotEmpty &&
+                      states.first == WidgetState.selected) {
+                    return const Icon(Icons.lock_outline_rounded);
+                  }
+                  return null; // All other states will use the default thumbIcon.
+                }),
+                value: true,
+                onChanged: (bool value) {
+                  if (!value) {
+                    SmartDialog.showToast('由于app使用的均为官方接口，此功能无法关闭');
+                  }
+                },
+              ),
             ),
           ),
           ListTile(
@@ -254,14 +253,14 @@ class _VideoSettingState extends State<VideoSetting> {
               title: '优先使用 OpenSL ES 输出音频',
               leading: Icon(Icons.speaker_outlined),
               subTitle:
-                  '关闭则优先使用AudioTrack输出音频（此项即mpv的--ao），若遇系统音效丢失、无声、音画不同步等问题请尝试关闭。',
+                  '关闭则优先使用AudioTrack输出音频（此项即mpv的--ao），若遇系统音效丢失、无声、音画不同步等问题请尝试切换。',
               setKey: SettingBoxKey.useOpenSLES,
-              defaultVal: true,
+              defaultVal: false,
             ),
           const SetSwitchItem(
             title: '扩大缓冲区',
             leading: Icon(Icons.storage_outlined),
-            subTitle: '默认缓冲区为视频3MB/直播16MB，开启后为32MB/64MB，加载时间变长',
+            subTitle: '默认缓冲区为视频4MB/直播16MB，开启后为32MB/64MB，加载时间变长',
             setKey: SettingBoxKey.expandBuffer,
             defaultVal: false,
           ),

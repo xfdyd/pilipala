@@ -8,7 +8,7 @@ import 'package:PiliPalaX/utils/utils.dart';
 
 import 'rich_node_panel.dart';
 
-Widget videoSeasonWidget(item, context, type, {floor = 1}) {
+Widget videoSeasonWidget(item, context, type, source, {floor = 1}) {
   TextStyle authorStyle =
       TextStyle(color: Theme.of(context).colorScheme.primary);
   // type archive  ugcSeason
@@ -73,11 +73,14 @@ Widget videoSeasonWidget(item, context, type, {floor = 1}) {
       //   const SizedBox(height: 6),
       // ],
       if (floor == 2 && item.modules.moduleDynamic.desc != null) ...[
-        Text.rich(richNode(item, context)),
+        Text.rich(richNode(item, context)!,
+            maxLines: source == 'detail' ? 999 : 6,
+            overflow: TextOverflow.fade),
         const SizedBox(height: 6),
       ],
       Padding(
-          padding: EdgeInsets.symmetric(horizontal: StyleString.safeSpace),
+          padding:
+              const EdgeInsets.symmetric(horizontal: StyleString.safeSpace),
           child: LayoutBuilder(builder: (context, box) {
             double width = box.maxWidth;
             return Stack(

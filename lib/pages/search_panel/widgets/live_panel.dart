@@ -30,7 +30,7 @@ Widget searchLivePanel(BuildContext context, ctr, list) {
 
 class LiveItem extends StatelessWidget {
   final dynamic liveItem;
-  const LiveItem({Key? key, required this.liveItem}) : super(key: key);
+  const LiveItem({super.key, required this.liveItem});
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +97,7 @@ class LiveItem extends StatelessWidget {
 
 class LiveContent extends StatelessWidget {
   final dynamic liveItem;
-  const LiveContent({Key? key, required this.liveItem}) : super(key: key);
+  const LiveContent({super.key, required this.liveItem});
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -147,8 +147,7 @@ class LiveStat extends StatelessWidget {
   final int? online;
   final String? cateName;
 
-  const LiveStat({Key? key, required this.online, this.cateName})
-      : super(key: key);
+  const LiveStat({super.key, required this.online, this.cateName});
 
   @override
   Widget build(BuildContext context) {

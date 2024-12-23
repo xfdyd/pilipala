@@ -66,10 +66,10 @@ InlineSpan picsNodes(List<OpusPicsModel> pics) {
                           ),
                           height > Get.size.height * 0.9
                               ? const PBadge(
-                            text: '长图',
-                            right: 8,
-                            bottom: 8,
-                          )
+                                  text: '长图',
+                                  right: 8,
+                                  bottom: 8,
+                                )
                               : const SizedBox(),
                         ],
                       )),
@@ -104,7 +104,7 @@ InlineSpan picsNodes(List<OpusPicsModel> pics) {
                     width: maxWidth,
                     height: maxWidth,
                     origAspectRatio:
-                    pics[i].width!.toInt() / pics[i].height!.toInt(),
+                        pics[i].width!.toInt() / pics[i].height!.toInt(),
                   ),
                 ));
           },
@@ -118,10 +118,10 @@ InlineSpan picsNodes(List<OpusPicsModel> pics) {
             double maxWidth = box.maxWidth.truncateToDouble();
             double crossCount = len < 3 ? 2 : 3;
             double height = maxWidth /
-                crossCount *
-                (len % crossCount == 0
-                    ? len ~/ crossCount
-                    : len ~/ crossCount + 1) +
+                    crossCount *
+                    (len % crossCount == 0
+                        ? len ~/ crossCount
+                        : len ~/ crossCount + 1) +
                 6;
             return Container(
               padding: const EdgeInsets.only(top: 6),
@@ -145,6 +145,7 @@ InlineSpan picsNodes(List<OpusPicsModel> pics) {
     children: spanChildren,
   );
 }
+
 Widget forWard(item, context, ctr, source, {floor = 1}) {
   TextStyle authorStyle =
       TextStyle(color: Theme.of(context).colorScheme.primary);
@@ -157,6 +158,8 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
   if (hasPics) {
     pics = item.modules.moduleDynamic.major.opus.pics;
   }
+  InlineSpan? richNodes = richNode(item, context);
+  print(item.type);
   switch (item.type) {
     // 图文
     case 'DYNAMIC_TYPE_DRAW':
@@ -201,12 +204,13 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
             //     ),
             //   ),
             // ],
-            Text.rich(
-              richNode(item, context),
-              // 被转发状态(floor=2) 隐藏
-              maxLines: source == 'detail' && floor != 2 ? 999 : 4,
-              overflow: TextOverflow.ellipsis,
-            ),
+            if (richNodes != null)
+              Text.rich(
+                richNodes,
+                // 被转发状态(floor=2) 隐藏
+                maxLines: source == 'detail' && floor != 2 ? 999 : 6,
+                overflow: TextOverflow.fade,
+              ),
             if (hasPics) ...[
               Text.rich(
                 picsNodes(pics),
@@ -234,7 +238,7 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
       );
     // 视频
     case 'DYNAMIC_TYPE_AV':
-      return videoSeasonWidget(item, context, 'archive', floor: floor);
+      return videoSeasonWidget(item, context, 'archive', source, floor: floor);
     // 文章
     case 'DYNAMIC_TYPE_ARTICLE':
       return Container(
@@ -261,8 +265,9 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
       return livePanel(item, context, floor: floor);
     // 合集
     case 'DYNAMIC_TYPE_UGC_SEASON':
-      return videoSeasonWidget(item, context, 'ugcSeason');
+      return videoSeasonWidget(item, context, 'ugcSeason', source);
     case 'DYNAMIC_TYPE_WORD':
+      InlineSpan? richNodes = richNode(item, context);
       return floor == 2
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,12 +294,13 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
                   ],
                 ),
                 const SizedBox(height: 8),
-                Text.rich(
-                  richNode(item, context),
-                  // 被转发状态(floor=2) 隐藏
-                  maxLines: source == 'detail' && floor != 2 ? 999 : 4,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                if (richNodes != null)
+                  Text.rich(
+                    richNodes,
+                    // 被转发状态(floor=2) 隐藏
+                    maxLines: source == 'detail' && floor != 2 ? 999 : 6,
+                    overflow: TextOverflow.ellipsis,
+                  ),
               ],
             )
           : item.modules.moduleDynamic.additional != null
@@ -306,9 +312,9 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
                 )
               : const SizedBox(height: 0);
     case 'DYNAMIC_TYPE_PGC':
-      return videoSeasonWidget(item, context, 'pgc', floor: floor);
+      return videoSeasonWidget(item, context, 'pgc', source, floor: floor);
     case 'DYNAMIC_TYPE_PGC_UNION':
-      return videoSeasonWidget(item, context, 'pgc', floor: floor);
+      return videoSeasonWidget(item, context, 'pgc', source, floor: floor);
     // 直播结束
     case 'DYNAMIC_TYPE_NONE':
       return Row(
@@ -334,6 +340,42 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
           )
         ],
       );
+    case 'DYNAMIC_TYPE_COMMON_SQUARE':
+      debugPrint('commonSquare: ${item.modules.moduleDynamic.major}');
+      return GestureDetector(
+          onTap: () => Get.toNamed('/webview', parameters: {
+                'url': item.modules.moduleDynamic.major.common.jumpUrl,
+                'type': 'url',
+                'pageTitle':
+                    item.modules.moduleDynamic.major.common.title ?? "",
+              }),
+          child: Row(
+            children: [
+              const SizedBox(width: 20),
+              NetworkImgLayer(
+                src: item.modules.moduleDynamic.major.common.cover ?? "",
+                width: 50,
+                height: 50,
+              ),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.modules.moduleDynamic.major.common.title ?? "",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    item.modules.moduleDynamic.major.common.desc ?? "",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              )
+            ],
+          ));
     default:
       return const SizedBox(
         width: double.infinity,

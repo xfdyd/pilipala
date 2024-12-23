@@ -5,8 +5,6 @@ import 'package:PiliPalaX/plugin/pl_player/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
-import '../plugin/pl_player/controller.dart';
-
 class ShutdownTimerService with WidgetsBindingObserver {
   static final ShutdownTimerService _instance =
       ShutdownTimerService._internal();

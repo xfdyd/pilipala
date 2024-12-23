@@ -79,6 +79,8 @@ class _OwnerFollowListState extends State<OwnerFollowList>
   Widget build(BuildContext context) {
     super.build(context);
     return RefreshIndicator(
+      displacement: 10.0,
+      edgeOffset: 10.0,
       onRefresh: () async => await followUpGroup('init'),
       child: FutureBuilder(
         future: _futureBuilderFuture,

@@ -2,14 +2,20 @@ class MemberArchiveDataModel {
   MemberArchiveDataModel({
     this.list,
     this.page,
+    this.episodicButton,
   });
 
   ArchiveListModel? list;
   Map? page;
+  EpisodicButton? episodicButton;
 
   MemberArchiveDataModel.fromJson(Map<String, dynamic> json) {
-    list = ArchiveListModel.fromJson(json['list']);
+    list =
+        json['list'] == null ? null : ArchiveListModel.fromJson(json['list']);
     page = json['page'];
+    episodicButton = json['episodic_button'] == null
+        ? null
+        : EpisodicButton.fromJson(json['episodic_button']);
   }
 }
 
@@ -160,5 +166,19 @@ class Owner {
     mid = json["mid"];
     name = json["author"];
     face = '';
+  }
+}
+
+class EpisodicButton {
+  EpisodicButton({
+    this.text,
+    this.uri,
+  });
+
+  String? text;
+  String? uri;
+  EpisodicButton.fromJson(Map<String, dynamic> json) {
+    text = json['text'];
+    uri = json['uri'];
   }
 }

@@ -22,7 +22,7 @@ class RecVideoItemAppModel {
     this.bangumiBadge,
     this.cardType,
     this.adInfo,
-    this.threePoint,
+    this.dislikeReasons,
     this.desc,
   });
 
@@ -48,7 +48,7 @@ class RecVideoItemAppModel {
 
   String? cardType;
   Map? adInfo;
-  ThreePoint? threePoint;
+  List<DislikeReason>? dislikeReasons;
   String? desc;
 
   RecVideoItemAppModel.fromJson(Map<String, dynamic> json) {
@@ -56,9 +56,7 @@ class RecVideoItemAppModel {
         ? json['player_args']['aid']
         : int.parse(json['param'] ?? '-1');
     aid = json['player_args'] != null ? json['player_args']['aid'] : -1;
-    bvid = json['player_args'] != null
-        ? IdUtils.av2bv(json['player_args']['aid'])
-        : '';
+    bvid = aid != -1 ? IdUtils.av2bv(aid!) : '';
     cid = json['player_args'] != null ? json['player_args']['cid'] : -1;
     pic = json['cover'];
     stat = RcmdStat.fromJson(json);
@@ -68,7 +66,7 @@ class RecVideoItemAppModel {
     //duration = json['cover_right_text'];
     title = json['title'];
     owner = RcmdOwner.fromJson(json);
-    rcmdReason = json['bottom_rcmd_reason'] ?? json['top_rcmd_reason'];
+    rcmdReason = json['rcmd_reason'];
     // 由于app端api并不会直接返回与owner的关注状态
     // 所以借用推荐原因是否为“已关注”、“新关注”判别关注状态，从而与web端接口等效
     isFollowed = (rcmdReason == '已关注') || (rcmdReason == '新关注') ? 1 : 0;
@@ -89,9 +87,14 @@ class RecVideoItemAppModel {
 
     cardType = json['card_type'];
     adInfo = json['ad_info'];
-    threePoint = json['three_point'] != null
-        ? ThreePoint.fromJson(json['three_point'])
-        : null;
+    json['three_point_v2']?.forEach((v) {
+      if (v['type'] == 'dislike' && v['reasons'] != null) {
+        dislikeReasons = <DislikeReason>[];
+        v['reasons'].forEach((vi) {
+          dislikeReasons!.add(DislikeReason.fromJson(vi));
+        });
+      }
+    });
     desc = json['desc'];
   }
 }
@@ -127,34 +130,34 @@ class RcmdOwner {
     mid = json['args']['up_id'] ?? -1;
   }
 }
-
-class ThreePoint {
-  ThreePoint({
-    this.dislikeReasons,
-    this.feedbacks,
-    this.watchLater,
-  });
-
-  List<DislikeReason>? dislikeReasons;
-  List<FeedbackReason>? feedbacks;
-  int? watchLater;
-
-  ThreePoint.fromJson(Map<String, dynamic> json) {
-    if (json['dislike_reasons'] != null) {
-      dislikeReasons = [];
-      json['dislike_reasons'].forEach((v) {
-        dislikeReasons!.add(DislikeReason.fromJson(v));
-      });
-    }
-    if (json['feedbacks'] != null) {
-      feedbacks = [];
-      json['feedbacks'].forEach((v) {
-        feedbacks!.add(FeedbackReason.fromJson(v));
-      });
-    }
-    watchLater = json['watch_later'];
-  }
-}
+//
+// class ThreePoint {
+//   ThreePoint({
+//     this.dislikeReasons,
+//     this.feedbacks,
+//     this.watchLater,
+//   });
+//
+//   List<DislikeReason>? dislikeReasons;
+//   List<FeedbackReason>? feedbacks;
+//   int? watchLater;
+//
+//   ThreePoint.fromJson(Map<String, dynamic> json) {
+//     if (json['dislike_reasons'] != null) {
+//       dislikeReasons = [];
+//       json['dislike_reasons'].forEach((v) {
+//         dislikeReasons!.add(DislikeReason.fromJson(v));
+//       });
+//     }
+//     if (json['feedbacks'] != null) {
+//       feedbacks = [];
+//       json['feedbacks'].forEach((v) {
+//         feedbacks!.add(FeedbackReason.fromJson(v));
+//       });
+//     }
+//     watchLater = json['watch_later'];
+//   }
+// }
 
 class DislikeReason {
   DislikeReason({
@@ -174,20 +177,20 @@ class DislikeReason {
   }
 }
 
-class FeedbackReason {
-  FeedbackReason({
-    this.id,
-    this.name,
-    this.toast,
-  });
-
-  int? id;
-  String? name;
-  String? toast;
-
-  FeedbackReason.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    toast = json['toast'];
-  }
-}
+// class FeedbackReason {
+//   FeedbackReason({
+//     this.id,
+//     this.name,
+//     this.toast,
+//   });
+//
+//   int? id;
+//   String? name;
+//   String? toast;
+//
+//   FeedbackReason.fromJson(Map<String, dynamic> json) {
+//     id = json['id'];
+//     name = json['name'];
+//     toast = json['toast'];
+//   }
+// }

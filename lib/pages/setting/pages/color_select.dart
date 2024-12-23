@@ -1,3 +1,4 @@
+import 'package:flex_seed_scheme/flex_seed_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -13,6 +14,8 @@ class ColorSelectPage extends StatefulWidget {
 
 class _ColorSelectPageState extends State<ColorSelectPage> {
   final ColorSelectController ctr = Get.put(ColorSelectController());
+  FlexSchemeVariant _dynamicSchemeVariant = FlexSchemeVariant.values[
+      GStorage.setting.get(SettingBoxKey.schemeVariant, defaultValue: 10)];
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +28,55 @@ class _ColorSelectPageState extends State<ColorSelectPage> {
       ),
       body: ListView(
         children: [
+          Builder(
+            builder: (context) => ListTile(
+              title: const Text('调色板风格'),
+              leading: Container(
+                width: 40,
+                alignment: Alignment.center,
+                child: const Icon(Icons.palette_outlined),
+              ),
+              subtitle: Text(
+                _dynamicSchemeVariant.description,
+                style: const TextStyle(fontSize: 12),
+              ),
+              trailing: PopupMenuButton(
+                initialValue: _dynamicSchemeVariant,
+                onSelected: (item) async {
+                  _dynamicSchemeVariant = item;
+                  await GStorage.setting
+                      .put(SettingBoxKey.schemeVariant, item.index);
+                  (context as Element).markNeedsBuild();
+                  Get.forceAppUpdate();
+                },
+                itemBuilder: (context) => FlexSchemeVariant.values
+                    .map((item) => PopupMenuItem<FlexSchemeVariant>(
+                          value: item,
+                          child: Text(item.variantName),
+                        ))
+                    .toList(),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _dynamicSchemeVariant.variantName,
+                      style: TextStyle(
+                        height: 1,
+                        fontSize: 13,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      strutStyle: const StrutStyle(leading: 0, height: 1),
+                    ),
+                    Icon(
+                      size: 20,
+                      Icons.keyboard_arrow_right,
+                      color: Theme.of(context).colorScheme.primary,
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
           Obx(
             () => RadioListTile(
               value: 0,
@@ -156,7 +208,7 @@ class _ColorSelectPageState extends State<ColorSelectPage> {
     }).toList();
 
     return colorEntries.map((entry) {
-      return Container(
+      return SizedBox(
         width: 80, // 固定宽度
         height: 40, // 固定高度
         child: Row(

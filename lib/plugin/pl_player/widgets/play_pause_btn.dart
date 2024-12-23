@@ -79,7 +79,7 @@ class PlayOrPauseButtonState extends State<PlayOrPauseButton>
             progress: animation,
             icon: AnimatedIcons.play_pause,
             color: Colors.white,
-            size: 20,
+            size: 24,
             // size: widget.iconSize ?? _theme(context).buttonBarButtonSize,
             // color: widget.iconColor ?? _theme(context).buttonBarButtonColor,
           ),

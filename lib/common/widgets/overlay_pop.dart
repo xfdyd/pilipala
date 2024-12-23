@@ -14,12 +14,12 @@ class OverlayPop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double imgWidth = min(Get.height,Get.width) - 8 * 2;
+    final double imgWidth = min(Get.height, Get.width) - 8 * 2;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       width: imgWidth,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.background,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(10.0),
       ),
       child: Column(
@@ -47,7 +47,7 @@ class OverlayPop extends StatelessWidget {
                   child: IconButton(
                     tooltip: '关闭',
                     style: ButtonStyle(
-                      padding: MaterialStateProperty.all(EdgeInsets.zero),
+                      padding: WidgetStateProperty.all(EdgeInsets.zero),
                     ),
                     onPressed: () => closeFn!(),
                     icon: const Icon(

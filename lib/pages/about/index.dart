@@ -472,7 +472,7 @@ class AboutController extends GetxController {
   //   }
   // }
   aPay() {
-    SmartDialog.showToast('新接口来不及写了，直接来群里找作者吧');
+    SmartDialog.showToast('感谢你的喜欢，给个Star就行~');
   }
 
   // 日志

@@ -9,7 +9,7 @@ import 'forward_panel.dart';
 class DynamicPanel extends StatelessWidget {
   final dynamic item;
   final String? source;
-  DynamicPanel({required this.item, this.source, Key? key}) : super(key: key);
+  DynamicPanel({required this.item, this.source, super.key});
   final DynamicsController _dynamicsController = Get.put(DynamicsController());
 
   @override

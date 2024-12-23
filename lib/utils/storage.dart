@@ -109,7 +109,6 @@ class SettingBoxKey {
       videoSync = 'videoSync',
       enableVerticalExpand = 'enableVerticalExpand',
       enableOnlineTotal = 'enableOnlineTotal',
-      enableAutoBrightness = 'enableAutoBrightness',
       enableAutoEnter = 'enableAutoEnter',
       enableAutoExit = 'enableAutoExit',
       enableLongShowControl = 'enableLongShowControl',
@@ -119,17 +118,21 @@ class SettingBoxKey {
       CDNService = 'CDNService',
       disableAudioCDN = 'disableAudioCDN',
       // enableCDN = 'enableCDN',
+      autoMiniPlayer = 'autoMiniPlayer',
       autoPiP = 'autoPiP',
       pipNoDanmaku = 'pipNoDanmaku',
       enableAutoLongPressSpeed = 'enableAutoLongPressSpeed',
       subtitlePreference = 'subtitlePreference',
-
+      playerGestureActionMap = 'playerGestureActionMap',
       // youtube 双击快进快退
       enableQuickDouble = 'enableQuickDouble',
-      fullScreenGestureReverse = 'fullScreenGestureReverse',
+      enableExtraButtonOnFullScreen = 'enableExtraButtonOnFullScreen',
+      // fullScreenGestureReverse = 'fullScreenGestureReverse',
+      // enableFloatingWindowGesture = 'enableFloatingWindowGesture',
       enableShowDanmaku = 'enableShowDanmaku',
       enableBackgroundPlay = 'enableBackgroundPlay',
       continuePlayInBackground = 'continuePlayInBackground',
+      setSystemBrightness = 'setSystemBrightness',
 
       /// 隐私
       anonymity = 'anonymity',
@@ -149,6 +152,7 @@ class SettingBoxKey {
       autoUpdate = 'autoUpdate',
       autoClearCache = 'autoClearCache',
       defaultShowComment = 'defaultShowComment',
+      defaultExpandIntroduction = 'defaultExpandIntroduction',
       replySortType = 'replySortType',
       defaultDynamicType = 'defaultDynamicType',
       enableHotKey = 'enableHotKey',
@@ -160,7 +164,7 @@ class SettingBoxKey {
       disableLikeMsg = 'disableLikeMsg',
       defaultHomePage = 'defaultHomePage',
 
-      // 弹幕相关设置 权重（云屏蔽） 屏蔽类型 显示区域 透明度 字体大小 弹幕时间 描边粗细 字体粗细
+      // 弹幕相关设置 权重（云屏蔽） 屏蔽类型 显示区域 透明度 字体大小 弹幕时间 描边粗细 字体粗细 海量模式
       danmakuWeight = 'danmakuWeight',
       danmakuBlockType = 'danmakuBlockType',
       danmakuShowArea = 'danmakuShowArea',
@@ -169,6 +173,7 @@ class SettingBoxKey {
       danmakuDuration = 'danmakuDuration',
       strokeWidth = 'strokeWidth',
       fontWeight = 'fontWeight',
+      danmakuMassiveMode = 'danmakuMassiveMode',
 
       // 代理host port
       systemProxyHost = 'systemProxyHost',
@@ -179,6 +184,7 @@ class SettingBoxKey {
       defaultTextScale = 'textScale',
       dynamicColor = 'dynamicColor', // bool
       customColor = 'customColor', // 自定义主题色
+      schemeVariant = 'schemeVariant',
       enableSingleRow = 'enableSingleRow', // 首页单列
       displayMode = 'displayMode',
       maxRowWidth = 'maxRowWidth', // 首页列最大宽度（dp）
@@ -188,7 +194,8 @@ class SettingBoxKey {
       dynamicsWaterfallFlow = 'dynamicsWaterfallFlow', // 动态瀑布流
       upPanelPosition = 'upPanelPosition', // up主面板位置
       dynamicsShowAllFollowedUp = 'dynamicsShowAllFollowedUp', // 动态显示全部关注up
-      useSideBar = 'useSideBar',
+      // useSideBar = 'useSideBar',
+      sideBarPosition = 'sideBarPosition',
       enableMYBar = 'enableMYBar',
       hideSearchBar = 'hideSearchBar', // 收起顶栏
       hideTabBar = 'hideTabBar', // 收起底栏
@@ -218,7 +225,7 @@ class VideoBoxKey {
   // 视频比例
   static const String videoFit = 'videoFit',
       // 亮度
-      videoBrightness = 'videoBrightness',
+      // videoBrightness = 'videoBrightness',
       // 倍速
       videoSpeed = 'videoSpeed',
       // 播放顺序

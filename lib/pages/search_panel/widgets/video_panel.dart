@@ -12,8 +12,8 @@ class SearchVideoPanel extends StatelessWidget {
   SearchVideoPanel({
     required this.ctr,
     required this.list,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final SearchPanelController ctr;
   final List list;
@@ -68,7 +68,7 @@ class SearchVideoPanel extends StatelessWidget {
                 child: IconButton(
                   tooltip: '筛选',
                   style: ButtonStyle(
-                    padding: MaterialStateProperty.all(EdgeInsets.zero),
+                    padding: WidgetStateProperty.all(EdgeInsets.zero),
                   ),
                   onPressed: () => controller.onShowFilterDialog(context, ctr),
                   icon: Icon(
@@ -115,8 +115,8 @@ class CustomFilterChip extends StatelessWidget {
     this.type,
     this.selectedType,
     this.callFn,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final String? label;
   final ArchiveFilterType? type;
@@ -178,10 +178,11 @@ class VideoPanelController extends GetxController {
     super.onInit();
   }
 
-  onShowFilterDialog(BuildContext context, SearchPanelController searchPanelCtr) {
+  onShowFilterDialog(
+      BuildContext context, SearchPanelController searchPanelCtr) {
     showDialog(
-    context: context,
-    builder: (context) {
+      context: context,
+      builder: (context) {
         TextStyle textStyle = Theme.of(context).textTheme.titleMedium!;
         return AlertDialog(
           title: const Text('时长筛选'),

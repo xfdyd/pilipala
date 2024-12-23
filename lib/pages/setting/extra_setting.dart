@@ -5,6 +5,7 @@ import 'package:PiliPalaX/models/common/dynamics_type.dart';
 import 'package:PiliPalaX/models/common/reply_sort_type.dart';
 import 'package:PiliPalaX/pages/setting/widgets/select_dialog.dart';
 import 'package:PiliPalaX/utils/storage.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import '../home/index.dart';
 import 'controller.dart';
@@ -150,7 +151,7 @@ class _ExtraSettingState extends State<ExtraSetting> {
                 alignment: Alignment.centerRight,
                 scale: 0.8,
                 child: Switch(
-                    thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
+                    thumbIcon: WidgetStateProperty.resolveWith<Icon?>(
                         (Set<MaterialState> states) {
                       if (states.isNotEmpty &&
                           states.first == MaterialState.selected) {
@@ -213,6 +214,13 @@ class _ExtraSettingState extends State<ExtraSetting> {
             subTitle: '在视频详情页默认切换至评论区页（仅tab型布局）',
             leading: Icon(Icons.mode_comment_outlined),
             setKey: SettingBoxKey.defaultShowComment,
+            defaultVal: false,
+          ),
+          SetSwitchItem(
+            title: '默认展开简介',
+            subTitle: '竖屏布局也在视频详情页默认展开简介',
+            leading: Icon(MdiIcons.arrowExpandDown),
+            setKey: SettingBoxKey.defaultExpandIntroduction,
             defaultVal: false,
           ),
           ListTile(
@@ -279,7 +287,7 @@ class _ExtraSettingState extends State<ExtraSetting> {
               alignment: Alignment.centerRight,
               scale: 0.8,
               child: Switch(
-                thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
+                thumbIcon: WidgetStateProperty.resolveWith<Icon?>(
                     (Set<MaterialState> states) {
                   if (states.isNotEmpty &&
                       states.first == MaterialState.selected) {
