@@ -1,5 +1,4 @@
 name: Build alpha
-
 on:
   workflow_dispatch:
   push:
@@ -11,7 +10,7 @@ on:
       - '.github/**'
       - '.idea/**'
       - '!.github/workflows/build-alpha.yml'
-  
+
 jobs:
   update_version:
     name: Read latest version
@@ -25,7 +24,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with: 
+        with:
           fetch-depth: 0
 
       - name: 获取最后一次提交
@@ -52,43 +51,44 @@ jobs:
           datetime=$(date -u -d "8 hours" +%m%d%H%M)
           echo "new_version=${version_name}-alpha.${datetime}+${version_code}" >> $GITHUB_OUTPUT
 
-  android:
-    name: Build CI (Android)
+  build_matrix:
+    name: Build CI (${{ matrix.target_platform }})
     needs: update_version
-    runs-on: ubuntu-latest
-
+    runs-on: ${{ matrix.build_os }}
+    strategy:
+      matrix:
+        target_platform: [android-arm, android-arm64, android-x64, android-universal, iOS]
+        include:
+          - build_os: ubuntu-latest
+          - target_platform: iOS
+            build_os: macos-latest
+              
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: 构建Java环境
+        if: startsWith(matrix.target_platform, 'android')
         uses: actions/setup-java@v3
         with:
-            distribution: "zulu"
-            java-version: "21"
-            token: ${{secrets.GIT_TOKEN}}
-
-      - name: 检查缓存
-        uses: actions/cache@v2
-        id: cache-flutter
-        with:
-            path: /root/flutter-sdk
-            key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+          distribution: "zulu"
+          java-version: "21"
+          token: ${{ secrets.GIT_TOKEN }}
 
       - name: 安装Flutter
-        if: steps.cache-flutter.outputs.cache-hit != 'true'
         uses: subosito/flutter-action@v2
         with:
-            flutter-version: 3.24.4
-            channel: stable
+          flutter-version: 3.24.4
+          channel: stable
 
-      - name: 修复3.24的stable显示中文不正确问题
+      - name: 修复Flutter 3.24中文字重异常
+        if: startsWith(matrix.target_platform, 'android')
         run: |
           cd $FLUTTER_ROOT
           git config --global user.name "orz12"
           git config --global user.email "orz12@test.com"
           git cherry-pick d4124bd --strategy-option theirs
-          # flutter precache
+          # Flutter precache
           flutter --version
           cd -
 
@@ -96,25 +96,42 @@ jobs:
         run: flutter pub get
 
       - name: 解码生成 jks
+        if: startsWith(matrix.target_platform, 'android')
         run: echo $KEYSTORE_BASE64 | base64 -di > android/app/vvex.jks
-        env:
-            KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        env: 
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
       - name: 更新版本号
         id: version
         run: |
-          # 更新pubspec.yaml文件中的版本号
-          sed -i "s/version: .*/version: ${{ needs.update_version.outputs.new_version }}/g" pubspec.yaml
+          yq ".version=\"${{ needs.update_version.outputs.new_version }}\"" pubspec.yaml > tmp.yaml
+          mv tmp.yaml pubspec.yaml
 
-      - name: flutter build apk
-        run: |
-          flutter build apk --release --split-per-abi
+      - name: flutter build apk (universal)
+        if: matrix.target_platform == 'android-universal'
+        run: flutter build apk --release
         env:
-            KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-            KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-            KEY_PASSWORD: ${{ secrets.KEY_PASSWORD}}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
-      - name: 重命名应用
+      - name: flutter build apk (${{ matrix.target_platform }})
+        if: startsWith(matrix.target_platform, 'android') && matrix.target_platform != 'android-universal'
+        run: flutter build apk --release --split-per-abi --target-platform=${{ matrix.target_platform }}
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+      - name: flutter build ipa
+        if: matrix.target_platform == 'iOS'
+        run: |
+          flutter build ios --release --no-codesign
+          ln -sf ./build/ios/iphoneos Payload
+          zip -r9 app.ipa Payload/runner.app
+
+      - name: 重命名安装包(${{ matrix.target_platform }})
+        if: startsWith(matrix.target_platform, 'android')
         run: |
           version_name=$(yq e .version pubspec.yaml | cut -d "+" -f 1)
           for file in build/app/outputs/flutter-apk/app-*.apk; do
@@ -124,81 +141,42 @@ jobs:
             fi
           done
 
-      - name: 上传
-        uses: actions/upload-artifact@v3
-        with:
-          name: PiliPalaX-alpha
-          path: |
-            build/app/outputs/flutter-apk/Pili-*.apk
-
-  iOS:
-    name: Build CI (iOS)
-    needs: update_version
-    runs-on: macos-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
-
-      - name: 安装Flutter 
-        uses: subosito/flutter-action@v2.10.0
-        with:
-          cache: true
-          flutter-version: 3.24.4
-
-      - name: 更新版本号
-        id: version
-        run: |
-          # 更新pubspec.yaml文件中的版本号
-          sed -i "" "s/version: .*/version: ${{ needs.update_version.outputs.new_version }}/g" pubspec.yaml
-
-      - name: flutter build ipa
-        run: |
-          flutter build ios --release --no-codesign 
-          ln -sf ./build/ios/iphoneos Payload
-          zip -r9 app.ipa Payload/runner.app
-
-      - name: 重命名应用
+      - name: 重命名安装包(iOS)
+        if: matrix.target_platform == 'iOS'
         run: |
           for file in app.ipa; do
             new_file_name="build/Pili-${{ needs.update_version.outputs.new_version }}.ipa"
             mv "$file" "$new_file_name"
           done
 
-      - name: 上传
+      - name: 上传至artifact (${{ matrix.target_platform }})
+        if: startsWith(matrix.target_platform, 'android')
         uses: actions/upload-artifact@v3
         with:
-          if-no-files-found: error
+          name: PiliPalaX-alpha
+          path: |
+            build/app/outputs/flutter-apk/Pili-*.apk
+
+      - name: 上传至artifact (iOS)
+        if: matrix.target_platform == 'iOS'
+        uses: actions/upload-artifact@v3
+        with: 
           name: PiliPalaX-alpha
           path: |
             build/Pili-*.ipa
 
   upload:
     runs-on: ubuntu-latest
-
-    needs:
+    needs: 
       - update_version
-      - iOS
-      - android
+      - build_matrix
+    
     steps:
-
-      - uses: actions/download-artifact@v3
+      - name: 从artifact下载
+        uses: actions/download-artifact@v3
         with:
           name: PiliPalaX-alpha
           path: ./PiliPalaX-alpha
-          
-      # - name: Upload Pre-release
-      #   uses: ncipollo/release-action@v1
-      #   with:
-      #     name: ${{ needs.update_version.outputs.new_version }}
-      #     token: ${{ secrets.GIT_TOKEN }}
-      #     commit: main
-      #     tag: ${{ needs.update_version.outputs.new_version }}
-      #     prerelease: true
-      #     allowUpdates: true
-      #     artifacts: Pilipala-CI/*
 
       - name: 发送到Telegram频道
         uses: xireiki/channel-post@v1.0.7
@@ -211,4 +189,4 @@ jobs:
           method: sendFile
           path: PiliPalaX-alpha/*
           parse_mode: Markdown
-          context: "*v${{ needs.update_version.outputs.new_version }}*\n${{ needs.update_version.outputs.last_commit }}"
+          context: "*v${{ needs.update_version.outputs.new_version }}*\n${{ needs.update_version.outputs.last_commit }}"      
