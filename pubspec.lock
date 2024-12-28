@@ -573,7 +573,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "7973a5f0011c3fe39b3d3ea81be9db79330ffcde"
+      resolved-ref: "34dee7c3a993eb24b678e52d7aea420b6ab98f12"
       url: "https://github.com/orz12/fl_pip.git"
     source: git
     version: "3.2.0"
