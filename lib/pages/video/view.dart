@@ -307,6 +307,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   @override
   void dispose() {
+    if (popRouteStackContinuously != "" &&
+        Get.currentRoute != popRouteStackContinuously) {
+      super.dispose();
+      return;
+    }
     // floating.dispose();
     // videoDetailController.floating?.dispose();
     videoDetailController.cid.close();
@@ -360,6 +365,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     // if (mounted) {
     //   setState(() => {});
     // }
+    if (popRouteStackContinuously != "" &&
+        Get.currentRoute != popRouteStackContinuously) {
+      super.didPopNext();
+      return;
+    }
     videoDetailController.isFirstTime = false;
     if (!videoDetailController.autoPlay.value &&
         floatingManager.containsFloating(globalId)) {

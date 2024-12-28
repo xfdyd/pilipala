@@ -7,6 +7,7 @@ import 'package:PiliPalaX/pages/setting/widgets/select_dialog.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
+import '../../utils/utils.dart';
 import '../home/index.dart';
 import 'controller.dart';
 import 'widgets/switch_item.dart';
@@ -218,7 +219,7 @@ class _ExtraSettingState extends State<ExtraSetting> {
           ),
           SetSwitchItem(
             title: '默认展开简介',
-            subTitle: '竖屏布局也在视频详情页默认展开简介',
+            subTitle: '在视频详情页默认展开简介',
             leading: Icon(MdiIcons.arrowExpandDown),
             setKey: SettingBoxKey.defaultExpandIntroduction,
             defaultVal: false,
@@ -313,12 +314,17 @@ class _ExtraSettingState extends State<ExtraSetting> {
             setKey: SettingBoxKey.autoClearCache,
             defaultVal: false,
           ),
-          const SetSwitchItem(
+          SetSwitchItem(
             title: '检查更新',
             subTitle: '每次启动时检查是否需要更新',
-            leading: Icon(Icons.system_update_alt_outlined),
+            leading: const Icon(Icons.system_update_alt_outlined),
             setKey: SettingBoxKey.autoUpdate,
             defaultVal: false,
+            callFn: (val) {
+              if (val) {
+                Utils.checkUpdate();
+              }
+            },
           ),
         ],
       ),

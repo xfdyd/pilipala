@@ -26,6 +26,7 @@ import 'package:PiliPalaX/http/danmaku.dart';
 import 'package:PiliPalaX/services/shutdown_timer_service.dart';
 import '../../../../models/video/play/CDN.dart';
 import '../../../../models/video_detail_res.dart';
+import '../../../services/service_locator.dart';
 import '../../setting/widgets/select_dialog.dart';
 import 'package:PiliPalaX/pages/video/introduction/detail/index.dart';
 import 'package:marquee/marquee.dart';
@@ -64,6 +65,7 @@ class _HeaderControlState extends State<HeaderControl> {
   // late StreamSubscription<bool> fullScreenStatusListener;
   late bool horizontalScreen;
   RxString now = ''.obs;
+  String nowSemanticsLabel = "";
   late Timer clock;
   late String defaultCDNService;
 
@@ -1428,12 +1430,19 @@ class _HeaderControlState extends State<HeaderControl> {
     );
   }
 
+  getNow() {
+    if (!mounted) {
+      return;
+    }
+    int hour = DateTime.now().hour;
+    int minute = DateTime.now().minute;
+    nowSemanticsLabel = '当前时间：$hour点$minute分';
+    now.value = '$hour:$minute';
+  }
   startClock() {
+    getNow();
     clock = Timer.periodic(const Duration(seconds: 1), (Timer t) {
-      if (!mounted) {
-        return;
-      }
-      now.value = DateTime.now().toString().split(' ')[1].substring(0, 5);
+      getNow();
     });
   }
 
@@ -1654,13 +1663,9 @@ class _HeaderControlState extends State<HeaderControl> {
                     // 销毁播放器实例
                     // await widget.controller!.dispose();
                     if (mounted) {
-                      // Navigator.popUntil(
-                      //     context, (Route<dynamic> route) => route.isFirst);
-                      if (Get.previousRoute == '/') {
-                        Get.back();
-                        return;
-                      }
-                      Get.offAllNamed('/');
+                      popRouteStackContinuously = Get.currentRoute;
+                      Get.until((route) => route.isFirst);
+                      popRouteStackContinuously = "";
                     }
                   },
                 ),
@@ -1679,6 +1684,7 @@ class _HeaderControlState extends State<HeaderControl> {
                           color: Colors.white,
                           fontSize: 16,
                         ),
+                        maxLines: 2,
                       ),
                       if (videoIntroController.isShowOnlineTotal)
                         Text(
@@ -1743,9 +1749,7 @@ class _HeaderControlState extends State<HeaderControl> {
                     fontSize: 11,
                     fontFeatures: [FontFeature.tabularFigures()],
                   ),
-                  semanticsLabel: '当前时间：'
-                      '${now.value.split(':')[0]}点'
-                      '${now.value.split(':')[1]}分',
+                  semanticsLabel: nowSemanticsLabel
                 ),
               ),
               const SizedBox(width: 1.5),

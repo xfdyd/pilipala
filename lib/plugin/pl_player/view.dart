@@ -28,6 +28,7 @@ import '../../common/widgets/audio_video_progress_bar.dart';
 import '../../models/video_detail_res.dart';
 import 'package:PiliPalaX/pages/video/introduction/bangumi/controller.dart';
 import '../../common/widgets/list_sheet.dart';
+import '../../services/service_locator.dart';
 import '../../utils/utils.dart';
 import 'models/bottom_control_type.dart';
 import 'models/bottom_progress_behavior.dart';
@@ -93,6 +94,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   late FullScreenMode mode;
   late int defaultBtmProgressBehavior;
   late bool enableQuickDouble;
+  late bool enableAdjustBrightnessVolume;
   // late bool fullScreenGestureReverse;
   // late bool enableFloatingWindowGesture;
   late Map<PlayerMiddleGesture, PlayerGestureAction> middleGestureAction;
@@ -121,14 +123,14 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   }
 
   // 双击播放、暂停
-  void onDoubleTapCenter() {
+  void onDoubleTapMiddle() {
     final PlPlayerController _ = widget.controller;
     _.videoPlayerController!.playOrPause();
   }
 
   void doubleTapFuc(String type) {
     if (!enableQuickDouble) {
-      onDoubleTapCenter();
+      onDoubleTapMiddle();
       return;
     }
     switch (type) {
@@ -136,8 +138,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         // 双击左边区域 👈
         onDoubleTapSeekBackward();
         break;
-      case 'center':
-        onDoubleTapCenter();
+      case 'middle':
+        onDoubleTapMiddle();
         break;
       case 'right':
         // 双击右边区域 👈
@@ -188,6 +190,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         defaultValue: BtmProgressBehavior.values.first.code);
     enableQuickDouble =
         setting.get(SettingBoxKey.enableQuickDouble, defaultValue: true);
+    enableAdjustBrightnessVolume = setting
+        .get(SettingBoxKey.enableAdjustBrightnessVolume, defaultValue: true);
     // fullScreenGestureReverse = setting
     //     .get(SettingBoxKey.fullScreenGestureReverse, defaultValue: false);
     // enableFloatingWindowGesture = setting
@@ -646,13 +650,15 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                   final double sectionWidth = totalWidth / 3;
                   if (tapPosition < sectionWidth) {
                     // 左边区域
-                    _gestureType = 'left';
+                    _gestureType =
+                        enableAdjustBrightnessVolume ? 'left' : 'middle';
                   } else if (tapPosition < sectionWidth * 2) {
                     // 全屏/应用内小窗
-                    _gestureType = 'center';
+                    _gestureType = 'middle';
                   } else {
                     // 右边区域
-                    _gestureType = 'right';
+                    _gestureType =
+                        enableAdjustBrightnessVolume ? 'right' : 'middle';
                   }
                 } else {
                   return;
@@ -685,7 +691,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 final double result = brightness.clamp(0.0, 1.0);
                 print("result:$result");
                 setBrightness(result);
-              } else if (_gestureType == 'center') {
+              } else if (_gestureType == 'middle') {
                 // 全屏/应用内小窗
                 const double threshold = 2.8; // 滑动阈值
                 double cumulativeDy =
@@ -702,18 +708,12 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 void floatingWindowTrigger() {
                   _.triggerFloatingWindow(
                       videoIntroController, bangumiIntroController);
-                  // Future.delayed(const Duration(milliseconds: 10), () {
-                  if (!Get.previousRoute.startsWith('/video') &&
-                      !Get.previousRoute.startsWith('/live')) {
-                    Get.back();
-                    return;
-                  }
-                  while (Get.rawRoute?.settings.name?.startsWith('/video') ==
-                          true ||
-                      Get.rawRoute?.settings.name?.startsWith('/live') ==
-                          true) {
-                    Get.removeRoute(Get.rawRoute!);
-                  }
+
+                  popRouteStackContinuously = Get.currentRoute;
+                  Get.until((route) =>
+                      route.settings.name?.startsWith('/video') != true &&
+                      route.settings.name?.startsWith('/live') != true);
+                  popRouteStackContinuously = "";
                 }
 
                 void actionTrigger(PlayerGestureAction action) {
@@ -749,11 +749,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                         break;
                       case PlayerGestureAction.backToHome:
                         // lib/pages/video/widgets/header_control.dart
-                        if (Get.previousRoute == '/') {
-                          Get.back();
-                          return;
-                        }
-                        Get.offAllNamed('/');
+                        popRouteStackContinuously = Get.currentRoute;
+                        Get.until((route) => route.isFirst);
+                        popRouteStackContinuously = "";
                         break;
                     }
                   });
@@ -1046,7 +1044,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 if (tapPosition < sectionWidth) {
                   type = 'left';
                 } else if (tapPosition < sectionWidth * 3) {
-                  type = 'center';
+                  type = 'middle';
                 } else {
                   type = 'right';
                 }

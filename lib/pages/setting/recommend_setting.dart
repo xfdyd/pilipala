@@ -239,7 +239,9 @@ class _RecommendSettingState extends State<RecommendSetting> {
             leading: const Icon(Icons.favorite_border_outlined),
             setKey: SettingBoxKey.exemptFilterForFollowed,
             defaultVal: true,
-            callFn: (_) => {RecommendFilter.update},
+            callFn: (_) {
+              RecommendFilter.update();
+            },
           ),
           // ListTile(
           //   dense: false,
@@ -275,7 +277,19 @@ class _RecommendSettingState extends State<RecommendSetting> {
             leading: const Icon(Icons.explore_outlined),
             setKey: SettingBoxKey.applyFilterToRelatedVideos,
             defaultVal: true,
-            callFn: (_) => {RecommendFilter.update},
+            callFn: (_) {
+              RecommendFilter.update();
+            },
+          ),
+          SetSwitchItem(
+            title: '禁止推荐相关视频',
+            subTitle: '相关视频区域显示为空白，阻断短平快沉浸体验（横屏适配时，可配合【优先展示评论区】使用）',
+            leading: const Icon(Icons.explore_off_outlined),
+            setKey: SettingBoxKey.disableRelatedVideos,
+            defaultVal: false,
+            callFn: (_) {
+              RecommendFilter.update();
+            },
           ),
           ListTile(
             dense: true,

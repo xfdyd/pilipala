@@ -219,13 +219,13 @@ class VideoCustomActions {
                       act: 5,
                       reSrc: 11,
                     );
-                    List<int> blackMidsList = GStorage.localCache
-                        .get(LocalCacheKey.blackMidsList, defaultValue: [-1])
+                    List<int> blackMidsList = GStorage.onlineCache
+                        .get(OnlineCacheKey.blackMidsList, defaultValue: [-1])
                         .map<int>((i) => i as int)
                         .toList();
                     blackMidsList.insert(0, videoItem.owner.mid);
-                    GStorage.localCache
-                        .put(LocalCacheKey.blackMidsList, blackMidsList);
+                    GStorage.onlineCache
+                        .put(OnlineCacheKey.blackMidsList, blackMidsList);
                     Get.back();
                     SmartDialog.showToast(res['msg'] ?? '成功');
                   },

@@ -27,6 +27,7 @@ import 'login.dart';
 /// view层根据 status 判断渲染逻辑
 class VideoHttp {
   static Box localCache = GStorage.localCache;
+  static Box onlineCache = GStorage.onlineCache;
   static Box setting = GStorage.setting;
   static bool enableRcmdDynamic =
       setting.get(SettingBoxKey.enableRcmdDynamic, defaultValue: true);
@@ -48,8 +49,8 @@ class VideoHttp {
     );
     if (res.data['code'] == 0) {
       List<RecVideoItemModel> list = [];
-      List<int> blackMidsList = localCache
-          .get(LocalCacheKey.blackMidsList, defaultValue: [-1])
+      List<int> blackMidsList = onlineCache
+          .get(OnlineCacheKey.blackMidsList, defaultValue: [-1])
           .map<int>((e) => e as int)
           .toList();
       for (var i in res.data['data']['item']) {
@@ -138,8 +139,8 @@ class VideoHttp {
     log(res.data['data'].toString());
     if (res.data['code'] == 0) {
       List<RecVideoItemAppModel> list = [];
-      List<int> blackMidsList = localCache
-          .get(LocalCacheKey.blackMidsList, defaultValue: [-1])
+      List<int> blackMidsList = onlineCache
+          .get(OnlineCacheKey.blackMidsList, defaultValue: [-1])
           .map<int>((e) => e as int)
           .toList();
       for (var i in res.data['data']['items']) {
@@ -171,8 +172,8 @@ class VideoHttp {
       );
       if (res.data['code'] == 0) {
         List<HotVideoItemModel> list = [];
-        List<int> blackMidsList = localCache
-            .get(LocalCacheKey.blackMidsList, defaultValue: [-1])
+        List<int> blackMidsList = onlineCache
+            .get(OnlineCacheKey.blackMidsList, defaultValue: [-1])
             .map<int>((e) => e as int)
             .toList();
         for (var i in res.data['data']['list']) {
@@ -266,6 +267,11 @@ class VideoHttp {
 
   // 相关视频
   static Future relatedVideoList({required String bvid}) async {
+    print(
+        'RecommendFilter.disableRelatedVideos: ${RecommendFilter.disableRelatedVideos}');
+    if (RecommendFilter.disableRelatedVideos) {
+      return {'status': true, 'data': []};
+    }
     var res = await Request().get(Api.relatedList, data: {'bvid': bvid});
     if (res.data['code'] == 0) {
       List<HotVideoItemModel> list = [];
@@ -778,8 +784,8 @@ class VideoHttp {
       var res = await Request().get(rankApi);
       if (res.data['code'] == 0) {
         List<HotVideoItemModel> list = [];
-        List<int> blackMidsList = localCache
-            .get(LocalCacheKey.blackMidsList, defaultValue: [-1])
+        List<int> blackMidsList = onlineCache
+            .get(OnlineCacheKey.blackMidsList, defaultValue: [-1])
             .map<int>((e) => e as int)
             .toList();
         for (var i in res.data['data']['list']) {
@@ -806,8 +812,8 @@ class VideoHttp {
     print("getRegionVideoList: $res");
     if (res.data['code'] == 0) {
       List<HotVideoItemModel> list = [];
-      List<int> blackMidsList = localCache
-          .get(LocalCacheKey.blackMidsList, defaultValue: [-1])
+      List<int> blackMidsList = onlineCache
+          .get(OnlineCacheKey.blackMidsList, defaultValue: [-1])
           .map<int>((e) => e as int)
           .toList();
       print(res.data['data']['archives']);

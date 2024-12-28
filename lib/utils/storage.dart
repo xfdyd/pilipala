@@ -13,6 +13,7 @@ class GStorage {
   static late final Box<dynamic> localCache;
   static late final Box<dynamic> setting;
   static late final Box<dynamic> video;
+  static late final Box<dynamic> onlineCache;
 
   static Future<void> init() async {
     final Directory dir = await getApplicationSupportDirectory();
@@ -44,6 +45,7 @@ class GStorage {
     );
     // 视频设置
     video = await Hive.openBox('video');
+    onlineCache = await Hive.openBox('onlineCache');
     GlobalData().imgQuality =
         setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10); // 设置全局变量
   }
@@ -84,6 +86,8 @@ class GStorage {
     setting.close();
     video.compact();
     video.close();
+    onlineCache.compact();
+    onlineCache.close();
   }
 }
 
@@ -126,6 +130,7 @@ class SettingBoxKey {
       playerGestureActionMap = 'playerGestureActionMap',
       // youtube 双击快进快退
       enableQuickDouble = 'enableQuickDouble',
+      enableAdjustBrightnessVolume = 'enableAdjustBrightnessVolume',
       enableExtraButtonOnFullScreen = 'enableExtraButtonOnFullScreen',
       // fullScreenGestureReverse = 'fullScreenGestureReverse',
       // enableFloatingWindowGesture = 'enableFloatingWindowGesture',
@@ -147,6 +152,7 @@ class SettingBoxKey {
       banWordForRecommend = 'banWordForRecommend',
       //filterUnfollowedRatio = 'filterUnfollowedRatio',
       applyFilterToRelatedVideos = 'applyFilterToRelatedVideos',
+      disableRelatedVideos = 'disableRelatedVideos',
 
       /// 其他
       autoUpdate = 'autoUpdate',
@@ -209,10 +215,6 @@ class LocalCacheKey {
   // 历史记录暂停状态 默认false 记录
   static const String historyPause = 'historyPause',
 
-      // 隐私设置-黑名单管理
-      blackMidsList = 'blackMidsList',
-      // 弹幕屏蔽规则
-      danmakuFilterRule = 'danmakuFilterRule',
       // access_key
       accessKey = 'accessKey',
 
@@ -238,4 +240,12 @@ class VideoBoxKey {
       customSpeedsList = 'customSpeedsList',
       // 画面填充比例
       cacheVideoFit = 'cacheVideoFit';
+}
+
+class OnlineCacheKey {
+  static const String
+      // 隐私设置-黑名单管理
+      blackMidsList = 'blackMidsList',
+      // 弹幕屏蔽规则
+      danmakuFilterRule = 'danmakuFilterRule';
 }

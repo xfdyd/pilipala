@@ -276,6 +276,7 @@ class _AboutPageState extends State<AboutPage> {
                           GStorage.localCache.clear();
                           GStorage.video.clear();
                           GStorage.historyWord.clear();
+                          GStorage.onlineCache.clear();
                           SmartDialog.showToast('重置成功');
                         },
                         child: const Text('重置所有数据（含登录信息）'),

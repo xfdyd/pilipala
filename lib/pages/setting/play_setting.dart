@@ -80,10 +80,10 @@ class _PlaySettingState extends State<PlaySetting> {
             title: Text('倍速设置', style: titleStyle),
             subtitle: Text('设置视频播放速度', style: subTitleStyle),
           ),
-          const SetSwitchItem(
+          SetSwitchItem(
             title: '自动播放',
             subTitle: '进入详情页自动播放',
-            leading: Icon(Icons.motion_photos_auto_outlined),
+            leading: Icon(MdiIcons.playPause),
             setKey: SettingBoxKey.autoPlayEnable,
             defaultVal: true,
           ),
@@ -92,6 +92,13 @@ class _PlaySettingState extends State<PlaySetting> {
             subTitle: '左侧双击快退/右侧双击快进，关闭则双击均为暂停/播放',
             leading: Icon(Icons.touch_app_outlined),
             setKey: SettingBoxKey.enableQuickDouble,
+            defaultVal: true,
+          ),
+          SetSwitchItem(
+            title: '左右侧滑动调节亮度/音量',
+            subTitle: '关闭则触发中部上下滑动手势',
+            leading: Icon(MdiIcons.tuneVerticalVariant),
+            setKey: SettingBoxKey.enableAdjustBrightnessVolume,
             defaultVal: true,
           ),
           ListTile(
