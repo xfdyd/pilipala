@@ -22,7 +22,7 @@ class _BlackListPageState extends State<BlackListPage> {
   final ScrollController scrollController = ScrollController();
   Future? _futureBuilderFuture;
   bool _isLoadingMore = false;
-  Box localCache = GStorage.localCache;
+  Box onlineCache = GStorage.onlineCache;
 
   @override
   void initState() {
@@ -46,7 +46,7 @@ class _BlackListPageState extends State<BlackListPage> {
   void dispose() {
     List<int> blackMidsList =
         _blackListController.blackList.map<int>((e) => e.mid!).toList();
-    localCache.put(LocalCacheKey.blackMidsList, blackMidsList);
+    onlineCache.put(OnlineCacheKey.blackMidsList, blackMidsList);
     scrollController.removeListener(() {});
     super.dispose();
   }

@@ -41,7 +41,7 @@ import '../../pages/video/introduction/detail/controller.dart';
 
 Box videoStorage = GStorage.video;
 Box setting = GStorage.setting;
-Box localCache = GStorage.localCache;
+Box onlineCache = GStorage.onlineCache;
 
 class PlPlayerController {
   static Player? _videoPlayerController;
@@ -360,7 +360,7 @@ class PlPlayerController {
         setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: true);
     danmakuWeight.value =
         setting.get(SettingBoxKey.danmakuWeight, defaultValue: 0);
-    danmakuFilterRule.value = localCache.get(LocalCacheKey.danmakuFilterRule,
+    danmakuFilterRule.value = onlineCache.get(OnlineCacheKey.danmakuFilterRule,
         defaultValue: []).map<Map<String, dynamic>>((e) {
       return Map<String, dynamic>.from(e);
     }).toList();
@@ -424,10 +424,10 @@ class PlPlayerController {
     _playerListenerForEnterPip =
         onPlayerStatusChanged.listen((PlayerStatus status) async {
       if (status != PlayerStatus.playing) {
-        bool isActive = (await FlPiP().isActive)?.status == PiPStatus.enabled;
-        if (isActive) return;
-        FlPiP().disable();
-        print('disabled pip');
+        // bool isActive = (await FlPiP().isActive)?.status == PiPStatus.enabled;
+        // if (isActive) return;
+        FlPiP().setEnableWhenBackground(false);
+        print('disable pip EnableWhenBackground');
         return;
       }
       print('enable pip');
@@ -734,7 +734,7 @@ class PlPlayerController {
 
   Future<void> autoEnterFullScreen() async {
     bool autoEnterFullscreen = GStorage.setting
-        .get(SettingBoxKey.enableAutoEnter, defaultValue: false);
+            .get(SettingBoxKey.enableAutoEnter, defaultValue: false);
     if (autoEnterFullscreen) {
       Future.delayed(const Duration(milliseconds: 500), () {
         if (dataStatus.status.value != DataStatus.loaded) {

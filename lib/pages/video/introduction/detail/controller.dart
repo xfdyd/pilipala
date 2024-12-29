@@ -657,6 +657,9 @@ class VideoIntroController extends GetxController {
     }
 
     final HotVideoItemModel videoItem = relatedCtr.relatedVideoList[0];
+    if (PlPlayerController.getInstance().isFullScreen.value) {
+      PlPlayerController.getInstance().toggleFullScreen(false);
+    }
     try {
       if (videoItem.cid != null) {
         Get.offNamed('/video?bvid=${videoItem.bvid}&cid=${videoItem.cid}',

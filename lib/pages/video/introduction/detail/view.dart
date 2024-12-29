@@ -110,7 +110,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
   late final bool loadingStatus; // 加载状态
 
-  bool? isExpanded;
+  late bool isExpanded;
 
   late int mid;
   late String memberHeroTag;
@@ -139,9 +139,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     enableAi = setting.get(SettingBoxKey.enableAi, defaultValue: true);
     defaultExpandIntroduction = setting
         .get(SettingBoxKey.defaultExpandIntroduction, defaultValue: true);
-    if (defaultExpandIntroduction) {
-      isExpanded = true;
-    }
+    isExpanded = defaultExpandIntroduction;
   }
 
   // 收藏
@@ -284,6 +282,31 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   Expanded(child: actionGrid(context, videoIntroController)),
                 ]
               ]),
+              // 合集
+              if (!loadingStatus &&
+                  widget.videoDetail?.ugcSeason != null) ...[
+                Obx(
+                      () => SeasonPanel(
+                    heroTag: heroTag,
+                    ugcSeason: widget.videoDetail!.ugcSeason!,
+                    cid: videoIntroController.lastPlayCid.value != 0
+                        ? videoIntroController.lastPlayCid.value
+                        : widget.videoDetail!.pages!.first.cid,
+                    changeFuc: videoIntroController.changeSeasonOrbangu,
+                  ),
+                )
+              ],
+              if (!loadingStatus &&
+                  widget.videoDetail?.pages != null &&
+                  widget.videoDetail!.pages!.length > 1) ...[
+                Obx(() => PagesPanel(
+                  heroTag: heroTag,
+                  pages: widget.videoDetail!.pages!,
+                  cid: videoIntroController.lastPlayCid.value,
+                  bvid: videoIntroController.bvid,
+                  changeFuc: videoIntroController.changeSeasonOrbangu,
+                ))
+              ],
               ListTileTheme(
                 key: const PageStorageKey<String>('视频信息'),
                 contentPadding: EdgeInsets.zero,
@@ -292,13 +315,12 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                 minLeadingWidth: 0,
                 minVerticalPadding: 0,
                 child: ExpansionTile(
-                  initiallyExpanded: isExpanded ?? isHorizontal,
+                  initiallyExpanded: isExpanded,
                   collapsedShape: const RoundedRectangleBorder(),
                   shape: const RoundedRectangleBorder(),
                   // showTrailingIcon: false,
                   onExpansionChanged: (bool expanded) {
                     feedBack();
-                    print(expanded);
                     setState(() {
                       isExpanded = expanded;
                     });
@@ -420,30 +442,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               // ),
               // 点赞收藏转发 布局样式2
               if (!isHorizontal) actionGrid(context, videoIntroController),
-              // 合集
-              if (!loadingStatus && widget.videoDetail?.ugcSeason != null) ...[
-                Obx(
-                  () => SeasonPanel(
-                    heroTag: heroTag,
-                    ugcSeason: widget.videoDetail!.ugcSeason!,
-                    cid: videoIntroController.lastPlayCid.value != 0
-                        ? videoIntroController.lastPlayCid.value
-                        : widget.videoDetail!.pages!.first.cid,
-                    changeFuc: videoIntroController.changeSeasonOrbangu,
-                  ),
-                )
-              ],
-              if (!loadingStatus &&
-                  widget.videoDetail?.pages != null &&
-                  widget.videoDetail!.pages!.length > 1) ...[
-                Obx(() => PagesPanel(
-                      heroTag: heroTag,
-                      pages: widget.videoDetail!.pages!,
-                      cid: videoIntroController.lastPlayCid.value,
-                      bvid: videoIntroController.bvid,
-                      changeFuc: videoIntroController.changeSeasonOrbangu,
-                    ))
-              ],
             ],
           )),
         );

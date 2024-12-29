@@ -21,7 +21,8 @@ class MainApp extends StatefulWidget {
   State<MainApp> createState() => _MainAppState();
 }
 
-class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
+class _MainAppState extends State<MainApp>
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   final MainController _mainController = Get.put(MainController());
   final HomeController _homeController = Get.put(HomeController());
   final DynamicsController _dynamicController = Get.put(DynamicsController());
@@ -104,12 +105,12 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     }
   }
 
-  @override
-  void dispose() async {
-    // await GStorage.close();
-    // EventBus().off(EventName.loginEvent);
-    super.dispose();
-  }
+  // @override
+  // void dispose() async {
+  // await GStorage.close();
+  // EventBus().off(EventName.loginEvent);
+  //   super.dispose();
+  // }
 
   Widget sideBar() => SizedBox(
         width: context.width * 0.0387 +
@@ -219,101 +220,110 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    bool usingLeftSideBar() =>
-        sideBarPosition == SideBarPosition.leftFixed ||
-        sideBarPosition == SideBarPosition.leftHorizontal &&
-            MediaQuery.of(context).orientation == Orientation.landscape;
+    super.build(context);
+    return OrientationBuilder(builder: (context, orientation) {
+      bool usingLeftSideBar() =>
+          sideBarPosition == SideBarPosition.leftFixed ||
+          sideBarPosition == SideBarPosition.leftHorizontal &&
+              orientation == Orientation.landscape;
 
-    bool usingRightSideBar() =>
-        sideBarPosition == SideBarPosition.rightFixed ||
-        sideBarPosition == SideBarPosition.rightHorizontal &&
-            MediaQuery.of(context).orientation == Orientation.landscape;
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (bool didPop, Object? result) async {
-        _mainController.onBackPressed(context);
-      },
-      child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle(
-          systemNavigationBarColor: Colors.transparent,
-          systemNavigationBarIconBrightness:
-              Theme.of(context).brightness == Brightness.light
-                  ? Brightness.dark
-                  : Brightness.light, // 设置虚拟按键图标颜色
-        ),
-        child: Scaffold(
-          extendBody: true,
-          body: Stack(children: [
-            // gradient background
-            if (enableGradientBg)
-              Align(
-                alignment: Alignment.topLeft,
-                child: Opacity(
-                  opacity: 0.6,
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withOpacity(0.6),
-                          Theme.of(context)
-                              .colorScheme
-                              .primaryContainer
-                              .withOpacity(0.6),
-                          Theme.of(context).colorScheme.surface
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        stops: const [0.1, 0.4, 0.7],
+      bool usingRightSideBar() =>
+          sideBarPosition == SideBarPosition.rightFixed ||
+          sideBarPosition == SideBarPosition.rightHorizontal &&
+              orientation == Orientation.landscape;
+      return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (bool didPop, Object? result) async {
+          _mainController.onBackPressed(context);
+        },
+        child: AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle(
+            systemNavigationBarColor: Colors.transparent,
+            systemNavigationBarIconBrightness:
+                Theme.of(context).brightness == Brightness.light
+                    ? Brightness.dark
+                    : Brightness.light, // 设置虚拟按键图标颜色
+          ),
+          child: Scaffold(
+            extendBody: true,
+            body: Stack(children: [
+              // gradient background
+              if (enableGradientBg)
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Opacity(
+                    opacity: 0.6,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(0.6),
+                            Theme.of(context)
+                                .colorScheme
+                                .primaryContainer
+                                .withOpacity(0.6),
+                            Theme.of(context).colorScheme.surface
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          stops: const [0.1, 0.4, 0.7],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (usingLeftSideBar()) ...[sideBar(), verticalDivider()],
-                if (usingRightSideBar()) SizedBox(width: context.width * 0.004),
-                Expanded(
-                  child: PageView(
-                    physics: const NeverScrollableScrollPhysics(),
-                    controller: _mainController.pageController,
-                    onPageChanged: (index) {
-                      _mainController.selectedIndex = index;
-                      setState(() {});
-                    },
-                    children: _mainController.pages,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (usingLeftSideBar()) ...[sideBar(), verticalDivider()],
+                  if (usingRightSideBar())
+                    SizedBox(width: context.width * 0.004),
+                  Expanded(
+                    child: PageView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      controller: _mainController.pageController,
+                      onPageChanged: (index) {
+                        _mainController.selectedIndex = index;
+                        setState(() {});
+                      },
+                      children: _mainController.pages,
+                    ),
                   ),
-                ),
-                if (usingLeftSideBar()) SizedBox(width: context.width * 0.004),
-                if (usingRightSideBar()) ...[sideBar(), verticalDivider()],
-              ],
-            )
-          ]),
-          bottomNavigationBar: usingLeftSideBar() || usingRightSideBar()
-              ? null
-              : StreamBuilder(
-                  stream: _mainController.hideTabBar
-                      ? _mainController.bottomBarStream.stream
-                      : StreamController<bool>.broadcast().stream,
-                  initialData: true,
-                  builder: (context, AsyncSnapshot snapshot) {
-                    return AnimatedSlide(
-                      curve: Curves.easeInOutCubicEmphasized,
-                      duration: const Duration(milliseconds: 500),
-                      offset: Offset(0, snapshot.data ? 0 : 1),
-                      child:
-                          enableMYBar ? navigationBar() : bottomNavigationBar(),
-                    );
-                  },
-                ),
+                  if (usingLeftSideBar())
+                    SizedBox(width: context.width * 0.004),
+                  if (usingRightSideBar()) ...[sideBar(), verticalDivider()],
+                ],
+              )
+            ]),
+            bottomNavigationBar: usingLeftSideBar() || usingRightSideBar()
+                ? null
+                : StreamBuilder(
+                    stream: _mainController.hideTabBar
+                        ? _mainController.bottomBarStream.stream
+                        : StreamController<bool>.broadcast().stream,
+                    initialData: true,
+                    builder: (context, AsyncSnapshot snapshot) {
+                      return AnimatedSlide(
+                        curve: Curves.easeInOutCubicEmphasized,
+                        duration: const Duration(milliseconds: 500),
+                        offset: Offset(0, snapshot.data ? 0 : 1),
+                        child: enableMYBar
+                            ? navigationBar()
+                            : bottomNavigationBar(),
+                      );
+                    },
+                  ),
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
