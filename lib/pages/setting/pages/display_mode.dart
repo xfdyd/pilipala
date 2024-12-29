@@ -75,7 +75,7 @@ class _SetDisplayModeState extends State<SetDisplayMode> {
             Padding(
               padding: const EdgeInsets.only(left: 25, top: 10, bottom: 5),
               child: Text(
-                '没有生效？重启app试试',
+                '没有生效？重启app试试\n（只能向操作系统提出建议，也不一定会生效）',
                 style: TextStyle(color: Theme.of(context).colorScheme.outline),
               ),
             ),

@@ -8,7 +8,9 @@ class RecommendFilter {
   static late int minLikeRatioForRecommend;
   static late bool exemptFilterForFollowed;
   static late bool applyFilterToRelatedVideos;
+  static late bool disableRelatedVideos;
   static late List<String> banWordList;
+
   RecommendFilter() {
     update();
   }
@@ -28,6 +30,9 @@ class RecommendFilter {
         setting.get(SettingBoxKey.exemptFilterForFollowed, defaultValue: true);
     applyFilterToRelatedVideos = setting
         .get(SettingBoxKey.applyFilterToRelatedVideos, defaultValue: true);
+
+    disableRelatedVideos =
+        setting.get(SettingBoxKey.disableRelatedVideos, defaultValue: false);
   }
 
   static bool filter(dynamic videoItem, {bool relatedVideos = false}) {

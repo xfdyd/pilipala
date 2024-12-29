@@ -42,13 +42,10 @@ class _SetSwitchItemState extends State<SetSwitchItem> {
   void switchChange(value) async {
     val = value ?? !val;
     await Setting.put(widget.setKey, val);
-    if (widget.setKey == SettingBoxKey.autoUpdate && value == true) {
-      Utils.checkUpdate();
-    }
     if (widget.callFn != null) {
       widget.callFn!.call(val);
     }
-    if (widget.needReboot != null && widget.needReboot!) {
+    if (widget.needReboot == true) {
       SmartDialog.showToast('重启生效');
     }
     setState(() {});

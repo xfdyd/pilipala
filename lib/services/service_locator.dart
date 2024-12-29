@@ -8,6 +8,7 @@ late VideoPlayerServiceHandler videoPlayerServiceHandler;
 late AudioSessionHandler audioSessionHandler;
 Floating? floatingWindow;
 const globalId = 'global_floating_window';
+String popRouteStackContinuously = "";
 
 Future<void> setupServiceLocator() async {
   final audio = await initAudioService();

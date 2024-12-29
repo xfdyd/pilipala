@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:PiliPalaX/services/service_locator.dart';
+import 'package:fl_pip/fl_pip.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_floating/floating/manager/floating_manager.dart';
 import 'package:get/get.dart';
@@ -173,7 +174,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
                             ),
                             //内置浏览器打开
                             IconButton(
-                              tooltip: '内置浏览器打开',
+                                tooltip: '内置浏览器打开',
                                 onPressed: () {
                                   Get.offNamed(
                                     '/webview',
@@ -225,14 +226,21 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
         ],
       ),
     );
-    // if (Platform.isAndroid) {
-    //   return PiPSwitcher(
-    //     childWhenDisabled: childWhenDisabled,
-    //     childWhenEnabled: videoPlayerPanel,
-    //     floating: floating,
-    //   );
-    // } else {
+    if (!Platform.isAndroid) {
       return childWhenDisabled;
-    // }
+    }
+    return PiPBuilder(builder: (PiPStatusInfo? statusInfo) {
+      print("PiPStatusInfo${statusInfo?.status}");
+      switch (statusInfo?.status) {
+        case PiPStatus.enabled:
+          return videoPlayerPanel;
+        case PiPStatus.disabled:
+          return childWhenDisabled;
+        case PiPStatus.unavailable:
+          return childWhenDisabled;
+        case null:
+          return childWhenDisabled;
+      }
+    });
   }
 }

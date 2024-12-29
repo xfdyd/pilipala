@@ -20,7 +20,7 @@ class _DanmakuBlockPageState extends State<DanmakuBlockPage> {
   final DanmakuBlockController _danmakuBlockController =
       Get.put(DanmakuBlockController());
   final ScrollController scrollController = ScrollController();
-  Box localCache = GStorage.localCache;
+  Box onlineCache = GStorage.onlineCache;
   late PlPlayerController plPlayerController;
 
   static const Map<int, String> ruleLabels = {
@@ -51,7 +51,7 @@ class _DanmakuBlockPageState extends State<DanmakuBlockPage> {
       return e.toMap();
     }).toList();
     print("simpleRuleList:$simpleRuleList");
-    localCache.put(LocalCacheKey.danmakuFilterRule, simpleRuleList);
+    onlineCache.put(OnlineCacheKey.danmakuFilterRule, simpleRuleList);
     plPlayerController.danmakuFilterRule.value = simpleRuleList;
     scrollController.removeListener(() {});
     scrollController.dispose();

@@ -19,7 +19,7 @@ class _PlaySpeedPageState extends State<PlaySpeedPage> {
   Box settingStorage = GStorage.setting;
   late double playSpeedDefault;
   late double longPressSpeedDefault;
-  late List customSpeedsList;
+  late List<double> customSpeedsList;
   late bool enableAutoLongPressSpeed;
   List<Map<dynamic, dynamic>> sheetMenu = [
     {
@@ -61,8 +61,8 @@ class _PlaySpeedPageState extends State<PlaySpeedPage> {
     longPressSpeedDefault =
         videoStorage.get(VideoBoxKey.longPressSpeedDefault, defaultValue: 3.0);
     // 自定义倍速
-    customSpeedsList =
-        videoStorage.get(VideoBoxKey.customSpeedsList, defaultValue: []);
+    customSpeedsList = videoStorage.get(VideoBoxKey.customSpeedsList,
+        defaultValue: <double>[0.5, 0.75, 1.25, 1.5, 1.75, 3.0]);
     enableAutoLongPressSpeed = settingStorage
         .get(SettingBoxKey.enableAutoLongPressSpeed, defaultValue: false);
     if (enableAutoLongPressSpeed) {
@@ -225,7 +225,8 @@ class _PlaySpeedPageState extends State<PlaySpeedPage> {
             ),
             ListTile(
               dense: false,
-              title: const Text('默认倍速'),
+              title:
+                  Text('默认倍速', style: Theme.of(context).textTheme.titleMedium),
               subtitle: Text(playSpeedDefault.toString()),
             ),
             SetSwitchItem(
@@ -245,7 +246,8 @@ class _PlaySpeedPageState extends State<PlaySpeedPage> {
             !enableAutoLongPressSpeed
                 ? ListTile(
                     dense: false,
-                    title: const Text('默认长按倍速'),
+                    title: Text('默认长按倍速',
+                        style: Theme.of(context).textTheme.titleMedium),
                     subtitle: Text(longPressSpeedDefault.toString()),
                   )
                 : const SizedBox(),

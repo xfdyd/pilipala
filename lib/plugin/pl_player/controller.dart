@@ -41,7 +41,7 @@ import '../../pages/video/introduction/detail/controller.dart';
 
 Box videoStorage = GStorage.video;
 Box setting = GStorage.setting;
-Box localCache = GStorage.localCache;
+Box onlineCache = GStorage.onlineCache;
 
 class PlPlayerController {
   static Player? _videoPlayerController;
@@ -360,7 +360,7 @@ class PlPlayerController {
         setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: true);
     danmakuWeight.value =
         setting.get(SettingBoxKey.danmakuWeight, defaultValue: 0);
-    danmakuFilterRule.value = localCache.get(LocalCacheKey.danmakuFilterRule,
+    danmakuFilterRule.value = onlineCache.get(OnlineCacheKey.danmakuFilterRule,
         defaultValue: []).map<Map<String, dynamic>>((e) {
       return Map<String, dynamic>.from(e);
     }).toList();
@@ -400,8 +400,9 @@ class PlPlayerController {
     }
     enableLongShowControl =
         setting.get(SettingBoxKey.enableLongShowControl, defaultValue: false);
-    speedsList = List<double>.from(videoStorage
-        .get(VideoBoxKey.customSpeedsList, defaultValue: <double>[]));
+    speedsList = List<double>.from(videoStorage.get(
+        VideoBoxKey.customSpeedsList,
+        defaultValue: <double>[0.5, 0.75, 1.25, 1.5, 1.75, 3.0]));
     for (final PlaySpeed i in PlaySpeed.values) {
       speedsList.add(i.value);
     }
@@ -424,10 +425,10 @@ class PlPlayerController {
     _playerListenerForEnterPip =
         onPlayerStatusChanged.listen((PlayerStatus status) async {
       if (status != PlayerStatus.playing) {
-        bool isActive = (await FlPiP().isActive)?.status == PiPStatus.enabled;
-        if (isActive) return;
-        FlPiP().disable();
-        print('disabled pip');
+        // bool isActive = (await FlPiP().isActive)?.status == PiPStatus.enabled;
+        // if (isActive) return;
+        FlPiP().setEnableWhenBackground(false);
+        print('disable pip EnableWhenBackground');
         return;
       }
       print('enable pip');

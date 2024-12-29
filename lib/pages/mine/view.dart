@@ -1,13 +1,16 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
+import 'package:flex_seed_scheme/flex_seed_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/constants.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 import 'package:PiliPalaX/models/common/theme_type.dart';
 import 'package:PiliPalaX/models/user/info.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import '../../utils/storage.dart';
 import 'controller.dart';
 
 class MinePage extends StatefulWidget {
@@ -48,14 +51,55 @@ class _MinePageState extends State<MinePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const SizedBox(width: 12),
-              Image.asset(
-                'assets/images/logo/logo_android_2.png',
-                width: 30,
-              ),
-              const SizedBox(width: 5),
-              Text(
-                'PiliPalaX',
-                style: Theme.of(context).textTheme.titleSmall,
+              InkWell(
+                child: Row(
+                  children: [
+                    Image.asset(
+                      'assets/images/logo/logo_android_2.png',
+                      width: 30,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      'PiliPalaX',
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  FlexSchemeVariant _dynamicSchemeVariant =
+                      FlexSchemeVariant.values[GStorage.setting
+                          .get(SettingBoxKey.schemeVariant, defaultValue: 10)];
+
+                  showMenu<FlexSchemeVariant>(
+                    context: context,
+                    position: const RelativeRect.fromLTRB(0, 0, 0, 0),
+                    initialValue: _dynamicSchemeVariant,
+                    items: FlexSchemeVariant.values
+                        .map(
+                          (item) => PopupMenuItem<FlexSchemeVariant>(
+                            value: item,
+                            height: 35,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(item.icon, size: 20),
+                                const SizedBox(width: 10),
+                                Text(item.variantName),
+                              ],
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ).then((selectedItem) {
+                    if (selectedItem != null) {
+                      _dynamicSchemeVariant = selectedItem;
+                      GStorage.setting
+                          .put(SettingBoxKey.schemeVariant, selectedItem.index);
+                      (context as Element).markNeedsBuild();
+                      Get.forceAppUpdate();
+                    }
+                  });
+                },
               ),
               const Expanded(
                 flex: 255,

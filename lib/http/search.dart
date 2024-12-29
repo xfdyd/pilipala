@@ -7,10 +7,11 @@ import '../models/search/hot.dart';
 import '../models/search/result.dart';
 import '../models/search/suggest.dart';
 import '../utils/storage.dart';
+import '../utils/wbi_sign.dart';
 import 'index.dart';
 
 class SearchHttp {
-  static Box localCache = GStorage.localCache;
+  static Box onlineCache = GStorage.onlineCache;
   static Future hotSearchList() async {
     var res = await Request().get(Api.hotSearchList);
     if (res.data is String) {
@@ -84,14 +85,16 @@ class SearchHttp {
       if (order != null) 'order': order,
       if (duration != null) 'duration': duration,
     };
+    Map<String, dynamic> params = await WbiSign().makSign(reqData);
+    reqData.addAll(params);
     var res = await Request().get(Api.searchByType, data: reqData);
     if (res.data['code'] == 0 && res.data['data']['numPages'] > 0) {
       Object data;
       try {
         switch (searchType) {
           case SearchType.video:
-            List<int> blackMidsList = localCache
-                .get(LocalCacheKey.blackMidsList, defaultValue: [-1])
+            List<int> blackMidsList = onlineCache
+                .get(OnlineCacheKey.blackMidsList, defaultValue: [-1])
                 .map<int>((i) => i as int)
                 .toList();
             for (var i in res.data['data']['result']) {
