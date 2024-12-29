@@ -5,6 +5,10 @@ import 'package:hive/hive.dart';
 import 'package:PiliPalaX/models/common/color_type.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 
+import '../../../models/common/theme_type.dart';
+import 'package:PiliPalaX/pages/setting/widgets/select_dialog.dart';
+import '../controller.dart';
+
 class ColorSelectPage extends StatefulWidget {
   const ColorSelectPage({super.key});
 
@@ -14,6 +18,7 @@ class ColorSelectPage extends StatefulWidget {
 
 class _ColorSelectPageState extends State<ColorSelectPage> {
   final ColorSelectController ctr = Get.put(ColorSelectController());
+  final SettingController settingController = Get.put(SettingController());
   FlexSchemeVariant _dynamicSchemeVariant = FlexSchemeVariant.values[
       GStorage.setting.get(SettingBoxKey.schemeVariant, defaultValue: 10)];
 
@@ -21,16 +26,136 @@ class _ColorSelectPageState extends State<ColorSelectPage> {
   Widget build(BuildContext context) {
     // 获取当前主题的 ColorScheme
     final colorScheme = Theme.of(context).colorScheme;
+    // 用于预览的颜色
+    final List<Color> previewColors = [
+      colorScheme.primary,
+      colorScheme.primaryContainer,
+      colorScheme.onPrimary,
+      colorScheme.onPrimaryContainer,
+      colorScheme.secondary,
+      colorScheme.secondaryContainer,
+      colorScheme.onSecondary,
+      colorScheme.onSecondaryContainer,
+      colorScheme.surface,
+      colorScheme.onSurface,
+      colorScheme.outline,
+      colorScheme.outlineVariant,
+    ];
+    TextStyle titleStyle = Theme.of(context).textTheme.titleMedium!;
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: const Text('选择应用主题'),
+        title: const Text('设置应用主题'),
       ),
       body: ListView(
         children: [
+          const SizedBox(height: 10),
+          // 颜色预览
+          ListTile(
+              title: Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outlineVariant,
+                width: 1,
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                for (var color in previewColors)
+                  Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: color,
+                    ),
+                  ),
+              ],
+            ),
+          )),
+          ListTile(
+            dense: false,
+            onTap: () async {
+              ThemeType? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SelectDialog<ThemeType>(
+                      title: '主题模式',
+                      value: settingController.themeType.value,
+                      values: ThemeType.values.map((e) {
+                        return {'title': e.description, 'value': e};
+                      }).toList());
+                },
+              );
+              if (result != null) {
+                settingController.themeType.value = result;
+                settingController.themeType.value = result;
+                ctr.setting.put(SettingBoxKey.themeMode, result.code);
+                Get.forceAppUpdate();
+              }
+            },
+            leading: Container(
+              width: 40,
+              alignment: Alignment.center,
+              child: const Icon(Icons.flashlight_on_outlined),
+            ),
+            title: Text('主题模式', style: titleStyle),
+            subtitle: Obx(() =>
+                Text('当前模式：${settingController.themeType.value.description}')),
+          ),
           Builder(
             builder: (context) => ListTile(
-              title: const Text('调色板风格'),
+              title: Row(children: [
+                Text('色彩风格', style: titleStyle),
+                const Spacer(),
+                PopupMenuButton(
+                  initialValue: _dynamicSchemeVariant,
+                  onSelected: (item) async {
+                    _dynamicSchemeVariant = item;
+                    await GStorage.setting
+                        .put(SettingBoxKey.schemeVariant, item.index);
+                    (context as Element).markNeedsBuild();
+                    Get.forceAppUpdate();
+                  },
+                  itemBuilder: (context) => FlexSchemeVariant.values
+                      .map((item) => PopupMenuItem<FlexSchemeVariant>(
+                            height: 35,
+                            value: item,
+                            child: Row(children: [
+                              Icon(item.icon),
+                              const SizedBox(width: 10),
+                              Text(item.variantName),
+                            ]),
+                          ))
+                      .toList(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(_dynamicSchemeVariant.icon,
+                          size: 18,
+                          color: Theme.of(context).colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Text(
+                        _dynamicSchemeVariant.variantName,
+                        style: TextStyle(
+                          height: 1,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        strutStyle: const StrutStyle(leading: 0, height: 1),
+                      ),
+                      const SizedBox(width: 8),
+                      Icon(
+                        size: 20,
+                        Icons.keyboard_arrow_right,
+                        color: Theme.of(context).colorScheme.primary,
+                      )
+                    ],
+                  ),
+                ),
+              ]),
               leading: Container(
                 width: 40,
                 alignment: Alignment.center,
@@ -40,47 +165,12 @@ class _ColorSelectPageState extends State<ColorSelectPage> {
                 _dynamicSchemeVariant.description,
                 style: const TextStyle(fontSize: 12),
               ),
-              trailing: PopupMenuButton(
-                initialValue: _dynamicSchemeVariant,
-                onSelected: (item) async {
-                  _dynamicSchemeVariant = item;
-                  await GStorage.setting
-                      .put(SettingBoxKey.schemeVariant, item.index);
-                  (context as Element).markNeedsBuild();
-                  Get.forceAppUpdate();
-                },
-                itemBuilder: (context) => FlexSchemeVariant.values
-                    .map((item) => PopupMenuItem<FlexSchemeVariant>(
-                          value: item,
-                          child: Text(item.variantName),
-                        ))
-                    .toList(),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _dynamicSchemeVariant.variantName,
-                      style: TextStyle(
-                        height: 1,
-                        fontSize: 13,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      strutStyle: const StrutStyle(leading: 0, height: 1),
-                    ),
-                    Icon(
-                      size: 20,
-                      Icons.keyboard_arrow_right,
-                      color: Theme.of(context).colorScheme.primary,
-                    )
-                  ],
-                ),
-              ),
             ),
           ),
           Obx(
             () => RadioListTile(
               value: 0,
-              title: const Text('动态取色'),
+              title: Text('动态取色', style: titleStyle),
               groupValue: ctr.type.value,
               onChanged: (dynamic val) async {
                 ctr.type.value = 0;
@@ -92,7 +182,7 @@ class _ColorSelectPageState extends State<ColorSelectPage> {
           Obx(
             () => RadioListTile(
               value: 1,
-              title: const Text('指定颜色'),
+              title: Text('指定颜色', style: titleStyle),
               groupValue: ctr.type.value,
               onChanged: (dynamic val) async {
                 ctr.type.value = 1;
@@ -102,72 +192,69 @@ class _ColorSelectPageState extends State<ColorSelectPage> {
             ),
           ),
           Obx(
-            () {
-              int type = ctr.type.value;
-              return Offstage(
-                offstage: type == 0,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 12, left: 12, right: 12),
-                  child: Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 22,
-                    runSpacing: 18,
-                    children: [
-                      ...ctr.colorThemes.map(
-                        (e) {
-                          final index = ctr.colorThemes.indexOf(e);
-                          return GestureDetector(
-                            onTap: () {
-                              ctr.currentColor.value = index;
-                              ctr.setting.put(SettingBoxKey.customColor, index);
-                              Get.forceAppUpdate();
-                            },
-                            child: Column(
-                              children: [
-                                Container(
-                                  width: 46,
-                                  height: 46,
-                                  decoration: BoxDecoration(
-                                    color: e['color'].withOpacity(0.8),
-                                    borderRadius: BorderRadius.circular(50),
-                                    border: Border.all(
-                                      width: 2,
-                                      color: ctr.currentColor.value == index
-                                          ? Colors.black
-                                          : e['color'].withOpacity(0.8),
-                                    ),
-                                  ),
-                                  child: AnimatedOpacity(
-                                    opacity:
-                                        ctr.currentColor.value == index ? 1 : 0,
-                                    duration: const Duration(milliseconds: 200),
-                                    child: const Icon(
-                                      Icons.done,
-                                      color: Colors.black,
-                                      size: 20,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 3),
-                                Text(
-                                  e['label'],
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: ctr.currentColor.value != index
-                                        ? Theme.of(context).colorScheme.outline
-                                        : null,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
+            () => Padding(
+              padding: const EdgeInsets.only(top: 12, left: 12, right: 12),
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 22,
+                runSpacing: 18,
+                children: [
+                  ...ctr.colorThemes.map(
+                    (e) {
+                      final index = ctr.colorThemes.indexOf(e);
+                      return GestureDetector(
+                        onTap: () {
+                          ctr.currentColor.value = index;
+                          ctr.type.value = 1;
+                          ctr.setting.put(SettingBoxKey.dynamicColor, false);
+                          ctr.setting.put(SettingBoxKey.customColor, index);
+                          Get.forceAppUpdate();
                         },
-                      )
-                    ],
-                  ),
-                ),
-              );
-            },
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 46,
+                              height: 46,
+                              decoration: BoxDecoration(
+                                color: e['color'].withOpacity(0.8),
+                                borderRadius: BorderRadius.circular(50),
+                                border: Border.all(
+                                  width: 2,
+                                  color: ctr.currentColor.value == index
+                                      ? (ctr.type.value == 1 ? Colors.black : Colors.black38)
+                                      : e['color'].withOpacity(0.8),
+                                ),
+                              ),
+                              child: AnimatedOpacity(
+                                opacity: ctr.currentColor.value == index
+                                    ? (ctr.type.value == 1? 1 : 0.2)
+                                    : 0,
+                                duration: const Duration(milliseconds: 200),
+                                child: const Icon(
+                                  Icons.done,
+                                  color: Colors.black,
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              e['label'],
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: ctr.currentColor.value != index
+                                    ? Theme.of(context).colorScheme.outline
+                                    : null,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  )
+                ],
+              ),
+            ),
           ),
           const SizedBox(height: 20),
           // 展示 ColorScheme 的颜色

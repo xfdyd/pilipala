@@ -400,8 +400,9 @@ class PlPlayerController {
     }
     enableLongShowControl =
         setting.get(SettingBoxKey.enableLongShowControl, defaultValue: false);
-    speedsList = List<double>.from(videoStorage
-        .get(VideoBoxKey.customSpeedsList, defaultValue: <double>[]));
+    speedsList = List<double>.from(videoStorage.get(
+        VideoBoxKey.customSpeedsList,
+        defaultValue: <double>[0.5, 0.75, 1.25, 1.5, 1.75, 3.0]));
     for (final PlaySpeed i in PlaySpeed.values) {
       speedsList.add(i.value);
     }
@@ -734,7 +735,7 @@ class PlPlayerController {
 
   Future<void> autoEnterFullScreen() async {
     bool autoEnterFullscreen = GStorage.setting
-            .get(SettingBoxKey.enableAutoEnter, defaultValue: false);
+        .get(SettingBoxKey.enableAutoEnter, defaultValue: false);
     if (autoEnterFullscreen) {
       Future.delayed(const Duration(milliseconds: 500), () {
         if (dataStatus.status.value != DataStatus.loaded) {

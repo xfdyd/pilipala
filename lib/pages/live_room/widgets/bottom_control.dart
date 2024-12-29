@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:fl_pip/fl_pip.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
@@ -101,6 +102,22 @@ class _BottomControlState extends State<BottomControl> {
                   // if (canUsePiP) {
                   //   await widget.floating!.enable(const ImmediatePiP());
                   // } else {}
+                  widget.controller!.controls = false;
+                  FlPiP().enable(
+                    ios: FlPiPiOSConfig(
+                        videoPath:
+                            widget.controller!.dataSource.videoSource ?? "",
+                        audioPath:
+                            widget.controller!.dataSource.audioSource ?? "",
+                        packageName: null),
+                    android: FlPiPAndroidConfig(
+                      aspectRatio: Rational(
+                          widget
+                              .controller!.videoPlayerController!.state.width!,
+                          widget.controller!.videoPlayerController!.state
+                              .height!),
+                    ),
+                  );
                 },
                 icon: const Icon(
                   Icons.picture_in_picture_alt,
@@ -112,9 +129,13 @@ class _BottomControlState extends State<BottomControl> {
             const SizedBox(width: 4),
           ],
           ComBtn(
-            icon: const Icon(
-              Icons.fullscreen,
-              semanticLabel: '全屏切换',
+            icon: Icon(
+              widget.controller!.isFullScreen.value
+                  ? Icons.fullscreen_exit
+                  : Icons.fullscreen,
+              semanticLabel: widget.controller!.isFullScreen.value
+                  ? '退出全屏'
+                  : '全屏',
               size: 20,
               color: Colors.white,
             ),

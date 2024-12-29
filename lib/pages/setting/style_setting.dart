@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:auto_orientation/auto_orientation.dart';
+import 'package:flex_seed_scheme/flex_seed_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -31,10 +32,11 @@ class _StyleSettingState extends State<StyleSetting> {
   final SettingController settingController = Get.put(SettingController());
   final ColorSelectController colorSelectController =
       Get.put(ColorSelectController());
+  FlexSchemeVariant _dynamicSchemeVariant = FlexSchemeVariant.values[
+      GStorage.setting.get(SettingBoxKey.schemeVariant, defaultValue: 10)];
 
   Box setting = GStorage.setting;
   late int picQuality;
-  late ThemeType _tempThemeValue;
   late double maxRowWidth;
   late UpPanelPosition upPanelPosition;
   late SideBarPosition sideBarPosition;
@@ -43,7 +45,6 @@ class _StyleSettingState extends State<StyleSetting> {
   void initState() {
     super.initState();
     picQuality = setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10);
-    _tempThemeValue = settingController.themeType.value;
     maxRowWidth =
         setting.get(SettingBoxKey.maxRowWidth, defaultValue: 240.0) as double;
     upPanelPosition = UpPanelPosition.values[setting.get(
@@ -122,6 +123,17 @@ class _StyleSettingState extends State<StyleSetting> {
                 setState(() {});
               }
             },
+          ),
+          ListTile(
+            dense: false,
+            onTap: () => Get.toNamed('/colorSetting'),
+            leading: const Icon(Icons.color_lens_outlined),
+            title: Text('应用主题', style: titleStyle),
+            subtitle: Obx(() => Text(
+                '${settingController.themeType.value.description}   '
+                '${colorSelectController.type.value == 0 ? '动态取色' : '指定颜色'}   '
+                '${_dynamicSchemeVariant.variantName}',
+                style: subTitleStyle)),
           ),
           const SetSwitchItem(
             title: 'MD3样式底栏',
@@ -345,42 +357,6 @@ class _StyleSettingState extends State<StyleSetting> {
             trailing: Obx(() => Text(
                 settingController.toastOpacity.value.toStringAsFixed(1),
                 style: Theme.of(context).textTheme.titleSmall)),
-          ),
-          ListTile(
-            dense: false,
-            onTap: () async {
-              ThemeType? result = await showDialog(
-                context: context,
-                builder: (context) {
-                  return SelectDialog<ThemeType>(
-                      title: '主题模式',
-                      value: _tempThemeValue,
-                      values: ThemeType.values.map((e) {
-                        return {'title': e.description, 'value': e};
-                      }).toList());
-                },
-              );
-              if (result != null) {
-                _tempThemeValue = result;
-                settingController.themeType.value = result;
-                setting.put(SettingBoxKey.themeMode, result.code);
-                Get.forceAppUpdate();
-              }
-            },
-            leading: const Icon(Icons.flashlight_on_outlined),
-            title: Text('主题模式', style: titleStyle),
-            subtitle: Obx(() => Text(
-                '当前模式：${settingController.themeType.value.description}',
-                style: subTitleStyle)),
-          ),
-          ListTile(
-            dense: false,
-            onTap: () => Get.toNamed('/colorSetting'),
-            leading: const Icon(Icons.color_lens_outlined),
-            title: Text('应用主题', style: titleStyle),
-            subtitle: Obx(() => Text(
-                '当前主题：${colorSelectController.type.value == 0 ? '动态取色' : '指定颜色'}',
-                style: subTitleStyle)),
           ),
           ListTile(
             dense: false,
