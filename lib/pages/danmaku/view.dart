@@ -45,10 +45,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
     super.initState();
     enableShowDanmaku =
         setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: true);
-    _plDanmakuController = PlDanmakuController(
-        widget.cid,
-        widget.playerController.danmakuWeight,
-        widget.playerController.danmakuFilterRule);
+    _plDanmakuController = PlDanmakuController(widget.cid);
     if (mounted) {
       playerController = widget.playerController;
       if (enableShowDanmaku || playerController.isOpenDanmu.value) {
@@ -103,7 +100,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
 
     if (currentDanmakuList != null && _controller != null) {
       Color? defaultColor = playerController.blockTypes.contains(6)
-          ? Colors.white//DmUtils.decimalToColor(16777215)
+          ? Colors.white //DmUtils.decimalToColor(16777215)
           : null;
       currentDanmakuList
           .map((e) => _controller!.addDanmaku(DanmakuContentItem(

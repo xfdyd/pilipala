@@ -599,6 +599,17 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       color: Colors.white,
       fontSize: 12,
     );
+    Widget video = Video(
+      key: ValueKey('${_.videoFit.value}${_.continuePlayInBackground.value}'),
+      controller: videoController,
+      controls: NoVideoControls,
+      pauseUponEnteringBackgroundMode: !_.continuePlayInBackground.value,
+      resumeUponEnteringForegroundMode: true,
+      // 字幕尺寸调节
+      subtitleViewConfiguration: const SubtitleViewConfiguration(
+          style: subTitleStyle, padding: EdgeInsets.all(24.0)),
+      fit: _.videoFit.value,
+    );
     return Stack(
       fit: StackFit.passthrough,
       key: _playerKey,
@@ -792,19 +803,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               _initialFocalPoint = Offset.zero;
               _gestureType = null;
             },
-            child: Video(
-              key: ValueKey(
-                  '${_.videoFit.value}${_.continuePlayInBackground.value}'),
-              controller: videoController,
-              controls: NoVideoControls,
-              pauseUponEnteringBackgroundMode:
-                  !_.continuePlayInBackground.value,
-              resumeUponEnteringForegroundMode: true,
-              // 字幕尺寸调节
-              subtitleViewConfiguration: const SubtitleViewConfiguration(
-                  style: subTitleStyle, padding: EdgeInsets.all(24.0)),
-              fit: _.videoFit.value,
-            ),
+            child: Transform.flip(flipX: _.flipX.value, child: video),
           ),
         ),
 

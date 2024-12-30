@@ -9,6 +9,8 @@ import '../../models/user/danmaku_block.dart';
 import '../../plugin/pl_player/controller.dart';
 import 'package:PiliPalaX/common/widgets/spring_physics.dart';
 
+import '../danmaku/controller.dart';
+
 class DanmakuBlockPage extends StatefulWidget {
   const DanmakuBlockPage({super.key});
 
@@ -21,7 +23,6 @@ class _DanmakuBlockPageState extends State<DanmakuBlockPage> {
       Get.put(DanmakuBlockController());
   final ScrollController scrollController = ScrollController();
   Box onlineCache = GStorage.onlineCache;
-  late PlPlayerController plPlayerController;
 
   static const Map<int, String> ruleLabels = {
     0: '关键词',
@@ -35,24 +36,11 @@ class _DanmakuBlockPageState extends State<DanmakuBlockPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _danmakuBlockController.queryDanmakuFilter();
     });
-    plPlayerController = Get.arguments as PlPlayerController;
   }
+
 
   @override
   void dispose() {
-    List<Map<String, dynamic>> simpleRuleList = _danmakuBlockController
-        .ruleTypes.values
-        .expand((element) => element)
-        .map<Map<String, dynamic>>((e) {
-      //当正则表达式前后都有"/"时，去掉，避免RegExp解析错误
-      if (e.type == 1 && e.filter.startsWith('/') && e.filter.endsWith('/')) {
-        e.filter = e.filter.substring(1, e.filter.length - 1);
-      }
-      return e.toMap();
-    }).toList();
-    print("simpleRuleList:$simpleRuleList");
-    onlineCache.put(OnlineCacheKey.danmakuFilterRule, simpleRuleList);
-    plPlayerController.danmakuFilterRule.value = simpleRuleList;
     scrollController.removeListener(() {});
     scrollController.dispose();
     super.dispose();
@@ -181,6 +169,21 @@ class DanmakuBlockController extends GetxController
     tabController = TabController(length: 3, vsync: this);
   }
 
+  void danmakuFilterRefresh() {
+    List<Map<String, dynamic>> simpleRuleList = ruleTypes.values
+        .expand((element) => element)
+        .map<Map<String, dynamic>>((e) {
+      //当正则表达式前后都有"/"时，去掉，避免RegExp解析错误
+      if (e.type == 1 && e.filter.startsWith('/') && e.filter.endsWith('/')) {
+        e.filter = e.filter.substring(1, e.filter.length - 1);
+      }
+      return e.toMap();
+    }).toList();
+    print("simpleRuleList:$simpleRuleList");
+    onlineCache.put(OnlineCacheKey.danmakuFilterRule, simpleRuleList);
+    PlDanmakuController.refresh();
+  }
+
   @override
   void onClose() {
     tabController.dispose();
@@ -193,11 +196,15 @@ class DanmakuBlockController extends GetxController
     SmartDialog.dismiss();
     if (result['status']) {
       danmakuRules.value = result['data'].rule;
+      for (var element in ruleTypes.values) {
+        element.clear();
+      }
       danmakuRules.map((e) {
         SimpleRule simpleRule = SimpleRule(e.id!, e.type!, e.filter!);
         ruleTypes[e.type!]!.add(simpleRule);
       }).toList();
       ruleTypes.refresh();
+      danmakuFilterRefresh();
       SmartDialog.showToast(result['data'].toast);
     } else {
       SmartDialog.showToast(result['msg']);
@@ -213,6 +220,7 @@ class DanmakuBlockController extends GetxController
       danmakuRules.removeWhere((e) => e.id == id);
       ruleTypes[type]!.removeWhere((e) => e.id == id);
       ruleTypes.refresh();
+      danmakuFilterRefresh();
       SmartDialog.showToast(result['msg']);
     } else {
       SmartDialog.showToast(result['msg']);
@@ -230,6 +238,7 @@ class DanmakuBlockController extends GetxController
       SimpleRule simpleRule = SimpleRule(data.id!, data.type!, data.filter!);
       ruleTypes[type]!.add(simpleRule);
       ruleTypes.refresh();
+      danmakuFilterRefresh();
       SmartDialog.showToast('添加成功');
     } else {
       SmartDialog.showToast(result['msg']);
