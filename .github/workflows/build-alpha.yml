@@ -95,10 +95,11 @@ jobs:
 
       - name: 生成新build_info.yml
         run: |
+          ls -l
           version=$(yq -er .version pubspec.yml | cut -d "+" -f 1)
           build_num=${{ steps.update_version.outputs.new_build_num}}
           
-          rm -r build_info.yml
+          rm -f build_info.yml
           cat << EOF > build_info.yml
           version: $version
           build_num: $build_num
