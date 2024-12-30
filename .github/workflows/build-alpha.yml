@@ -71,32 +71,26 @@ jobs:
             echo "Neither build_info.yml exists nor specified build_num manually!"
             exit 1
           fi
-
+          
+          # pubspec.yml中版本号比tag新，则发布pre版，否则发布pre版
+          alpha_or_pre=pre
           if (echo $last_tag | grep $version_name); then
-            # 版本号一致，发行alpha版
-            # TODO alpha_num可能无法等于1
-            alpha_num=0
-            if [[ -n "${{ inputs.build_num }}" ]]; then
-              alpha_num=${{ inputs.build_num }}
-            else
-              let alpha_num=$(yq -r .build_num build_info.yml)+1
-            fi
-            echo "new_version=${version_name}-alpha.${alpha_num}+${version_code}" >> $GITHUB_OUTPUT
-            echo "new_build_num=$alpha_num" >> $GITHUB_OUTPUT
-          else
-            # 版本号不存在，发行pre版
-            pre_num=0
-            if [[ -n "${{ inputs.build_num }}" ]]; then
-              pre_num=${{ inputs.build_num }}
-            else
-              if [[ $(yq -r .version build_info.yml) == $version_name ]]; then
-                pre_num=$(yq -r .build_num build_info.yml)
-              fi
-              let ++pre_num
-            fi
-            echo "new_version=${version_name}-pre.${pre_num}+${version_code}" >> $GITHUB_OUTPUT
-            echo "new_build_num=$pre_num" >> $GITHUB_OUTPUT
+            alpha_or_pre=alpha
           fi
+
+          build_num=0
+          # 手动指定build_num优先于文件
+          if [[ -n "${{ inputs.build_num }}" ]]; then
+            build_num=${{ inputs.build_num }}
+          else
+            if [[ $(yq -r .version build_info.yml) == $version_name ]]; then
+              build_num=$(yq -r .build_num build_info.yml)
+            fi
+            let ++build_num
+          fi
+
+          echo "new_version=${version_name}-${alpha_or_pre}.${build_num}+${version_code}" >> $GITHUB_OUTPUT
+          echo "new_build_num=$alpha_num" >> $GITHUB_OUTPUT                                      
 
       - name: 生成新build_info.yml
         run: |
