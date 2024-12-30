@@ -41,7 +41,7 @@ jobs:
           last_commit_hash=$(git log -1 --pretty="%H" --first-parent)
           echo "included_commits=$included_commits" >> $GITHUB_OUTPUT
           echo "last_commit_hash=$last_commit_hash" >> $GITHUB_OUTPUT
-
+      # TODO 语法可能已过时
       - name: Get previous workflow run
         id: get_previous_run
         env:
@@ -73,6 +73,7 @@ jobs:
 
           if (echo $last_tag | grep $version_name); then
             # 版本号一致，发行alpha版
+            # TODO alpha_num可能无法等于1
             alpha_num=0
             if [[ -n "${{ inputs.build_num }}" ]]; then
               alpha_num=${{ inputs.build_num }}
@@ -80,6 +81,7 @@ jobs:
               let alpha_num=$(yq -r .build_num build_info.yml)+1
             fi
             echo "new_version=${version_name}-alpha.${alpha_num}+${version_code}" >> $GITHUB_OUTPUT
+            echo "new_build_num=$alpha_num" >> $GITHUB_OUTPUT
           else
             # 版本号不存在，发行pre版
             pre_num=0
@@ -92,7 +94,25 @@ jobs:
               let ++pre_num
             fi
             echo "new_version=${version_name}-pre.${pre_num}+${version_code}" >> $GITHUB_OUTPUT
+            echo "new_build_num=$pre_num" >> $GITHUB_OUTPUT
           fi
+
+      - name: 生成新build_info.yml
+        run: |
+          version=$(yq -er .version pubspec.yml | cut -d "+" -f 1)
+          build_num=${{ steps.update_version.outputs.new_build_num}}
+          
+          rm -r build_info.yml
+          cat << EOF > build_info.yml
+          version: $version
+          build_num: $build_num
+          EOF
+
+      - name: 上传build_info.yml
+        uses: actions/upload-artifact@v4
+        with:
+          name: build_info
+          path: ./build_info.yml
 
   build_matrix:
     name: Build CI (${{ matrix.target_platform }})
