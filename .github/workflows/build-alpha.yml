@@ -1,6 +1,13 @@
 name: Build alpha
 on:
   workflow_dispatch:
+    inputs:
+      build_num:
+        require: true
+        type: choice
+        default: 1
+        options: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 114514]
+
   push:
     branches:
       - 'dev'
@@ -27,7 +34,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 获取最后一次提交
+      - name: 解析push事件信息
         id: analyze_push_event
         run: |
           included_commits=$(git log ${{ github.event.before }}..HEAD --pretty="%h %s" --first-parent | jq -Rs '.')
@@ -35,23 +42,57 @@ jobs:
           echo "included_commits=$included_commits" >> $GITHUB_OUTPUT
           echo "last_commit_hash=$last_commit_hash" >> $GITHUB_OUTPUT
 
+      - name: Get previous workflow run
+        id: get_previous_run
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+        run: |
+          workflow_runs=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/${{ env.id }}/runs?status=completed&per_page=2")
+          previous_run_id=$(echo $workflow_runs | jq -r '.workflow_runs[1].id')
+          echo "Previous run ID: $previous_run_id"
+          echo "previous_run_id=$previous_run_id" >> $GITHUB_ENV
+
+      - name: 从artifact获取上次构建信息
+        uses: actions/download-artifact@v3
+        with:
+          name: build_info
+          run-id: ${{ env.previous_run_id }}
+
       - name: 生成alpha版本号
         id: update_version
         run: |
-          version_name=$(yq e .version pubspec.yaml | cut -d "+" -f 1)
           last_tag=$(git tag --sort=committerdate | tail -1)
+          version_name=$(yq e .version pubspec.yaml | cut -d "+" -f 1)
+          version_code=$(echo $last_tag | cut -d "+" -f 2)
 
-          if (echo $last_tag | grep -v "+"); then
-            echo "Illegal tag! ($last_tag)"
-            exit 1
-          elif (echo $last_tag | grep -v $version_name); then
-            echo "No tags for current version ($version_name) in the repo, please add one manually."
+          if [[ ! -e build_info.yml && -z "${{ inputs.build_num }}" ]]; then
+            echo "Neither build_info.yml exists nor specified build_num manually!"
             exit 1
           fi
 
-          version_code=$(echo $last_tag | cut -d "+" -f 2)
-          datetime=$(date -u -d "8 hours" +%m%d%H%M)
-          echo "new_version=${version_name}-alpha.${datetime}+${version_code}" >> $GITHUB_OUTPUT
+          if (echo $last_tag | grep $version_name); then
+            # 版本号一致，发行alpha版
+            alpha_num=0
+            if [[ -n "${{ inputs.build_num }}" ]]; then
+              alpha_num=${{ inputs.build_num }}
+            else
+              let alpha_num=$(yq -r .build_num build_info.yml)+1
+            fi
+            echo "new_version=${version_name}-alpha.${alpha_num}+${version_code}" >> $GITHUB_OUTPUT
+          else
+            # 版本号不存在，发行pre版
+            pre_num=0
+            if [[ -n "${{ inputs.build_num }}" ]]; then
+              pre_num=${{ inputs.build_num }}
+            else
+              if [[ $(yq -r .version build_info.yml) == $version_name ]]; then
+                pre_num=$(yq -r .build_num build_info.yml)
+              fi
+              let ++pre_num
+            fi
+            echo "new_version=${version_name}-pre.${pre_num}+${version_code}" >> $GITHUB_OUTPUT
+          fi
 
   build_matrix:
     name: Build CI (${{ matrix.target_platform }})
