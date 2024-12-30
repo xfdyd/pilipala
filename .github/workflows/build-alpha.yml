@@ -91,7 +91,7 @@ jobs:
           fi
 
           echo "new_version=${version_name}-${alpha_or_pre}.${build_num}+${version_code}" >> $GITHUB_OUTPUT
-          echo "new_build_num=$alpha_num" >> $GITHUB_OUTPUT                                      
+          echo "new_build_num=$build_num" >> $GITHUB_OUTPUT                                      
 
       - name: 生成新build_info.yml
         run: |
