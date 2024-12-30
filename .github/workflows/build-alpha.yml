@@ -54,6 +54,7 @@ jobs:
           echo "previous_run_id=$previous_run_id" >> $GITHUB_OUTPUT
 
       - name: 从artifact获取上次构建信息
+        if: ! ${{ inputs.build_num }}
         uses: actions/download-artifact@v4
         with:
           name: build_info
