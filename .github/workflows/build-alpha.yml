@@ -41,23 +41,24 @@ jobs:
           last_commit_hash=$(git log -1 --pretty="%H" --first-parent)
           echo "included_commits=$included_commits" >> $GITHUB_OUTPUT
           echo "last_commit_hash=$last_commit_hash" >> $GITHUB_OUTPUT
-      # TODO 语法可能已过时
+
       - name: Get previous workflow run
         id: get_previous_run
         env:
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
         run: |
           workflow_runs=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/${{ env.id }}/runs?status=completed&per_page=2")
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/build-alpha.yml/runs?status=completed&per_page=2")
           previous_run_id=$(echo $workflow_runs | jq -r '.workflow_runs[1].id')
           echo "Previous run ID: $previous_run_id"
-          echo "previous_run_id=$previous_run_id" >> $GITHUB_ENV
+          echo "previous_run_id=$previous_run_id" >> $GITHUB_OUTPUT
 
       - name: 从artifact获取上次构建信息
         uses: actions/download-artifact@v4
         with:
           name: build_info
-          run-id: ${{ env.previous_run_id }}
+          github-token: $${{ secrets.GIT_TOKEN }}
+          run-id: ${{ steps.get_previous_run.outputs.previous_run_id }}
 
       - name: 生成alpha版本号
         id: update_version
