@@ -73,7 +73,7 @@ jobs:
             exit 1
           fi
           
-          # pubspec.yml中版本号比tag新，则发布pre版，否则发布pre版
+          # pubspec.yaml中版本号比tag新，则发布pre版，否则发布pre版
           alpha_or_pre=pre
           if (echo $last_tag | grep $version_name); then
             alpha_or_pre=alpha
@@ -95,8 +95,7 @@ jobs:
 
       - name: 生成新build_info.yml
         run: |
-          ls -l
-          version=$(yq -er .version pubspec.yml | cut -d "+" -f 1)
+          version=$(yq -er .version pubspec.yaml | cut -d "+" -f 1)
           build_num=${{ steps.update_version.outputs.new_build_num}}
           
           rm -f build_info.yml
