@@ -237,8 +237,6 @@ jobs:
     steps:
       - name: 从artifact下载
         uses: actions/download-artifact@v4
-        with:
-          path: ./PiliPalaX-alpha
 
       - name: 发送到Telegram频道
         uses: xireiki/channel-post@v1.0.10
@@ -249,6 +247,6 @@ jobs:
           api_hash: ${{ secrets.TELEGRAM_API_HASH }}
           large_file: true
           method: sendFile
-          path: PiliPalaX-alpha/Pili-*
+          path: PiliPalaX-*/*
           parse_mode: Markdown
           context: "*v${{ needs.prepare_publish_info.outputs.new_version }}:*\n${{ fromJson(needs.prepare_publish_info.outputs.included_commits) }}"      
