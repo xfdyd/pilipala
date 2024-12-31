@@ -58,7 +58,7 @@ jobs:
           echo "Previous run ID: $previous_run_id"
           echo "previous_run_id=$previous_run_id" >> $GITHUB_OUTPUT
           echo "Previous run success: $previous_run_success"
-          echo "Previous run success=$previous_run_success" >> $GITHUB_OUTPUT
+          echo "previous_run_success=$previous_run_success" >> $GITHUB_OUTPUT
 
       - name: 从artifact获取上次构建信息
         if: ${{ ! inputs.build_num }}
