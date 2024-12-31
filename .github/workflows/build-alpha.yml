@@ -47,6 +47,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
         run: |
+          # TODO: 获取上一个workflow run运行状态以等待其artifact
           workflow_runs=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
             "https://api.github.com/repos/${{ github.repository }}/actions/workflows/build-alpha.yml/runs?status=completed&per_page=2")
           previous_run_id=$(echo $workflow_runs | jq -r '.workflow_runs[1].id')
@@ -79,8 +80,8 @@ jobs:
             alpha_or_pre=alpha
           fi
 
+          # TODO: 如果上次workflow run失败，且与当前版本号一致，不递增build_num。
           build_num=0
-          # 手动指定build_num优先于文件
           if [[ -n "${{ inputs.build_num }}" ]]; then
             build_num=${{ inputs.build_num }}
           else
@@ -212,7 +213,7 @@ jobs:
         if: startsWith(matrix.target_platform, 'android')
         uses: actions/upload-artifact@v4
         with:
-          name: PiliPalaX-alpha
+          name: PiliPalaX-${{ matrix.target_platform }}
           path: |
             build/app/outputs/flutter-apk/Pili-*.apk
 
@@ -220,7 +221,7 @@ jobs:
         if: matrix.target_platform == 'iOS'
         uses: actions/upload-artifact@v4
         with: 
-          name: PiliPalaX-alpha
+          name: PiliPalaX-iOS
           path: |
             build/Pili-*.ipa
 
@@ -234,7 +235,6 @@ jobs:
       - name: 从artifact下载
         uses: actions/download-artifact@v4
         with:
-          name: PiliPalaX-alpha
           path: ./PiliPalaX-alpha
 
       - name: 发送到Telegram频道
@@ -246,6 +246,6 @@ jobs:
           api_hash: ${{ secrets.TELEGRAM_API_HASH }}
           large_file: true
           method: sendFile
-          path: PiliPalaX-alpha/*
+          path: PiliPalaX-alpha/Pili-*
           parse_mode: Markdown
           context: "*v${{ needs.prepare_publish_info.outputs.new_version }}:*\n${{ fromJson(needs.prepare_publish_info.outputs.included_commits) }}"      
