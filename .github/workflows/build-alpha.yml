@@ -45,7 +45,7 @@ jobs:
       - name: Get previous workflow run
         id: get_previous_run
         env:
-          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # TODO: 获取上一个workflow run运行状态以等待其artifact
           workflow_runs=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
@@ -65,7 +65,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build_info
-          github-token: $${{ secrets.GIT_TOKEN }}
+          github-token: $${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ steps.get_previous_run.outputs.previous_run_id }}
 
       - name: 生成alpha版本号
