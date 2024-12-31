@@ -51,8 +51,14 @@ jobs:
           workflow_runs=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
             "https://api.github.com/repos/${{ github.repository }}/actions/workflows/build-alpha.yml/runs?status=completed&per_page=2")
           previous_run_id=$(echo $workflow_runs | jq -r '.workflow_runs[1].id')
+          previous_run_success=0
+          if (echo $workflow_runs | jq -r '.workflow_runs[1].conclusion' | grep -q 'success'); then
+            previous_run_success=1
+          fi
           echo "Previous run ID: $previous_run_id"
           echo "previous_run_id=$previous_run_id" >> $GITHUB_OUTPUT
+          echo "Previous run success: $previous_run_success"
+          echo "Previous run success=$previous_run_success" >> $GITHUB_OUTPUT
 
       - name: 从artifact获取上次构建信息
         if: ${{ ! inputs.build_num }}
@@ -80,15 +86,12 @@ jobs:
             alpha_or_pre=alpha
           fi
 
-          # TODO: 如果上次workflow run失败，且与当前版本号一致，不递增build_num。
-          build_num=0
+          # 如果上次workflow run失败，且与当前版本号一致，不递增build_num。
+          build_num=1
           if [[ -n "${{ inputs.build_num }}" ]]; then
             build_num=${{ inputs.build_num }}
-          else
-            if [[ $(yq -r .version build_info.yml) == $version_name ]]; then
-              build_num=$(yq -r .build_num build_info.yml)
-            fi
-            let ++build_num
+          elif [[ $(yq -r .version build_info.yml) == $version_name ]]; then
+            let build_num=$(yq -r .build_num build_info.yml)+${{ steps.get_previous_run.outputs.previous_run_success }}
           fi
 
           echo "new_version=${version_name}-${alpha_or_pre}.${build_num}+${version_code}" >> $GITHUB_OUTPUT
