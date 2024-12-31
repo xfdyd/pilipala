@@ -50,7 +50,7 @@ jobs:
           # TODO: 获取上一个workflow run运行状态以等待其artifact
           workflow_runs=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
             "https://api.github.com/repos/${{ github.repository }}/actions/workflows/build-alpha.yml/runs?status=completed&per_page=2")
-          previous_run_id=$(echo $workflow_runs | jq -r '.workflow_runs[1].id')
+          previous_run_id=$(echo $workflow_runs | jq -r '.workflow_runs[0].id')
           previous_run_success=0
           if (echo $workflow_runs | jq -r '.workflow_runs[1].conclusion' | grep -q 'success'); then
             previous_run_success=1
