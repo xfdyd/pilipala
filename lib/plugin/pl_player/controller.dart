@@ -33,6 +33,7 @@ import 'package:PiliPalaX/utils/storage.dart';
 // import 'package:screen_brightness/screen_brightness.dart';
 import 'package:universal_platform/universal_platform.dart';
 import '../../models/video/play/subtitle.dart';
+import '../../pages/danmaku/controller.dart';
 import '../../pages/video/controller.dart';
 import '../../pages/video/introduction/bangumi/controller.dart';
 import '../../pages/video/introduction/detail/controller.dart';
@@ -105,6 +106,8 @@ class PlPlayerController {
   Rx<bool> _continuePlayInBackground = false.obs;
 
   Rx<bool> _onlyPlayAudio = false.obs;
+
+  Rx<bool> _flipX = false.obs;
 
   ///
   // ignore: prefer_final_fields
@@ -236,6 +239,9 @@ class PlPlayerController {
   /// 听视频
   Rx<bool> get onlyPlayAudio => _onlyPlayAudio;
 
+  /// 镜像
+  Rx<bool> get flipX => _flipX;
+
   /// 是否长按倍速
   Rx<bool> get doubleSpeedStatus => _doubleSpeedStatus;
 
@@ -257,11 +263,6 @@ class PlPlayerController {
 
   /// 弹幕开关
   Rx<bool> isOpenDanmu = false.obs;
-
-  /// 弹幕权重
-  ValueNotifier<int> danmakuWeight = ValueNotifier(0);
-  ValueNotifier<List<Map<String, dynamic>>> danmakuFilterRule =
-      ValueNotifier([]);
   // 关联弹幕控制器
   DanmakuController? danmakuController;
   // 弹幕相关配置
@@ -358,12 +359,6 @@ class PlPlayerController {
     _videoType = videoType;
     isOpenDanmu.value =
         setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: true);
-    danmakuWeight.value =
-        setting.get(SettingBoxKey.danmakuWeight, defaultValue: 0);
-    danmakuFilterRule.value = onlineCache.get(OnlineCacheKey.danmakuFilterRule,
-        defaultValue: []).map<Map<String, dynamic>>((e) {
-      return Map<String, dynamic>.from(e);
-    }).toList();
     blockTypes = setting.get(SettingBoxKey.danmakuBlockType, defaultValue: []);
     showArea = setting.get(SettingBoxKey.danmakuShowArea, defaultValue: 0.5);
     // 不透明度
@@ -400,8 +395,9 @@ class PlPlayerController {
     }
     enableLongShowControl =
         setting.get(SettingBoxKey.enableLongShowControl, defaultValue: false);
-    speedsList = List<double>.from(videoStorage
-        .get(VideoBoxKey.customSpeedsList, defaultValue: <double>[]));
+    speedsList = List<double>.from(videoStorage.get(
+        VideoBoxKey.customSpeedsList,
+        defaultValue: <double>[0.5, 0.75, 1.25, 1.5, 1.75, 3.0]));
     for (final PlaySpeed i in PlaySpeed.values) {
       speedsList.add(i.value);
     }
@@ -734,7 +730,7 @@ class PlPlayerController {
 
   Future<void> autoEnterFullScreen() async {
     bool autoEnterFullscreen = GStorage.setting
-            .get(SettingBoxKey.enableAutoEnter, defaultValue: false);
+        .get(SettingBoxKey.enableAutoEnter, defaultValue: false);
     if (autoEnterFullscreen) {
       Future.delayed(const Duration(milliseconds: 500), () {
         if (dataStatus.status.value != DataStatus.loaded) {
@@ -1554,7 +1550,7 @@ class PlPlayerController {
   }
 
   void putDanmakuSettings() {
-    setting.put(SettingBoxKey.danmakuWeight, danmakuWeight.value);
+    setting.put(SettingBoxKey.danmakuWeight, PlDanmakuController.danmakuWeight);
     setting.put(SettingBoxKey.danmakuBlockType, blockTypes);
     setting.put(SettingBoxKey.danmakuShowArea, showArea);
     setting.put(SettingBoxKey.danmakuOpacity, opacityVal);

@@ -170,8 +170,18 @@ class MyApp extends StatelessWidget {
         ColorScheme? darkColorScheme;
         if (lightDynamic != null && darkDynamic != null && isDynamicColor) {
           // dynamic取色成功
-          lightColorScheme = lightDynamic.harmonized();
-          darkColorScheme = darkDynamic.harmonized();
+          // lightColorScheme = lightDynamic.harmonized();
+          // darkColorScheme = darkDynamic.harmonized();
+          lightColorScheme = SeedColorScheme.fromSeeds(
+            primaryKey: lightDynamic.primary,
+            brightness: Brightness.light,
+            variant: variant,
+          );
+          darkColorScheme = SeedColorScheme.fromSeeds(
+            primaryKey: darkDynamic.primary,
+            brightness: Brightness.dark,
+            variant: variant,
+          );
         } else {
           // dynamic取色失败，采用品牌色
           lightColorScheme = SeedColorScheme.fromSeeds(

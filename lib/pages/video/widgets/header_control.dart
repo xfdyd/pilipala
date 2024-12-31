@@ -27,6 +27,8 @@ import 'package:PiliPalaX/services/shutdown_timer_service.dart';
 import '../../../../models/video/play/CDN.dart';
 import '../../../../models/video_detail_res.dart';
 import '../../../services/service_locator.dart';
+import '../../danmaku/controller.dart';
+import '../../danmaku_block/index.dart';
 import '../../setting/widgets/select_dialog.dart';
 import 'package:PiliPalaX/pages/video/introduction/detail/index.dart';
 import 'package:marquee/marquee.dart';
@@ -229,19 +231,27 @@ class _HeaderControlState extends State<HeaderControl> {
                       },
                     ),
                     ListTile(
-                      onTap: () {
-                        Get.back();
-                      },
                       dense: true,
-                      leading:
-                          const Icon(Icons.switch_video_outlined, size: 20),
-                      title: const Text('功能', style: titleStyle),
-                      trailing: Row(
+                      title: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Obx(
                             () => ActionRowLineItem(
+                              key: const Key('flipX'),
+                              icon: Icons.flip,
+                              onTap: () {
+                                widget.controller!.flipX.value =
+                                    !widget.controller!.flipX.value;
+                              },
+                              text: " 镜像翻转 ",
+                              selectStatus: widget.controller!.flipX.value,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Obx(
+                            () => ActionRowLineItem(
                               key: const Key('onlyPlayAudio'),
+                              icon: Icons.headphones,
                               onTap: () {
                                 widget.controller!.setOnlyPlayAudio(null);
                               },
@@ -255,6 +265,7 @@ class _HeaderControlState extends State<HeaderControl> {
                           Obx(
                             () => ActionRowLineItem(
                               key: const Key('continuePlayInBackground'),
+                              icon: Icons.play_circle_outline,
                               onTap: () {
                                 widget.controller!
                                     .setContinuePlayInBackground(null);
@@ -978,7 +989,7 @@ class _HeaderControlState extends State<HeaderControl> {
       {'value': 1.0, 'label': '满屏'},
     ];
     // 智能云屏蔽
-    int danmakuWeight = widget.controller!.danmakuWeight.value;
+    int danmakuWeight = PlDanmakuController.danmakuWeight;
     // 显示区域
     double showArea = widget.controller!.showArea;
     // 不透明度
@@ -1032,13 +1043,20 @@ class _HeaderControlState extends State<HeaderControl> {
                             minimumSize: Size.zero,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
-                          onPressed: () => {
-                                Get.back(),
-                                Get.toNamed('/danmakuBlock',
-                                    arguments: widget.controller)
-                              },
+                          onPressed: () {
+                            // 弹出对话框
+                            Get.back();
+                            showDialog(
+                              context: context,
+                              useSafeArea: true,
+                              builder: (_) => const Dialog(
+                                insetPadding: EdgeInsets.zero,
+                                child: DanmakuBlockPage(),
+                              ),
+                            );
+                          },
                           child: Text(
-                              "屏蔽管理(${widget.controller!.danmakuFilterRule.value.length})")),
+                              "屏蔽管理(${PlDanmakuController.danmakuFilter.length})")),
                     ],
                   ),
                   Padding(
@@ -1065,8 +1083,7 @@ class _HeaderControlState extends State<HeaderControl> {
                         label: '$danmakuWeight',
                         onChanged: (double val) {
                           danmakuWeight = val.toInt();
-                          widget.controller!.danmakuWeight.value =
-                              danmakuWeight;
+                          PlDanmakuController.danmakuWeight = danmakuWeight;
                           widget.controller!.putDanmakuSettings();
                           setState(() {});
                           // try {
@@ -1439,6 +1456,7 @@ class _HeaderControlState extends State<HeaderControl> {
     nowSemanticsLabel = '当前时间：$hour点$minute分';
     now.value = '$hour:$minute';
   }
+
   startClock() {
     getNow();
     clock = Timer.periodic(const Duration(seconds: 1), (Timer t) {
@@ -1742,15 +1760,13 @@ class _HeaderControlState extends State<HeaderControl> {
           if (widget.controller!.isFullScreen.value || equivalentFullScreen())
             Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
               Obx(
-                () => Text(
-                  "   ${now.value}",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontFeatures: [FontFeature.tabularFigures()],
-                  ),
-                  semanticsLabel: nowSemanticsLabel
-                ),
+                () => Text("   ${now.value}",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontFeatures: [FontFeature.tabularFigures()],
+                    ),
+                    semanticsLabel: nowSemanticsLabel),
               ),
               const SizedBox(width: 1.5),
               if (widget.controller!.isFullScreen.value)

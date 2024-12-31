@@ -103,11 +103,13 @@ class ActionRowLineItem extends StatelessWidget {
     this.onTap,
     this.text,
     this.loadingStatus = false,
+    this.icon,
   });
   final bool? selectStatus;
   final Function? onTap;
   final bool? loadingStatus;
   final String? text;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -135,6 +137,14 @@ class ActionRowLineItem extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (icon != null)
+                Icon(
+                  icon,
+                  size: 13,
+                  color: selectStatus!
+                      ? Theme.of(context).colorScheme.onSecondaryContainer
+                      : Theme.of(context).colorScheme.outline,
+                ),
               AnimatedOpacity(
                 opacity: loadingStatus! ? 0 : 1,
                 duration: const Duration(milliseconds: 200),
