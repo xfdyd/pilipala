@@ -34,13 +34,13 @@ class _MainAppState extends State<MainApp>
   // late bool useSideBar;
   late SideBarPosition sideBarPosition;
   late bool enableGradientBg;
+  final GlobalKey pageViewKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
     _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
-    _mainController.pageController =
-        PageController(initialPage: _mainController.selectedIndex);
+
     enableMYBar = setting.get(SettingBoxKey.enableMYBar, defaultValue: true);
     // useSideBar = setting.get(SettingBoxKey.useSideBar, defaultValue: false);
     sideBarPosition = SideBarPositionCode.fromCode(setting.get(
@@ -285,6 +285,7 @@ class _MainAppState extends State<MainApp>
                     SizedBox(width: context.width * 0.004),
                   Expanded(
                     child: PageView(
+                      key: pageViewKey,
                       physics: const NeverScrollableScrollPhysics(),
                       controller: _mainController.pageController,
                       onPageChanged: (index) {
