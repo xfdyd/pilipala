@@ -265,22 +265,28 @@ class BangumiIntroController extends GetxController {
           return AlertDialog(
             title: const Text('请选择'),
             actions: [
-              TextButton(
+              TextButton.icon(
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: videoUrl));
                     SmartDialog.showToast('已复制');
+                    Get.back();
                   },
-                  child: const Text('复制链接到剪贴板')),
-              TextButton(
+                  icon: const Icon(Icons.copy),
+                  label: const Text('复制链接')),
+              TextButton.icon(
                   onPressed: () {
                     launchUrl(Uri.parse(videoUrl));
+                    Get.back();
                   },
-                  child: const Text('其它app打开')),
-              TextButton(
+                  icon: const Icon(Icons.open_in_browser),
+                  label: const Text('其它app打开')),
+              TextButton.icon(
                   onPressed: () async {
                     await Share.share(videoUrl).whenComplete(() {});
+                    Get.back();
                   },
-                  child: const Text('分享视频')),
+                  icon: const Icon(Icons.share),
+                  label: const Text('分享视频')),
             ],
           );
         });

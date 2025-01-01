@@ -27,6 +27,8 @@ import 'package:PiliPalaX/services/shutdown_timer_service.dart';
 import '../../../../models/video/play/CDN.dart';
 import '../../../../models/video_detail_res.dart';
 import '../../../services/service_locator.dart';
+import '../../danmaku/controller.dart';
+import '../../danmaku_block/index.dart';
 import '../../setting/widgets/select_dialog.dart';
 import 'package:PiliPalaX/pages/video/introduction/detail/index.dart';
 import 'package:marquee/marquee.dart';
@@ -229,19 +231,27 @@ class _HeaderControlState extends State<HeaderControl> {
                       },
                     ),
                     ListTile(
-                      onTap: () {
-                        Get.back();
-                      },
                       dense: true,
-                      leading:
-                          const Icon(Icons.switch_video_outlined, size: 20),
-                      title: const Text('功能', style: titleStyle),
-                      trailing: Row(
+                      title: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Obx(
                             () => ActionRowLineItem(
+                              key: const Key('flipX'),
+                              icon: Icons.flip,
+                              onTap: () {
+                                widget.controller!.flipX.value =
+                                    !widget.controller!.flipX.value;
+                              },
+                              text: " 镜像翻转 ",
+                              selectStatus: widget.controller!.flipX.value,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Obx(
+                            () => ActionRowLineItem(
                               key: const Key('onlyPlayAudio'),
+                              icon: Icons.headphones,
                               onTap: () {
                                 widget.controller!.setOnlyPlayAudio(null);
                               },
@@ -255,6 +265,7 @@ class _HeaderControlState extends State<HeaderControl> {
                           Obx(
                             () => ActionRowLineItem(
                               key: const Key('continuePlayInBackground'),
+                              icon: Icons.play_circle_outline,
                               onTap: () {
                                 widget.controller!
                                     .setContinuePlayInBackground(null);
@@ -978,7 +989,7 @@ class _HeaderControlState extends State<HeaderControl> {
       {'value': 1.0, 'label': '满屏'},
     ];
     // 智能云屏蔽
-    int danmakuWeight = widget.controller!.danmakuWeight.value;
+    int danmakuWeight = PlDanmakuController.danmakuWeight;
     // 显示区域
     double showArea = widget.controller!.showArea;
     // 不透明度
@@ -1032,13 +1043,20 @@ class _HeaderControlState extends State<HeaderControl> {
                             minimumSize: Size.zero,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
-                          onPressed: () => {
-                                Get.back(),
-                                Get.toNamed('/danmakuBlock',
-                                    arguments: widget.controller)
-                              },
+                          onPressed: () {
+                            // 弹出对话框
+                            Get.back();
+                            showDialog(
+                              context: context,
+                              useSafeArea: true,
+                              builder: (_) => const Dialog(
+                                insetPadding: EdgeInsets.zero,
+                                child: DanmakuBlockPage(),
+                              ),
+                            );
+                          },
                           child: Text(
-                              "屏蔽管理(${widget.controller!.danmakuFilterRule.value.length})")),
+                              "屏蔽管理(${PlDanmakuController.danmakuFilter.length})")),
                     ],
                   ),
                   Padding(
@@ -1065,8 +1083,7 @@ class _HeaderControlState extends State<HeaderControl> {
                         label: '$danmakuWeight',
                         onChanged: (double val) {
                           danmakuWeight = val.toInt();
-                          widget.controller!.danmakuWeight.value =
-                              danmakuWeight;
+                          PlDanmakuController.danmakuWeight = danmakuWeight;
                           widget.controller!.putDanmakuSettings();
                           setState(() {});
                           // try {
@@ -1439,6 +1456,7 @@ class _HeaderControlState extends State<HeaderControl> {
     nowSemanticsLabel = '当前时间：$hour点$minute分';
     now.value = '$hour:$minute';
   }
+
   startClock() {
     getNow();
     clock = Timer.periodic(const Duration(seconds: 1), (Timer t) {
@@ -1449,7 +1467,7 @@ class _HeaderControlState extends State<HeaderControl> {
   Widget shootDanmakuButton() {
     return SizedBox(
       width: 42,
-      height: 34,
+      height: 38,
       child: IconButton(
         tooltip: '发弹幕',
         style: ButtonStyle(
@@ -1468,7 +1486,7 @@ class _HeaderControlState extends State<HeaderControl> {
   Widget danmakuSwitcher() {
     return SizedBox(
       width: 42,
-      height: 34,
+      height: 38,
       child: Obx(
         () => IconButton(
           tooltip: "${widget.controller!.isOpenDanmu.value ? '关闭' : '开启'}弹幕",
@@ -1499,7 +1517,7 @@ class _HeaderControlState extends State<HeaderControl> {
   Widget pipButton() {
     return SizedBox(
       width: 42,
-      height: 34,
+      height: 38,
       child: IconButton(
         tooltip: '画中画',
         style: ButtonStyle(
@@ -1539,7 +1557,7 @@ class _HeaderControlState extends State<HeaderControl> {
   Widget likeVideoButton() {
     return SizedBox(
       width: 42,
-      height: 34,
+      height: 38,
       child: IconButton(
         tooltip: videoIntroController.hasLike.value ? '已点赞' : '点赞',
         style: ButtonStyle(
@@ -1562,7 +1580,7 @@ class _HeaderControlState extends State<HeaderControl> {
   Widget coinVideoButton() {
     return SizedBox(
       width: 42,
-      height: 34,
+      height: 38,
       child: IconButton(
         tooltip: videoIntroController.hasCoin.value ? '已投币' : '投币',
         style: ButtonStyle(
@@ -1585,7 +1603,7 @@ class _HeaderControlState extends State<HeaderControl> {
   Widget shareButton() {
     return SizedBox(
       width: 42,
-      height: 34,
+      height: 38,
       child: IconButton(
         tooltip: '分享',
         style: ButtonStyle(
@@ -1606,10 +1624,9 @@ class _HeaderControlState extends State<HeaderControl> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      bool equivalentFullScreen() =>
-          !widget.controller!.isFullScreen.value &&
-          !horizontalScreen &&
-          MediaQuery.of(context).orientation == Orientation.landscape;
+      bool isEquivalentFullScreen = widget.controller!.isFullScreen.value ||
+          !widget.controller!.horizontalScreen &&
+              MediaQuery.of(context).orientation == Orientation.landscape;
       return AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
@@ -1619,16 +1636,14 @@ class _HeaderControlState extends State<HeaderControl> {
         centerTitle: false,
         automaticallyImplyLeading: false,
         titleSpacing: 10,
-        toolbarHeight:
-            widget.controller!.isFullScreen.value || equivalentFullScreen()
-                ? 100
-                : null,
+        toolbarHeight: isEquivalentFullScreen ? 100 : null,
         title: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               SizedBox(
                 width: 42,
-                height: 34,
+                height: 38,
                 child: IconButton(
                   tooltip: '上一页',
                   icon: const Icon(
@@ -1651,7 +1666,7 @@ class _HeaderControlState extends State<HeaderControl> {
               ),
               SizedBox(
                 width: 42,
-                height: 34,
+                height: 38,
                 child: IconButton(
                   tooltip: '返回主页',
                   icon: const Icon(
@@ -1672,8 +1687,7 @@ class _HeaderControlState extends State<HeaderControl> {
               ),
               const SizedBox(width: 10),
               if ((videoIntroController.videoDetail.value.title != null) &&
-                  (widget.controller!.isFullScreen.value ||
-                      equivalentFullScreen()))
+                  isEquivalentFullScreen)
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1684,7 +1698,8 @@ class _HeaderControlState extends State<HeaderControl> {
                           color: Colors.white,
                           fontSize: 16,
                         ),
-                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                       if (videoIntroController.isShowOnlineTotal)
                         Text(
@@ -1696,9 +1711,7 @@ class _HeaderControlState extends State<HeaderControl> {
                         )
                     ],
                   ),
-                )
-              else
-                const Spacer(),
+                ),
               // ComBtn(
               //   icon: const Icon(
               //     FontAwesomeIcons.cropSimple,
@@ -1707,15 +1720,16 @@ class _HeaderControlState extends State<HeaderControl> {
               //   ),
               //   fuc: () => _.screenshot(),
               // ),
-              if (!widget.controller!.isFullScreen.value &&
-                  !equivalentFullScreen()) ...[
+              if (!isEquivalentFullScreen) ...[
+                const SizedBox(width: 42),
+                const SizedBox(width: 42),
                 shootDanmakuButton(),
                 danmakuSwitcher(),
                 pipButton(),
               ],
               SizedBox(
                 width: 42,
-                height: 34,
+                height: 38,
                 child: IconButton(
                   tooltip: "更多设置",
                   style: ButtonStyle(
@@ -1739,22 +1753,19 @@ class _HeaderControlState extends State<HeaderControl> {
           // if ((isFullScreen || !horizontalScreen))
           // const Spacer(),
           // show current datetime
-          if (widget.controller!.isFullScreen.value || equivalentFullScreen())
+          if (isEquivalentFullScreen)
             Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
               Obx(
-                () => Text(
-                  "   ${now.value}",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontFeatures: [FontFeature.tabularFigures()],
-                  ),
-                  semanticsLabel: nowSemanticsLabel
-                ),
+                () => Text("   ${now.value}",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontFeatures: [FontFeature.tabularFigures()],
+                    ),
+                    semanticsLabel: nowSemanticsLabel),
               ),
               const SizedBox(width: 1.5),
-              if (widget.controller!.isFullScreen.value)
-                const SizedBox(width: 42),
+              if (isEquivalentFullScreen) const SizedBox(width: 42),
               for (var i = 0; i < 11; i++) const SizedBox(width: 0),
               likeVideoButton(),
               coinVideoButton(),

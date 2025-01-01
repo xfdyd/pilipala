@@ -59,7 +59,7 @@ class MediaController extends GetxController {
     }
     var res = await await UserHttp.userfavFolder(
       pn: 1,
-      ps: 5,
+      ps: 10,
       mid: mid ?? GStorage.userInfo.get('userInfoCache').mid,
     );
     favFolderData.value = res['data'];

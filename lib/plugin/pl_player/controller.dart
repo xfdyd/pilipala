@@ -33,6 +33,7 @@ import 'package:PiliPalaX/utils/storage.dart';
 // import 'package:screen_brightness/screen_brightness.dart';
 import 'package:universal_platform/universal_platform.dart';
 import '../../models/video/play/subtitle.dart';
+import '../../pages/danmaku/controller.dart';
 import '../../pages/video/controller.dart';
 import '../../pages/video/introduction/bangumi/controller.dart';
 import '../../pages/video/introduction/detail/controller.dart';
@@ -105,6 +106,8 @@ class PlPlayerController {
   Rx<bool> _continuePlayInBackground = false.obs;
 
   Rx<bool> _onlyPlayAudio = false.obs;
+
+  Rx<bool> _flipX = false.obs;
 
   ///
   // ignore: prefer_final_fields
@@ -236,6 +239,9 @@ class PlPlayerController {
   /// 听视频
   Rx<bool> get onlyPlayAudio => _onlyPlayAudio;
 
+  /// 镜像
+  Rx<bool> get flipX => _flipX;
+
   /// 是否长按倍速
   Rx<bool> get doubleSpeedStatus => _doubleSpeedStatus;
 
@@ -257,11 +263,6 @@ class PlPlayerController {
 
   /// 弹幕开关
   Rx<bool> isOpenDanmu = false.obs;
-
-  /// 弹幕权重
-  ValueNotifier<int> danmakuWeight = ValueNotifier(0);
-  ValueNotifier<List<Map<String, dynamic>>> danmakuFilterRule =
-      ValueNotifier([]);
   // 关联弹幕控制器
   DanmakuController? danmakuController;
   // 弹幕相关配置
@@ -277,6 +278,7 @@ class PlPlayerController {
   // int? defaultDuration;
   late bool enableAutoLongPressSpeed = false;
   late bool enableLongShowControl;
+  late bool horizontalScreen;
 
   // 播放顺序相关
   PlayRepeat playRepeat = PlayRepeat.pause;
@@ -323,6 +325,11 @@ class PlPlayerController {
     return _instance != null;
   }
 
+  static void updateSettings() {
+    _instance?.horizontalScreen =
+        setting.get(SettingBoxKey.horizontalScreen, defaultValue: false);
+  }
+
   static Future<void> playIfExists(
       {bool repeat = false, bool hideControls = true}) async {
     await _instance?.play(repeat: repeat, hideControls: hideControls);
@@ -358,26 +365,25 @@ class PlPlayerController {
     _videoType = videoType;
     isOpenDanmu.value =
         setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: true);
-    danmakuWeight.value =
-        setting.get(SettingBoxKey.danmakuWeight, defaultValue: 0);
-    danmakuFilterRule.value = onlineCache.get(OnlineCacheKey.danmakuFilterRule,
-        defaultValue: []).map<Map<String, dynamic>>((e) {
-      return Map<String, dynamic>.from(e);
-    }).toList();
     blockTypes = setting.get(SettingBoxKey.danmakuBlockType, defaultValue: []);
-    showArea = setting.get(SettingBoxKey.danmakuShowArea, defaultValue: 0.5);
+    showArea = setting
+        .get(SettingBoxKey.danmakuShowArea, defaultValue: 0.5)
+        .toDouble();
     // 不透明度
-    opacityVal = setting.get(SettingBoxKey.danmakuOpacity, defaultValue: 1.0);
+    opacityVal =
+        setting.get(SettingBoxKey.danmakuOpacity, defaultValue: 1.0).toDouble();
     // 字体大小
-    fontSizeVal =
-        setting.get(SettingBoxKey.danmakuFontScale, defaultValue: 1.0);
+    fontSizeVal = setting
+        .get(SettingBoxKey.danmakuFontScale, defaultValue: 1.0)
+        .toDouble();
     // 弹幕时间
     danmakuDurationVal =
         setting.get(SettingBoxKey.danmakuDuration, defaultValue: 7.29).round();
     // 描边粗细
-    strokeWidth = setting.get(SettingBoxKey.strokeWidth, defaultValue: 1.5);
+    strokeWidth =
+        setting.get(SettingBoxKey.strokeWidth, defaultValue: 1.5).toDouble();
     // 弹幕字体粗细
-    fontWeight = setting.get(SettingBoxKey.fontWeight, defaultValue: 5);
+    fontWeight = setting.get(SettingBoxKey.fontWeight, defaultValue: 5).round();
     // 弹幕海量模式
     massiveMode =
         setting.get(SettingBoxKey.danmakuMassiveMode, defaultValue: false);
@@ -387,8 +393,9 @@ class PlPlayerController {
               videoStorage.get(VideoBoxKey.playRepeat,
                   defaultValue: PlayRepeat.pause.value),
         );
-    _playbackSpeed.value =
-        videoStorage.get(VideoBoxKey.playSpeedDefault, defaultValue: 1.0);
+    _playbackSpeed.value = videoStorage
+        .get(VideoBoxKey.playSpeedDefault, defaultValue: 1.0)
+        .toDouble();
     enableAutoLongPressSpeed = setting
         .get(SettingBoxKey.enableAutoLongPressSpeed, defaultValue: false);
     // 后台播放
@@ -396,13 +403,18 @@ class PlPlayerController {
         .get(SettingBoxKey.continuePlayInBackground, defaultValue: false);
     if (!enableAutoLongPressSpeed) {
       _longPressSpeed.value = videoStorage
-          .get(VideoBoxKey.longPressSpeedDefault, defaultValue: 3.0);
+          .get(VideoBoxKey.longPressSpeedDefault, defaultValue: 3.0)
+          .toDouble();
     }
     enableLongShowControl =
         setting.get(SettingBoxKey.enableLongShowControl, defaultValue: false);
-    speedsList = List<double>.from(videoStorage.get(
-        VideoBoxKey.customSpeedsList,
-        defaultValue: <double>[0.5, 0.75, 1.25, 1.5, 1.75, 3.0]));
+    horizontalScreen =
+        setting.get(SettingBoxKey.horizontalScreen, defaultValue: false);
+
+    List<double> defaultList = <double>[0.5, 0.75, 1.25, 1.5, 1.75, 3.0];
+    speedsList = List<double>.from(videoStorage
+        .get(VideoBoxKey.customSpeedsList, defaultValue: defaultList)
+        .map((e) => e.toDouble()));
     for (final PlaySpeed i in PlaySpeed.values) {
       speedsList.add(i.value);
     }
@@ -1447,7 +1459,8 @@ class PlPlayerController {
   }
 
   // 全屏
-  Future<void> triggerFullScreen({bool status = true}) async {
+  Future<void> triggerFullScreen(
+      {bool status = true, bool equivalent = false}) async {
     stopScreenTimer();
     FullScreenMode mode = FullScreenModeCode.fromCode(
         setting.get(SettingBoxKey.fullScreenMode, defaultValue: 0))!;
@@ -1482,10 +1495,11 @@ class PlPlayerController {
       // StatusBarControl.setHidden(false, animation: StatusBarAnimation.FADE);
       if (!removeSafeArea) showStatusBar();
       toggleFullScreen(false);
+      await Future.delayed(const Duration(milliseconds: 10));
       if (mode == FullScreenMode.none) {
         return;
       }
-      if (!setting.get(SettingBoxKey.horizontalScreen, defaultValue: false)) {
+      if (!horizontalScreen) {
         await verticalScreenForTwoSeconds();
       } else {
         await autoScreen();
@@ -1555,7 +1569,7 @@ class PlPlayerController {
   }
 
   void putDanmakuSettings() {
-    setting.put(SettingBoxKey.danmakuWeight, danmakuWeight.value);
+    setting.put(SettingBoxKey.danmakuWeight, PlDanmakuController.danmakuWeight);
     setting.put(SettingBoxKey.danmakuBlockType, blockTypes);
     setting.put(SettingBoxKey.danmakuShowArea, showArea);
     setting.put(SettingBoxKey.danmakuOpacity, opacityVal);

@@ -64,69 +64,61 @@ class FavVideoCardH extends StatelessWidget {
               epId != null ? SearchType.media_bangumi : SearchType.video,
         });
       },
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-                StyleString.safeSpace, 5, StyleString.safeSpace, 5),
-            child: LayoutBuilder(
-              builder: (context, boxConstraints) {
-                double width =
-                    (boxConstraints.maxWidth - StyleString.cardSpace * 6) / 2;
-                return SizedBox(
-                  height: width / StyleString.aspectRatio,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AspectRatio(
-                        aspectRatio: StyleString.aspectRatio,
-                        child: LayoutBuilder(
-                          builder: (context, boxConstraints) {
-                            double maxWidth = boxConstraints.maxWidth;
-                            double maxHeight = boxConstraints.maxHeight;
-                            return Stack(
-                              children: [
-                                Hero(
-                                  tag: heroTag,
-                                  child: NetworkImgLayer(
-                                    src: videoItem.pic,
-                                    width: maxWidth,
-                                    height: maxHeight,
-                                  ),
-                                ),
-                                PBadge(
-                                  text: Utils.timeFormat(videoItem.duration!),
-                                  right: 6.0,
-                                  bottom: 6.0,
-                                  type: 'gray',
-                                ),
-                                if (videoItem.ogv != null) ...[
-                                  PBadge(
-                                    text: videoItem.ogv['type_name'],
-                                    top: 6.0,
-                                    right: 6.0,
-                                    bottom: null,
-                                    left: null,
-                                  ),
-                                ],
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                      VideoContent(
-                        videoItem: videoItem,
-                        callFn: callFn,
-                        searchType: searchType,
-                      )
-                    ],
+      child: LayoutBuilder(
+        builder: (context, boxConstraints) {
+          double width =
+              (boxConstraints.maxWidth - StyleString.cardSpace * 6) / 2;
+          return SizedBox(
+            height: width / StyleString.aspectRatio,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AspectRatio(
+                  aspectRatio: StyleString.aspectRatio,
+                  child: LayoutBuilder(
+                    builder: (context, boxConstraints) {
+                      double maxWidth = boxConstraints.maxWidth;
+                      double maxHeight = boxConstraints.maxHeight;
+                      return Stack(
+                        children: [
+                          Hero(
+                            tag: heroTag,
+                            child: NetworkImgLayer(
+                              src: videoItem.pic,
+                              width: maxWidth,
+                              height: maxHeight,
+                            ),
+                          ),
+                          PBadge(
+                            text: Utils.timeFormat(videoItem.duration!),
+                            right: 6.0,
+                            bottom: 6.0,
+                            type: 'gray',
+                          ),
+                          if (videoItem.ogv != null) ...[
+                            PBadge(
+                              text: videoItem.ogv['type_name'],
+                              top: 6.0,
+                              right: 6.0,
+                              bottom: null,
+                              left: null,
+                            ),
+                          ],
+                        ],
+                      );
+                    },
                   ),
-                );
-              },
+                ),
+                VideoContent(
+                  videoItem: videoItem,
+                  callFn: callFn,
+                  searchType: searchType,
+                )
+              ],
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -175,21 +167,12 @@ class VideoContent extends StatelessWidget {
                 ],
                 const Spacer(),
                 Text(
-                  Utils.dateFormat(videoItem.favTime),
+                  "${Utils.dateFormat(videoItem.pubdate!, formatType: 'day')} ${videoItem.owner.name}",
                   style: TextStyle(
-                      fontSize: 11,
-                      color: Theme.of(context).colorScheme.outline),
-                ),
-                if (videoItem.owner.name != '') ...[
-                  Text(
-                    videoItem.owner.name,
-                    style: TextStyle(
                       fontSize:
                           Theme.of(context).textTheme.labelMedium!.fontSize,
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
-                  ),
-                ],
+                      color: Theme.of(context).colorScheme.outline),
+                ),
                 Padding(
                   padding: const EdgeInsets.only(top: 2),
                   child: Row(
@@ -207,52 +190,53 @@ class VideoContent extends StatelessWidget {
                 ),
               ],
             ),
-            searchType != 1
-                ? Positioned(
-                    right: 0,
-                    bottom: -4,
-                    child: IconButton(
-                      tooltip: '取消收藏',
-                      style: ButtonStyle(
-                        padding: WidgetStateProperty.all(EdgeInsets.zero),
-                      ),
-                      onPressed: () {
-                        showDialog(
-                          context: Get.context!,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('提示'),
-                              content: const Text('要取消收藏吗?'),
-                              actions: [
-                                TextButton(
-                                    onPressed: () => Get.back(),
-                                    child: Text(
-                                      '取消',
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .outline),
-                                    )),
-                                TextButton(
-                                  onPressed: () async {
-                                    await callFn!();
-                                    Get.back();
-                                  },
-                                  child: const Text('确定取消'),
-                                )
-                              ],
-                            );
-                          },
+            if (searchType != 1)
+              Positioned(
+                right: 0,
+                bottom: -6,
+                width: 28,
+                height: 28,
+                child: IconButton(
+                  tooltip: '取消收藏',
+                  style: ButtonStyle(
+                    padding: WidgetStateProperty.all(EdgeInsets.zero),
+                  ),
+                  onPressed: () {
+                    showDialog(
+                      context: Get.context!,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('提示'),
+                          content: const Text('要取消收藏吗?'),
+                          actions: [
+                            TextButton(
+                                onPressed: () => Get.back(),
+                                child: Text(
+                                  '取消',
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .outline),
+                                )),
+                            TextButton(
+                              onPressed: () async {
+                                await callFn!();
+                                Get.back();
+                              },
+                              child: const Text('确定取消'),
+                            )
+                          ],
                         );
                       },
-                      icon: Icon(
-                        Icons.clear_outlined,
-                        color: Theme.of(context).colorScheme.outline,
-                        size: 18,
-                      ),
-                    ),
-                  )
-                : const SizedBox(),
+                    );
+                  },
+                  icon: Icon(
+                    Icons.clear_outlined,
+                    color: Theme.of(context).colorScheme.outline,
+                    size: 18,
+                  ),
+                ),
+              ),
           ],
         ),
       ),

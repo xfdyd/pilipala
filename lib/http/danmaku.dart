@@ -4,25 +4,37 @@ import 'index.dart';
 
 class DanmakaHttp {
   // 获取视频弹幕
-  static Future queryDanmaku({
+  static Future<DmSegMobileReply> queryDanmaku({
     required int cid,
     required int segmentIndex,
+    int maxRetries = 3, // 最大重试次数
   }) async {
-    // 构建参数对象
     Map<String, int> params = {
       'type': 1,
       'oid': cid,
       'segment_index': segmentIndex,
     };
-    var response = await Request().get(
-      Api.webDanmaku,
-      data: params,
-      extra: {'resType': ResponseType.bytes},
-    );
-    if (response.statusCode != 200 || response.data == null) {
-      return DmSegMobileReply();
+
+    int retryCount = 0;
+    while (retryCount < maxRetries) {
+      var response = await Request().get(
+        Api.webDanmaku,
+        data: params,
+        extra: {'resType': ResponseType.bytes},
+      );
+
+      if (response.statusCode == 200) {
+        return response.data != null
+            ? DmSegMobileReply.fromBuffer(response.data)
+            : DmSegMobileReply();
+      }
+      print('第${retryCount + 1}次重试失败, 状态码:${response.statusCode}');
+      retryCount++;
+      await Future.delayed(const Duration(seconds: 1)); // 重试间隔时间
     }
-    return DmSegMobileReply.fromBuffer(response.data);
+
+    print('所有重试失败，返回默认值');
+    return DmSegMobileReply();
   }
 
   static Future shootDanmaku({

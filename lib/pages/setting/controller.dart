@@ -38,7 +38,7 @@ class SettingController extends GetxController {
     feedBackEnable.value =
         setting.get(SettingBoxKey.feedBackEnable, defaultValue: false);
     toastOpacity.value =
-        setting.get(SettingBoxKey.defaultToastOp, defaultValue: 1.0);
+        setting.get(SettingBoxKey.defaultToastOp, defaultValue: 1.0).toDouble();
     picQuality.value =
         setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10);
     themeType.value = ThemeType.values[setting.get(SettingBoxKey.themeMode,

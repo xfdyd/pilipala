@@ -16,10 +16,9 @@ import '../../models/common/nav_bar_config.dart';
 
 class MainController extends GetxController {
   List<Widget> pages = <Widget>[
-    const HomePage(),
-    // const RankPage(),
-    const DynamicsPage(),
-    const MediaPage(),
+    HomePage(key: GlobalKey()),
+    DynamicsPage(key: GlobalKey()),
+    MediaPage(key: GlobalKey()),
   ];
   RxList navigationBars = defaultNavigationBars.obs;
   final StreamController<bool> bottomBarStream =
@@ -28,7 +27,7 @@ class MainController extends GetxController {
   DateTime? _lastPressedAt;
   late bool hideTabBar;
   late PageController pageController;
-  int selectedIndex = 0;
+  late int selectedIndex;
   Box userInfoCache = GStorage.userInfo;
   RxBool userLogin = false.obs;
   late DynamicBadgeMode dynamicBadgeType;
@@ -44,6 +43,8 @@ class MainController extends GetxController {
         setting.get(SettingBoxKey.defaultHomePage, defaultValue: 0) as int;
     selectedIndex = defaultNavigationBars
         .indexWhere((item) => item['id'] == defaultHomePage);
+    print("selectedIndex: ${selectedIndex}");
+    pageController = PageController(initialPage: selectedIndex);
     var userInfo = userInfoCache.get('userInfoCache');
     userLogin.value = userInfo != null;
     dynamicBadgeType = DynamicBadgeMode.values[setting.get(
