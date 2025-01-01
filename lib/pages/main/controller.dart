@@ -16,10 +16,9 @@ import '../../models/common/nav_bar_config.dart';
 
 class MainController extends GetxController {
   List<Widget> pages = <Widget>[
-    const HomePage(),
-    // const RankPage(),
-    const DynamicsPage(),
-    const MediaPage(),
+    HomePage(key: GlobalKey()),
+    DynamicsPage(key: GlobalKey()),
+    MediaPage(key: GlobalKey()),
   ];
   RxList navigationBars = defaultNavigationBars.obs;
   final StreamController<bool> bottomBarStream =

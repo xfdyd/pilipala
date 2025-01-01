@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:PiliPalaX/utils/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -83,38 +84,58 @@ class CacheManage {
 
   // 清除缓存
   Future<bool> clearCacheAll(BuildContext context) async {
+    // 是否启动时清除
+    RxBool autoClearCache = RxBool(GStorage.setting
+        .get(SettingBoxKey.autoClearCache, defaultValue: false));
     bool cleanStatus = await showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('提示'),
-          content: const Text('该操作将清除图片及网络请求缓存数据，确认清除？'),
+          content: const Text('该操作将清除图片及网络请求缓存数据'),
           actions: [
+            Obx(
+              () => TextButton.icon(
+                onPressed: () {
+                  autoClearCache.value = !autoClearCache.value;
+                  GStorage.setting
+                      .put(SettingBoxKey.autoClearCache, autoClearCache.value);
+                  SmartDialog.showToast(
+                      autoClearCache.value ? '启动时自动清除缓存' : '已关闭');
+                },
+                icon: Icon(autoClearCache.value
+                    ? Icons.check_box
+                    : Icons.check_box_outline_blank),
+                label: const Text(
+                  '自动',
+                ),
+              ),
+            ),
             TextButton(
-              onPressed: () => Get.back(),
+              onPressed: () {
+                Get.back();
+              },
               child: Text(
                 '取消',
                 style: TextStyle(color: Theme.of(context).colorScheme.outline),
               ),
             ),
             TextButton(
+              autofocus: true,
               onPressed: () async {
                 Get.back();
                 SmartDialog.showLoading(msg: '正在清除...');
                 try {
-                  // 清除缓存 图片缓存
                   await clearLibraryCache();
-                  Timer(const Duration(milliseconds: 500), () {
-                    SmartDialog.dismiss().then((res) {
-                      SmartDialog.showToast('清除成功');
-                    });
+                  SmartDialog.dismiss().then((res) {
+                    SmartDialog.showToast('清除成功');
                   });
                 } catch (err) {
                   SmartDialog.dismiss();
                   SmartDialog.showToast(err.toString());
                 }
               },
-              child: const Text('确认'),
+              child: const Text('清除'),
             )
           ],
         );

@@ -16,6 +16,7 @@ import 'package:PiliPalaX/utils/storage.dart';
 import '../../models/common/dynamic_badge_mode.dart';
 import '../../models/common/side_bar_position.dart';
 import '../../models/common/up_panel_position.dart';
+import '../../plugin/pl_player/controller.dart';
 import '../../plugin/pl_player/utils/fullscreen.dart';
 import '../../models/common/nav_bar_config.dart';
 import 'controller.dart';
@@ -87,6 +88,7 @@ class _StyleSettingState extends State<StyleSetting> {
                   AutoOrientation.portraitUpMode();
                   SmartDialog.showToast('已关闭横屏适配');
                 }
+                PlPlayerController.updateSettings();
               }),
           // const SetSwitchItem(
           //   title: '改用侧边栏',
@@ -101,7 +103,7 @@ class _StyleSettingState extends State<StyleSetting> {
             title: Text('主页侧栏布局', style: titleStyle),
             leading: const Icon(Icons.chrome_reader_mode_outlined),
             subtitle: Text(
-                '当前主页侧边栏位置：${sideBarPosition.labels}，开启后底栏与顶栏将被替换为侧栏，横屏或折叠屏推荐使用',
+                '当前：${sideBarPosition.labels}。开启后底栏与顶栏将被替换为侧栏，横屏或折叠屏推荐使用',
                 style: subTitleStyle),
             onTap: () async {
               SideBarPosition? result = await showDialog(

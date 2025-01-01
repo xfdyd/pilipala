@@ -200,60 +200,60 @@ class _FavDetailPageState extends State<FavDetailPage> {
           //     ),
           //   ),
           // ),
-          FutureBuilder(
-            future: _futureBuilderFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
+          SliverPadding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: StyleString.safeSpace),
+            sliver: FutureBuilder(
+              future: _futureBuilderFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState != ConnectionState.done ||
+                    !snapshot.hasData) {
+                  // 骨架屏
+                  return SliverGrid(
+                    gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                        mainAxisSpacing: StyleString.cardSpace,
+                        crossAxisSpacing: StyleString.safeSpace,
+                        maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                        childAspectRatio: StyleString.aspectRatio * 2.4,
+                        mainAxisExtent: 0),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      return const VideoCardHSkeleton();
+                    }, childCount: 10),
+                  );
+                }
                 Map data = snapshot.data;
-                if (data['status']) {
-                  if (_favDetailController.item!.mediaCount == 0) {
-                    return const NoData();
-                  } else {
-                    List favList = _favDetailController.favList;
-                    return Obx(
-                      () => favList.isEmpty
-                          ? const SliverToBoxAdapter(child: SizedBox())
-                          : SliverGrid(
-                              gridDelegate:
-                                  SliverGridDelegateWithExtentAndRatio(
-                                      mainAxisSpacing: StyleString.cardSpace,
-                                      crossAxisSpacing: StyleString.safeSpace,
-                                      maxCrossAxisExtent: Grid.maxRowWidth * 2,
-                                      childAspectRatio:
-                                          StyleString.aspectRatio * 2.4,
-                                      mainAxisExtent: 0),
-                              delegate:
-                                  SliverChildBuilderDelegate((context, index) {
-                                return FavVideoCardH(
-                                  videoItem: favList[index],
-                                  callFn: () => _favDetailController
-                                      .onCancelFav(favList[index].id),
-                                );
-                              }, childCount: favList.length),
-                            ),
-                    );
-                  }
-                } else {
+                if (!data['status']) {
                   return HttpError(
                     errMsg: data['msg'],
                     fn: () => setState(() {}),
                   );
                 }
-              } else {
-                // 骨架屏
-                return SliverGrid(
-                  gridDelegate: SliverGridDelegateWithExtentAndRatio(
-                      mainAxisSpacing: StyleString.cardSpace,
-                      crossAxisSpacing: StyleString.safeSpace,
-                      maxCrossAxisExtent: Grid.maxRowWidth * 2,
-                      childAspectRatio: StyleString.aspectRatio * 2.4,
-                      mainAxisExtent: 0),
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    return const VideoCardHSkeleton();
-                  }, childCount: 10),
-                );
-              }
-            },
+                if (_favDetailController.item!.mediaCount == 0) {
+                  return const NoData();
+                }
+                List favList = _favDetailController.favList;
+                return Obx(() {
+                  if (favList.isEmpty) {
+                    return const SliverToBoxAdapter(child: SizedBox());
+                  }
+                  return SliverGrid(
+                    gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                        mainAxisSpacing: StyleString.cardSpace,
+                        crossAxisSpacing: StyleString.safeSpace,
+                        maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                        childAspectRatio: StyleString.aspectRatio * 2.4,
+                        mainAxisExtent: 0),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      return FavVideoCardH(
+                        videoItem: favList[index],
+                        callFn: () =>
+                            _favDetailController.onCancelFav(favList[index].id),
+                      );
+                    }, childCount: favList.length),
+                  );
+                });
+              },
+            ),
           ),
           SliverToBoxAdapter(
             child: Container(

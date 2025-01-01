@@ -2,7 +2,7 @@ enum BottomControlType {
   pre,
   playOrPause,
   next,
-  time,
+  // time,
   space,
   spaceButton,
   episode,

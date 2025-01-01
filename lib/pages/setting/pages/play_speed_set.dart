@@ -55,14 +55,17 @@ class _PlaySpeedPageState extends State<PlaySpeedPage> {
   void initState() {
     super.initState();
     // 默认倍速
-    playSpeedDefault =
-        videoStorage.get(VideoBoxKey.playSpeedDefault, defaultValue: 1.0);
+    playSpeedDefault = videoStorage
+        .get(VideoBoxKey.playSpeedDefault, defaultValue: 1.0)
+        .toDouble();
     // 默认长按倍速
-    longPressSpeedDefault =
-        videoStorage.get(VideoBoxKey.longPressSpeedDefault, defaultValue: 3.0);
-    // 自定义倍速
-    customSpeedsList = videoStorage.get(VideoBoxKey.customSpeedsList,
-        defaultValue: <double>[0.5, 0.75, 1.25, 1.5, 1.75, 3.0]);
+    longPressSpeedDefault = videoStorage
+        .get(VideoBoxKey.longPressSpeedDefault, defaultValue: 3.0)
+        .toDouble();
+    List<double> defaultList = <double>[0.5, 0.75, 1.25, 1.5, 1.75, 3.0];
+    customSpeedsList = List<double>.from(videoStorage
+        .get(VideoBoxKey.customSpeedsList, defaultValue: defaultList)
+        .map((e) => e.toDouble()));
     enableAutoLongPressSpeed = settingStorage
         .get(SettingBoxKey.enableAutoLongPressSpeed, defaultValue: false);
     if (enableAutoLongPressSpeed) {
