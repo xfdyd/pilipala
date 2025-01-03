@@ -126,6 +126,11 @@ class PlPlayerController {
   final RxList<Map<String, String>> _vttSubtitles = <Map<String, String>>[].obs;
   final RxInt _vttSubtitlesIndex = 0.obs;
 
+  final RxDouble subtitleFontSize = 60.0.obs;
+  final RxDouble subtitleBottomPadding = 24.0.obs;
+
+  late Rx<TextStyle> subtitleStyle;
+
   Timer? _timer;
   Timer? _timerForSeek;
   Timer? _timerForVolume;
@@ -410,6 +415,21 @@ class PlPlayerController {
         setting.get(SettingBoxKey.enableLongShowControl, defaultValue: false);
     horizontalScreen =
         setting.get(SettingBoxKey.horizontalScreen, defaultValue: false);
+    subtitleFontSize.value = videoStorage
+        .get(VideoBoxKey.subtitleFontSize, defaultValue: 60.0)
+        .toDouble();
+    subtitleStyle = TextStyle(
+      height: 1.3,
+      fontSize: subtitleFontSize.value,
+      letterSpacing: 0.1,
+      wordSpacing: 0.1,
+      color: const Color(0xffffffff),
+      fontWeight: FontWeight.normal,
+      backgroundColor: const Color(0xaa000000),
+    ).obs;
+    subtitleBottomPadding.value = videoStorage
+        .get(VideoBoxKey.subtitleBottomPadding, defaultValue: 24.0)
+        .toDouble();
 
     List<double> defaultList = <double>[0.5, 0.75, 1.25, 1.5, 1.75, 3.0];
     speedsList = List<double>.from(videoStorage
@@ -1298,16 +1318,6 @@ class PlPlayerController {
       );
     }
 
-    const TextStyle subTitleStyle = TextStyle(
-      height: 1.3,
-      fontSize: 60.0,
-      letterSpacing: 0.1,
-      wordSpacing: 0.1,
-      color: Color(0xffffffff),
-      fontWeight: FontWeight.normal,
-      backgroundColor: Color(0xaa000000),
-    );
-
     print("enterPip");
     print(videoIntroController);
     print(bangumiIntroController);
@@ -1359,8 +1369,10 @@ class PlPlayerController {
                     !_continuePlayInBackground.value,
                 resumeUponEnteringForegroundMode: true,
                 // 字幕尺寸调节
-                subtitleViewConfiguration: const SubtitleViewConfiguration(
-                    style: subTitleStyle, padding: EdgeInsets.all(24.0)),
+                subtitleViewConfiguration: SubtitleViewConfiguration(
+                    style: subtitleStyle.value,
+                    padding:
+                        EdgeInsets.only(bottom: subtitleBottomPadding.value)),
                 fit: BoxFit.contain,
               ),
             ),
@@ -1670,5 +1682,81 @@ class PlPlayerController {
     _onlyPlayAudio.value = status ?? !_onlyPlayAudio.value;
     videoPlayerController?.setVideoTrack(
         _onlyPlayAudio.value ? VideoTrack.no() : VideoTrack.auto());
+  }
+
+  void setSubtitleFontSize() {
+    showDialog(
+      context: Get.context!,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('字幕字号设置'),
+          content: StatefulBuilder(builder: (context, StateSetter setState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Slider(
+                  value: subtitleFontSize.value,
+                  onChanged: (double value) {
+                    setState(() {
+                      subtitleFontSize.value = value;
+                      subtitleStyle.value = subtitleStyle.value
+                          .copyWith(fontSize: subtitleFontSize.value);
+                    });
+                  },
+                  onChangeEnd: (double value) {
+                    videoStorage.put(VideoBoxKey.subtitleFontSize, value);
+                  },
+                  min: 40.0,
+                  max: 120.0,
+                  divisions: 80,
+                  label: subtitleFontSize.value.round().toString(),
+                ),
+                Text(
+                  '当前字号：${subtitleFontSize.value.round()}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
+            );
+          }),
+        );
+      },
+    );
+  }
+
+  void setSubtitleBottomPadding() {
+    showDialog(
+      context: Get.context!,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('字幕底部间距设置'),
+          content: StatefulBuilder(builder: (context, StateSetter setState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Slider(
+                  value: subtitleBottomPadding.value,
+                  onChanged: (double value) {
+                    setState(() {
+                      subtitleBottomPadding.value = value;
+                    });
+                  },
+                  onChangeEnd: (double value) {
+                    videoStorage.put(VideoBoxKey.subtitleBottomPadding, value);
+                  },
+                  min: 10.0,
+                  max: 180.0,
+                  divisions: 170,
+                  label: subtitleBottomPadding.value.round().toString(),
+                ),
+                Text(
+                  '当前底部间距：${subtitleBottomPadding.value.round()}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
+            );
+          }),
+        );
+      },
+    );
   }
 }

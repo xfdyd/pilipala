@@ -479,7 +479,16 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 height: 38,
                 child: PopupMenuButton<int>(
                   onSelected: (int value) {
-                    _.setSubtitle(value);
+                    switch (value) {
+                      case -1:
+                        _.setSubtitleFontSize();
+                        break;
+                      case -2:
+                        _.setSubtitleBottomPadding();
+                        break;
+                      default:
+                        _.setSubtitle(value);
+                    }
                   },
                   initialValue:
                       _.vttSubtitles.length < _.vttSubtitlesIndex.value
@@ -487,22 +496,32 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                           : _.vttSubtitlesIndex.value,
                   color: Colors.black.withOpacity(0.8),
                   itemBuilder: (BuildContext context) {
-                    return _.vttSubtitles.asMap().entries.map((entry) {
-                      return PopupMenuItem<int>(
-                        value: entry.key,
-                        child: Text(
-                          "${entry.value['title']}",
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      );
-                    }).toList();
+                    return [
+                          const PopupMenuItem<int>(
+                              value: -1,
+                              child: Text("设置字号",
+                                  style: TextStyle(color: Colors.white))),
+                          const PopupMenuItem<int>(
+                              value: -2,
+                              child: Text("设置底边距",
+                                  style: TextStyle(color: Colors.white))),
+                        ] +
+                        _.vttSubtitles.asMap().entries.map((entry) {
+                          return PopupMenuItem<int>(
+                              value: entry.key,
+                              child: Text("${entry.value['title']}",
+                                  style: const TextStyle(color: Colors.white)));
+                        }).toList();
                   },
                   child: Container(
                     width: 42,
                     height: 38,
                     alignment: Alignment.center,
-                    child: const Icon(
-                      Icons.closed_caption,
+                    child: Icon(
+                      (_.vttSubtitlesIndex.value == 0 ||
+                              _.vttSubtitles.length < _.vttSubtitlesIndex.value)
+                          ? Icons.closed_caption_off
+                          : Icons.closed_caption,
                       size: 25,
                       color: Colors.white,
                       semanticLabel: '字幕',
@@ -589,28 +608,21 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   Widget build(BuildContext context) {
     final PlPlayerController _ = widget.controller;
     final Color colorTheme = Theme.of(context).colorScheme.primary;
-    const TextStyle subTitleStyle = TextStyle(
-      height: 1.3,
-      fontSize: 60.0,
-      letterSpacing: 0.1,
-      wordSpacing: 0.1,
-      color: Color(0xffffffff),
-      fontWeight: FontWeight.normal,
-      backgroundColor: Color(0xaa000000),
-    );
     const TextStyle textStyle = TextStyle(
       color: Colors.white,
       fontSize: 12,
     );
     Widget video = Video(
-      key: ValueKey('${_.videoFit.value}${_.continuePlayInBackground.value}'),
+      key: ValueKey('${_.videoFit.value}${_.continuePlayInBackground.value}'
+          '${_.subtitleFontSize.value}${_.subtitleBottomPadding.value}'),
       controller: videoController,
       controls: NoVideoControls,
       pauseUponEnteringBackgroundMode: !_.continuePlayInBackground.value,
       resumeUponEnteringForegroundMode: true,
       // 字幕尺寸调节
-      subtitleViewConfiguration: const SubtitleViewConfiguration(
-          style: subTitleStyle, padding: EdgeInsets.all(24.0)),
+      subtitleViewConfiguration: SubtitleViewConfiguration(
+          style: _.subtitleStyle.value,
+          padding: EdgeInsets.only(bottom: _.subtitleBottomPadding.value)),
       fit: _.videoFit.value,
     );
     return Stack(
@@ -766,6 +778,18 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                         popRouteStackContinuously = Get.currentRoute;
                         Get.until((route) => route.isFirst);
                         popRouteStackContinuously = "";
+                        break;
+                      case PlayerGestureAction.prevPlay:
+                        bool? ret;
+                        ret ??= videoIntroController?.prevPlay();
+                        ret ??= bangumiIntroController?.prevPlay();
+                        SmartDialog.showToast(ret == true ? '上一集' : '没有上一集了');
+                        break;
+                      case PlayerGestureAction.nextPlay:
+                        bool? ret;
+                        ret ??= videoIntroController?.nextPlay();
+                        ret ??= bangumiIntroController?.nextPlay();
+                        SmartDialog.showToast(ret == true ? '下一集' : '没有下一集了');
                         break;
                     }
                   });
