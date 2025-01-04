@@ -72,6 +72,7 @@ class _PlaySettingState extends State<PlaySetting> {
             leading: Icon(Icons.comment_outlined),
             setKey: SettingBoxKey.enableShowDanmaku,
             defaultVal: true,
+            callFn: PlPlayerController.updateSettingsIfExist,
           ),
           ListTile(
             dense: false,
@@ -86,6 +87,7 @@ class _PlaySettingState extends State<PlaySetting> {
             leading: Icon(MdiIcons.playPause),
             setKey: SettingBoxKey.autoPlayEnable,
             defaultVal: true,
+            callFn: PlPlayerController.updateSettingsIfExist,
           ),
           const SetSwitchItem(
             title: '左右侧双击快退/快进',
@@ -141,6 +143,7 @@ class _PlaySettingState extends State<PlaySetting> {
               );
               if (result != null) {
                 setting.put(SettingBoxKey.subtitlePreference, result);
+                PlPlayerController.updateSettingsIfExist();
                 defaultSubtitlePreference = result;
                 setState(() {});
               }
@@ -186,9 +189,7 @@ class _PlaySettingState extends State<PlaySetting> {
             leading: Icon(MdiIcons.locationExit),
             setKey: SettingBoxKey.continuePlayInBackground,
             defaultVal: false,
-            callFn: (val) {
-              SmartDialog.showToast('如果该设置未生效，请重启');
-            },
+            callFn: PlPlayerController.updateSettingsIfExist,
           ),
           const SetSwitchItem(
               title: '应用内小窗',

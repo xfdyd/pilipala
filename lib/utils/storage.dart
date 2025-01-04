@@ -146,6 +146,7 @@ class SettingBoxKey {
       autoPiP = 'autoPiP',
       pipNoDanmaku = 'pipNoDanmaku',
       enableAutoLongPressSpeed = 'enableAutoLongPressSpeed',
+      enableLongPressSpeedIncrease = 'enableLongPressSpeedIncrease',
       subtitlePreference = 'subtitlePreference',
       playerGestureActionMap = 'playerGestureActionMap',
       // youtube 双击快进快退

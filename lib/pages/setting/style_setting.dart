@@ -88,7 +88,7 @@ class _StyleSettingState extends State<StyleSetting> {
                   AutoOrientation.portraitUpMode();
                   SmartDialog.showToast('已关闭横屏适配');
                 }
-                PlPlayerController.updateSettings();
+                PlPlayerController.updateSettingsIfExist();
               }),
           // const SetSwitchItem(
           //   title: '改用侧边栏',

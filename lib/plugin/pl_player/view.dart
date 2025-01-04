@@ -842,7 +842,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               translation: const Offset(0.0, 0.3), // 上下偏移量（负数向上偏移）
               child: AnimatedOpacity(
                 curve: Curves.easeInOut,
-                opacity: _.doubleSpeedStatus.value ? 1.0 : 0.0,
+                opacity: _.doubleSpeedStatus.value > 0 ? 1.0 : 0.0,
                 duration: const Duration(milliseconds: 150),
                 child: Container(
                     alignment: Alignment.center,
@@ -851,10 +851,12 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                       borderRadius: BorderRadius.circular(16.0),
                     ),
                     height: 32.0,
-                    width: 70.0,
+                    width: 85.0,
                     child: Center(
                       child: Obx(() => Text(
-                            '${_.enableAutoLongPressSpeed ? _.playbackSpeed * 2 : _.longPressSpeed}倍速中',
+                            _.doubleSpeedStatus.value > 0
+                                ? '${_.doubleSpeedStatus.value.toStringAsFixed(2)}倍速中'
+                                : '${_.playbackSpeed}倍速',
                             style: const TextStyle(
                                 color: Colors.white, fontSize: 13),
                           )),

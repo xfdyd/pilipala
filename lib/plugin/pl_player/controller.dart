@@ -88,7 +88,7 @@ class PlPlayerController {
   final Rx<bool> _showControls = false.obs;
   final Rx<bool> _showVolumeStatus = false.obs;
   final Rx<bool> _showBrightnessStatus = false.obs;
-  final Rx<bool> _doubleSpeedStatus = false.obs;
+  final RxDouble _doubleSpeedStatus = 0.0.obs;
   final Rx<bool> _controlsLock = false.obs;
   final Rx<bool> _isFullScreen = false.obs;
   // 默认投稿视频格式
@@ -247,8 +247,8 @@ class PlPlayerController {
   /// 镜像
   Rx<bool> get flipX => _flipX;
 
-  /// 是否长按倍速
-  Rx<bool> get doubleSpeedStatus => _doubleSpeedStatus;
+  /// 长按倍速值（0为非长按倍速）
+  RxDouble get doubleSpeedStatus => _doubleSpeedStatus;
 
   Rx<bool> isBuffering = true.obs;
 
@@ -281,7 +281,8 @@ class PlPlayerController {
   late bool massiveMode;
   late List<double> speedsList;
   // int? defaultDuration;
-  late bool enableAutoLongPressSpeed = false;
+  late bool enableAutoLongPressSpeed;
+  late bool enableLongPressSpeedIncrease;
   late bool enableLongShowControl;
   late bool horizontalScreen;
 
@@ -330,17 +331,11 @@ class PlPlayerController {
     return _instance != null;
   }
 
-  static void updateSettings() {
-    _instance?.horizontalScreen =
-        setting.get(SettingBoxKey.horizontalScreen, defaultValue: false);
-  }
-
   static Future<void> playIfExists(
       {bool repeat = false, bool hideControls = true}) async {
     await _instance?.play(repeat: repeat, hideControls: hideControls);
   }
 
-  // try to get PlayerStatus
   static PlayerStatus? getPlayerStatusIfExists() {
     return _instance?.playerStatus.status.value;
   }
@@ -365,9 +360,11 @@ class PlPlayerController {
     await _instance?.setVolume(volumeNew, videoPlayerVolume: videoPlayerVolume);
   }
 
-  // 添加一个私有构造函数
-  PlPlayerController._() {
-    _videoType = videoType;
+  static void updateSettingsIfExist() {
+    _instance?.updateSettings();
+  }
+
+  void updateSettings() {
     isOpenDanmu.value =
         setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: true);
     blockTypes = setting.get(SettingBoxKey.danmakuBlockType, defaultValue: []);
@@ -403,14 +400,16 @@ class PlPlayerController {
         .toDouble();
     enableAutoLongPressSpeed = setting
         .get(SettingBoxKey.enableAutoLongPressSpeed, defaultValue: false);
-    // 后台播放
-    _continuePlayInBackground.value = setting
-        .get(SettingBoxKey.continuePlayInBackground, defaultValue: false);
+    enableLongPressSpeedIncrease = setting
+        .get(SettingBoxKey.enableLongPressSpeedIncrease, defaultValue: false);
     if (!enableAutoLongPressSpeed) {
       _longPressSpeed.value = videoStorage
           .get(VideoBoxKey.longPressSpeedDefault, defaultValue: 3.0)
           .toDouble();
     }
+    // 后台播放
+    _continuePlayInBackground.value = setting
+        .get(SettingBoxKey.continuePlayInBackground, defaultValue: false);
     enableLongShowControl =
         setting.get(SettingBoxKey.enableLongShowControl, defaultValue: false);
     horizontalScreen =
@@ -439,6 +438,12 @@ class PlPlayerController {
       speedsList.add(i.value);
     }
     speedsList.sort();
+  }
+
+  // 添加一个私有构造函数
+  PlPlayerController._() {
+    _videoType = videoType;
+    updateSettings();
     // _playerEventSubs = onPlayerStatusChanged.listen((PlayerStatus status) {
     //   if (status == PlayerStatus.playing) {
     //     WakelockPlus.enable();
@@ -560,32 +565,8 @@ class PlPlayerController {
       }
       await _initializePlayer(seekTo: seekTo);
       if (videoType.value != 'live' && _cid != 0) {
-        refreshSubtitles().then((value) {
-          if (_vttSubtitles.isNotEmpty) {
-            if (_vttSubtitlesIndex > 0 &&
-                _vttSubtitlesIndex < _vttSubtitles.length) {
-              setSubtitle(_vttSubtitlesIndex.value);
-            } else {
-              String preference = setting.get(SettingBoxKey.subtitlePreference,
-                  defaultValue: SubtitlePreference.values.first.code);
-              if (preference == 'on') {
-                setSubtitle(1);
-              } else if (preference == 'withoutAi') {
-                bool found = false;
-                for (int i = 1; i < _vttSubtitles.length; i++) {
-                  if (_vttSubtitles[i]['language']!.startsWith('ai')) {
-                    continue;
-                  }
-                  found = true;
-                  setSubtitle(i);
-                  break;
-                }
-                if (!found) _vttSubtitlesIndex.value = 0;
-              } else {
-                _vttSubtitlesIndex.value = 0;
-              }
-            }
-          }
+        refreshSubtitles().then((_) {
+          chooseSubtitle();
         });
       }
     } catch (err, stackTrace) {
@@ -964,7 +945,7 @@ class PlPlayerController {
     //   danmakuController!.updateOption(updatedOption);
     // } catch (_) {}
     // fix 长按倍速后放开不恢复
-    if (!doubleSpeedStatus.value) {
+    if (doubleSpeedStatus.value == 0) {
       _playbackSpeed.value = speed;
     }
   }
@@ -1267,12 +1248,23 @@ class PlPlayerController {
     if (controlsLock.value) {
       return;
     }
-    _doubleSpeedStatus.value = val;
     if (val) {
-      await setPlaybackSpeed(
-          enableAutoLongPressSpeed ? playbackSpeed * 2 : longPressSpeed);
+      _doubleSpeedStatus.value =
+          enableAutoLongPressSpeed ? playbackSpeed * 2 : longPressSpeed;
+      await setPlaybackSpeed(_doubleSpeedStatus.value);
+      if (enableLongPressSpeedIncrease) {
+        Timer.periodic(const Duration(milliseconds: 500), (timer) async {
+          if (_doubleSpeedStatus.value > 0) {
+            _doubleSpeedStatus.value = min(8, _doubleSpeedStatus.value * 1.15);
+            await setPlaybackSpeed(_doubleSpeedStatus.value);
+          } else {
+            timer.cancel();
+          }
+        });
+      }
     } else {
-      print(playbackSpeed);
+      print("playbackSpeed: $playbackSpeed");
+      _doubleSpeedStatus.value = 0;
       await setPlaybackSpeed(playbackSpeed);
     }
   }
@@ -1652,6 +1644,45 @@ class PlPlayerController {
     //   SmartDialog.showToast('字幕均加载失败');
     // }
     return;
+  }
+
+  void chooseSubtitle() {
+    if (_vttSubtitles.isEmpty) return;
+
+    int findSubtitleWithoutAi() {
+      return _vttSubtitles.indexWhere((element) {
+        return !element['language']!.startsWith('ai');
+      });
+    }
+
+    void setSubtitleFallback(int defaultIndex) {
+      int index = findSubtitleWithoutAi();
+      setSubtitle(index != -1 ? index : defaultIndex);
+    }
+
+    String preference = setting.get(SettingBoxKey.subtitlePreference,
+        defaultValue: SubtitlePreference.values.first.code);
+
+    if (_vttSubtitlesIndex < 1 || _vttSubtitlesIndex >= _vttSubtitles.length) {
+      switch (preference) {
+        case 'on':
+          setSubtitleFallback(1);
+          break;
+        case 'withoutAi':
+          setSubtitleFallback(0);
+          break;
+        default:
+          setSubtitle(0);
+      }
+      return;
+    }
+
+    if (_vttSubtitles[_vttSubtitlesIndex.value]['language']!.startsWith('ai')) {
+      setSubtitleFallback(
+          preference == 'withoutAi' ? 0 : _vttSubtitlesIndex.value);
+    } else {
+      setSubtitle(_vttSubtitlesIndex.value);
+    }
   }
 
   // 设定字幕轨道
