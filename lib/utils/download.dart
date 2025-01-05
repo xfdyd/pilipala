@@ -98,7 +98,7 @@ class DownloadUtils {
         Uint8List.fromList(response.data),
         quality: 100,
         fileName: picName,
-        extension: 'jpg',
+        // extension: 'jpg',
         // 保存到 PiliPalaX文件夹
         androidRelativePath: "Pictures/PiliPalaX",
         skipIfExists: false,

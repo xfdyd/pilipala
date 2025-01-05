@@ -1452,7 +1452,7 @@ class PlPlayerController {
         ),
         isPosCache: true,
         slideType: FloatingSlideType.onRightAndTop,
-        right: 10,
+        right: 0,
         top: 100,
         moveOpacity: 0.5,
         slideBottomHeight: 20,
