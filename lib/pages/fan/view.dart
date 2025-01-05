@@ -65,6 +65,7 @@ class _FansPageState extends State<FansPage> {
         edgeOffset: 10.0,
         onRefresh: () async => await _fansController.queryFans('init'),
         child: CustomScrollView(
+            cacheExtent: 3500,
             physics: const AlwaysScrollableScrollPhysics(),
             controller: scrollController,
             slivers: [

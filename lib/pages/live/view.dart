@@ -87,6 +87,7 @@ class _LivePageState extends State<LivePage>
           return await _liveController.onRefresh();
         },
         child: CustomScrollView(
+          cacheExtent: 3500,
           physics: const AlwaysScrollableScrollPhysics(),
           controller: _liveController.scrollController,
           slivers: [

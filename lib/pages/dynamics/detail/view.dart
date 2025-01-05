@@ -222,6 +222,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
                 double padding = max(context.width / 2 - Grid.maxRowWidth, 0);
                 if (orientation == Orientation.portrait) {
                   return CustomScrollView(
+                    cacheExtent: 3500,
                     controller: scrollController,
                     physics: const AlwaysScrollableScrollPhysics(),
                     slivers: [
@@ -244,6 +245,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
                     children: [
                       Expanded(
                         child: CustomScrollView(
+                            cacheExtent: 3500,
                             controller: ScrollController(),
                             physics: const AlwaysScrollableScrollPhysics(),
                             slivers: [
@@ -259,6 +261,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
                       ),
                       Expanded(
                         child: CustomScrollView(
+                            cacheExtent: 3500,
                             controller: scrollController,
                             physics: const AlwaysScrollableScrollPhysics(),
                             slivers: [

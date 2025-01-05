@@ -87,6 +87,7 @@ class _ZonePageState extends State<ZonePage>
         return await _zoneController.onRefresh();
       },
       child: CustomScrollView(
+        cacheExtent: 3500,
         controller: scrollController,
         slivers: [
           SliverPadding(

@@ -65,6 +65,7 @@ class _MemberDynamicsPageState extends State<MemberDynamicsPage> {
         edgeOffset: 10.0,
         onRefresh: _memberDynamicController.onRefresh, // 下拉刷新时触发的异步操作
         child: CustomScrollView(
+          cacheExtent: 3500,
           physics: const ClampingScrollPhysics(),
           // 不能设置controller，否则NestedScrollView的联动会失效
           // controller: _memberDynamicController.scrollController,

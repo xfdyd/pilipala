@@ -55,6 +55,7 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
         edgeOffset: 10.0,
         onRefresh: _memberArchivesController.onRefresh, // 下拉刷新时触发的异步操作
         child: CustomScrollView(
+          cacheExtent: 3500,
           physics: const ClampingScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(

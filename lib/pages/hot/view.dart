@@ -79,6 +79,7 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
         return await _hotController.onRefresh();
       },
       child: CustomScrollView(
+        cacheExtent: 3500,
         physics: const AlwaysScrollableScrollPhysics(),
         controller: _hotController.scrollController,
         slivers: [

@@ -40,6 +40,7 @@ class _UpPanelState extends State<UpPanel> {
     liveList = widget.upData!.liveUsers?.items ?? [];
     // return const SizedBox();
     return CustomScrollView(
+        cacheExtent: 3500,
         physics: const AlwaysScrollableScrollPhysics(),
         controller: widget.scrollController,
         slivers: [

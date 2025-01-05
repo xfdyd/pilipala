@@ -83,6 +83,7 @@ class _HistorySearchPageState extends State<HistorySearchPage> {
         () => _historySearchCtr.loadingStatus.value == 'init'
             ? const SizedBox()
             : CustomScrollView(
+                cacheExtent: 3500,
                 physics: const AlwaysScrollableScrollPhysics(),
                 controller: scrollController,
                 slivers: [

@@ -112,6 +112,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                 return await _videoReplyReplyController.queryReplyList();
               },
               child: CustomScrollView(
+                cacheExtent: 3500,
                 controller: _videoReplyReplyController.scrollController,
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: <Widget>[

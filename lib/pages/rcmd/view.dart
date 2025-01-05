@@ -86,6 +86,7 @@ class _RcmdPageState extends State<RcmdPage>
           await Future.delayed(const Duration(milliseconds: 300));
         },
         child: CustomScrollView(
+          cacheExtent: 3500,
           controller: _rcmdController.scrollController,
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [

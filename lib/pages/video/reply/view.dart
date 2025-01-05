@@ -139,6 +139,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
       child: Stack(
         children: [
           CustomScrollView(
+            cacheExtent: 3500,
             controller: scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
             key: const PageStorageKey<String>('评论'),

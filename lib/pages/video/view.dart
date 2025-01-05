@@ -708,6 +708,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                           controller: videoDetailController.tabCtr,
                           children: <Widget>[
                             CustomScrollView(
+                              cacheExtent: 3500,
                               key: const PageStorageKey<String>('简介'),
                               slivers: <Widget>[
                                 if (videoDetailController.videoType ==
@@ -771,6 +772,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 controller: videoDetailController.tabCtr,
                 children: <Widget>[
                   CustomScrollView(
+                    cacheExtent: 3500,
                     key: const PageStorageKey<String>('简介'),
                     slivers: <Widget>[
                       if (videoDetailController.videoType ==
@@ -824,6 +826,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               child: Row(children: [
             Expanded(
                 child: CustomScrollView(
+              cacheExtent: 3500,
               key: PageStorageKey<String>('简介${videoDetailController.bvid}'),
               slivers: <Widget>[
                 if (videoDetailController.videoType == SearchType.video) ...[
@@ -858,6 +861,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           return Row(children: [
             Expanded(
                 child: CustomScrollView(
+              cacheExtent: 3500,
               key: PageStorageKey<String>('简介${videoDetailController.bvid}'),
               slivers: <Widget>[
                 if (videoDetailController.videoType == SearchType.video) ...[
@@ -912,6 +916,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                             ? 0
                             : MediaQuery.of(context).padding.top),
                     child: CustomScrollView(
+                      cacheExtent: 3500,
                       key: PageStorageKey<String>(
                           '简介${videoDetailController.bvid}'),
                       slivers: <Widget>[
@@ -938,6 +943,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               children: <Widget>[
                 if (videoDetailController.videoType == SearchType.video)
                   CustomScrollView(
+                    cacheExtent: 3500,
                     slivers: [relatedVideo],
                   ),
                 Obx(
