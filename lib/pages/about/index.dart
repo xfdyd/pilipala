@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:PiliPalaX/http/index.dart';
 import 'package:PiliPalaX/models/github/latest.dart';
@@ -50,41 +51,29 @@ class _AboutPageState extends State<AboutPage> {
       ),
       body: ListView(
         children: [
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 150),
-            child: ExcludeSemantics(
-                child: Image.asset(
+          Column(children: [
+            Image.asset(
+              excludeFromSemantics: true,
+              height: 150,
               'assets/images/logo/logo_android_2.png',
-            )),
-          ),
-          ListTile(
-            title: Text('PiliPalaX',
-                textAlign: TextAlign.center,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium!
-                    .copyWith(height: 2)),
-            subtitle: Row(children: [
-              const Spacer(),
-              Text(
-                '使用Flutter开发的B站第三方客户端',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Theme.of(context).colorScheme.outline),
-                semanticsLabel: '与你一起，发现不一样的世界',
-              ),
-              const Icon(
-                Icons.accessibility_new,
-                semanticLabel: "无障碍适配",
-                size: 18,
-              ),
-              const Spacer(),
-            ]),
-          ),
+            ),
+            Text('PiliPalaX',
+                textAlign: TextAlign.left,
+                style: Theme.of(context).textTheme.titleMedium,
+                semanticsLabel: 'PiliPalaX 与你一起，发现不一样的世界'),
+            Text(
+              '使用Flutter开发的B站第三方客户端⁺',
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.outline, height: 3),
+              semanticsLabel: '使用Flutter开发的B站第三方客户端（带无障碍适配）',
+            ),
+          ]),
           Obx(
             () => ListTile(
               onTap: () => _aboutController.tapOnVersion(),
               title: const Text('当前版本'),
-              leading: const Icon(Icons.commit_outlined),
+              leading: Icon(MdiIcons.sourceCommitLocal),
               trailing: Text(_aboutController.currentVersion.value,
                   style: subTitleStyle),
             ),
@@ -93,7 +82,7 @@ class _AboutPageState extends State<AboutPage> {
             () => ListTile(
               onTap: () => _aboutController.onUpdate(),
               title: const Text('最新版本'),
-              leading: const Icon(Icons.flag_outlined),
+              leading: Icon(MdiIcons.newBox),
               trailing: Text(
                 _aboutController.isLoading.value
                     ? '正在获取'
@@ -119,26 +108,16 @@ class _AboutPageState extends State<AboutPage> {
           ),
           ListTile(
             onTap: () => _aboutController.githubUrl(),
-            leading: const Icon(Icons.star_outline_outlined),
-            title: const Text('Github开源仓库'),
+            leading: Icon(MdiIcons.github),
+            title: const Text('开源仓库⭐'),
             trailing: Text(
-              'github.com/orz12/PiliPalaX',
+              'Github.com/orz12/PiliPalaX',
               style: subTitleStyle,
             ),
           ),
           ListTile(
-            onTap: () => _aboutController.feedback(context),
-            leading: const Icon(Icons.feedback_outlined),
-            title: const Text('问题反馈'),
-            trailing: Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: outline,
-            ),
-          ),
-          ListTile(
             onTap: () => _aboutController.qqGroup(),
-            leading: const Icon(Icons.group_add_outlined),
+            leading: Icon(MdiIcons.qqchat),
             title: const Text('QQ群'),
             trailing: Text(
               '392176105',
@@ -147,19 +126,29 @@ class _AboutPageState extends State<AboutPage> {
           ),
           ListTile(
             onTap: () => _aboutController.tgChannel(),
-            leading: const Icon(Icons.group_add_outlined),
-            title: const Text('TG频道'),
+            leading: Icon(MdiIcons.sendCircle),
+            title: const Text('TG群'),
             trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
           ),
           ListTile(
-            onTap: () => _aboutController.aPay(),
-            leading: const Icon(Icons.wallet_giftcard_outlined),
-            title: const Text('赞赏'),
-            trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
+            onTap: () => _aboutController.feedback(context),
+            leading: Icon(MdiIcons.chatAlert),
+            title: const Text('问题反馈'),
+            trailing: Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: outline,
+            ),
           ),
+          // ListTile(
+          //   onTap: () => _aboutController.aPay(),
+          //   leading: const Icon(Icons.wallet_giftcard_outlined),
+          //   title: const Text('赞赏'),
+          //   trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
+          // ),
           ListTile(
             onTap: () => _aboutController.logs(),
-            leading: const Icon(Icons.bug_report_outlined),
+            leading: const Icon(Icons.bug_report),
             title: const Text('错误日志'),
             trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
           ),
@@ -168,14 +157,14 @@ class _AboutPageState extends State<AboutPage> {
               await CacheManage().clearCacheAll(context);
               getCacheSize();
             },
-            leading: const Icon(Icons.delete_outline),
+            leading: const Icon(Icons.delete),
             title: const Text('清除缓存'),
-            subtitle: Text('图片及网络缓存 $cacheSize', style: subTitleStyle),
+            trailing: Text('图片及网络缓存 $cacheSize', style: subTitleStyle),
           ),
           ListTile(
               title: const Text('导入/导出设置'),
               dense: false,
-              leading: const Icon(Icons.import_export_outlined),
+              leading: const Icon(Icons.import_export),
               onTap: () async {
                 await showDialog(
                   context: context,
@@ -244,7 +233,7 @@ class _AboutPageState extends State<AboutPage> {
               }),
           ListTile(
             title: const Text('重置所有设置'),
-            leading: const Icon(Icons.settings_backup_restore_outlined),
+            leading: const Icon(Icons.settings_backup_restore),
             onTap: () async {
               await showDialog(
                 context: context,
@@ -301,7 +290,7 @@ class AboutController extends GetxController {
   late LatestDataModel remoteAppInfo;
   RxBool isUpdate = true.obs;
   RxBool isLoading = true.obs;
-  late LatestDataModel data;
+  LatestDataModel? data;
   RxInt count = 0.obs;
 
   @override
@@ -348,8 +337,8 @@ class AboutController extends GetxController {
       return false;
     }
     data = LatestDataModel.fromJson(result.data[0]);
-    remoteAppInfo = data;
-    remoteVersion.value = data.tagName!;
+    remoteAppInfo = data!;
+    remoteVersion.value = data!.tagName!;
     isUpdate.value =
         Utils.needUpdate(currentVersion.value, remoteVersion.value);
     isLoading.value = false;
@@ -357,6 +346,12 @@ class AboutController extends GetxController {
 
   // 跳转下载/本地更新
   Future onUpdate() async {
+    if (data == null) {
+      SmartDialog.showLoading(msg: '正在尝试从Github获取最新版本');
+      await getRemoteApp();
+      SmartDialog.dismiss();
+      return;
+    }
     Utils.matchVersion(data);
   }
 
@@ -397,7 +392,7 @@ class AboutController extends GetxController {
       context: context,
       builder: (context) {
         return SimpleDialog(
-          title: const Text('问题反馈（建议直接加群反馈）'),
+          title: const Text('问题反馈\n（建议直接加群）'),
           children: [
             ListTile(
               title: const Text('GitHub Issue'),
@@ -438,7 +433,7 @@ class AboutController extends GetxController {
     }
   }
 
-  // tg频道
+  // tg群
   tgChannel() {
     Clipboard.setData(
       const ClipboardData(text: 'https://t.me/+162zlPtZlT9hNWVl'),

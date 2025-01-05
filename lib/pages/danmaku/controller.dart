@@ -8,7 +8,7 @@ class PlDanmakuController {
   final int cid;
   static int danmakuWeight = 0;
   static List<Map<String, dynamic>> danmakuFilter = [];
-  PlDanmakuController(this.cid){
+  PlDanmakuController(this.cid) {
     refresh();
   }
 

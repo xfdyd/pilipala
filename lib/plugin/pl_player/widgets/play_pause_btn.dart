@@ -65,7 +65,7 @@ class PlayOrPauseButtonState extends State<PlayOrPauseButton>
   Widget build(BuildContext context) {
     return SizedBox(
       width: 42,
-      height: 34,
+      height: 38,
       child: InkWell(
         onTap: player.playOrPause,
         // iconSize: widget.iconSize ?? _theme(context).buttonBarButtonSize,

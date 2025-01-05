@@ -50,9 +50,29 @@ class GStorage {
         setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10); // 设置全局变量
   }
 
+  // 特殊处理playerGestureActionMap的逻辑
+  // json不支持Map<int, int>，需要使用Map<String, int>中介
+  static String specialKey = SettingBoxKey.playerGestureActionMap;
+
+  static Map toEncodableManually(Map data) {
+    if (data.containsKey(specialKey)) {
+      data[specialKey] =
+          data[specialKey].map((key, value) => MapEntry(key.toString(), value));
+    }
+    return data;
+  }
+
+  static Map fromEncodableManually(Map data) {
+    if (data.containsKey(specialKey)) {
+      data[specialKey] =
+          data[specialKey].map((key, value) => MapEntry(int.parse(key), value));
+    }
+    return data;
+  }
+
   static Future<String> exportAllSettings() async {
     return jsonEncode({
-      setting.name: setting.toMap(),
+      setting.name: toEncodableManually(setting.toMap()),
       video.name: video.toMap(),
     });
   }
@@ -61,7 +81,7 @@ class GStorage {
     final Map<String, dynamic> map = jsonDecode(data);
     await setting.clear();
     await video.clear();
-    await setting.putAll(map[setting.name]);
+    await setting.putAll(fromEncodableManually(map[setting.name]));
     await video.putAll(map[video.name]);
   }
 
