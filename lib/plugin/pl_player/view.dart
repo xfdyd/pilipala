@@ -1273,6 +1273,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                         ?.screenshot(format: 'image/png')
                         .then((value) {
                       if (value != null) {
+                        if (!context.mounted) return;
                         SmartDialog.showToast('点击弹窗保存截图');
                         showDialog(
                           context: context,
@@ -1287,11 +1288,17 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                               shape: const RoundedRectangleBorder(),
                               content: GestureDetector(
                                 onTap: () async {
-                                  String name = DateTime.now().toString();
+                                  String name = DateTime.now()
+                                      .toString()
+                                      .replaceAll(' ', '_')
+                                      .replaceAll(':', '-')
+                                      .split('.')
+                                      .first;
                                   final SaveResult result =
                                       await SaverGallery.saveImage(
                                     value,
                                     fileName: name,
+                                    extension: 'png',
                                     androidRelativePath: "Pictures/Screenshots",
                                     skipIfExists: false,
                                   );
