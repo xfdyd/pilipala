@@ -31,6 +31,7 @@ import 'widgets/header_control.dart';
 import 'package:PiliPalaX/common/widgets/spring_physics.dart';
 import 'package:flutter_floating/floating/floating.dart';
 import 'package:flutter_floating/floating/manager/floating_manager.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 
 class VideoDetailPage extends StatefulWidget {
   const VideoDetailPage({super.key});
@@ -606,6 +607,53 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   Widget get relatedVideo =>
       RelatedVideoPanel(key: relatedVideoPanelKey, heroTag: heroTag);
 
+  Widget get videoReply => Obx(
+        () => VideoReplyPanel(
+          key: const PageStorageKey<String>('评论'),
+          bvid: videoDetailController.bvid,
+          oid: videoDetailController.oid.value,
+          heroTag: heroTag,
+        ),
+      );
+  Widget get videoIntro => (videoDetailController.videoType == SearchType.video)
+      ? VideoIntroPanel(heroTag: heroTag)
+      : Obx(() => BangumiIntroPanel(
+          heroTag: heroTag, cid: videoDetailController.cid.value));
+  Widget get divider => SliverToBoxAdapter(
+        child: Divider(
+          indent: 12,
+          endIndent: 12,
+          color: Theme.of(context).dividerColor.withOpacity(0.06),
+        ),
+      );
+
+  Widget pullToFullScreen(Widget child) => CustomMaterialIndicator(
+        onRefresh: () => plPlayerController!.triggerFullScreen(status: true),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        indicatorBuilder: (context, controller) {
+          double progress = min(controller.value, 1.0);
+          Color color = Theme.of(context).primaryColor.withOpacity(progress);
+          return Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: Stack(alignment: Alignment.center, children: [
+              Icon(
+                Icons.fullscreen,
+                color: color,
+                size: 27,
+              ),
+              CircularProgressIndicator(
+                strokeWidth: 2,
+                color: color,
+                value: controller.state.isLoading
+                    ? null
+                    : min(controller.value, 1.0),
+              )
+            ]),
+          );
+        },
+        child: child,
+      );
+
   Widget get childWhenDisabled => SafeArea(
         top: !removeSafeArea &&
             MediaQuery.of(context).orientation == Orientation.portrait &&
@@ -707,39 +755,21 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                           physics: const CustomTabBarViewScrollPhysics(),
                           controller: videoDetailController.tabCtr,
                           children: <Widget>[
-                            CustomScrollView(
-                              cacheExtent: 3500,
-                              key: const PageStorageKey<String>('简介'),
-                              slivers: <Widget>[
-                                if (videoDetailController.videoType ==
-                                    SearchType.video) ...[
-                                  VideoIntroPanel(heroTag: heroTag),
-                                ] else if (videoDetailController.videoType ==
-                                    SearchType.media_bangumi) ...[
-                                  Obx(() => BangumiIntroPanel(
-                                      heroTag: heroTag,
-                                      cid: videoDetailController.cid.value)),
+                            pullToFullScreen(
+                              CustomScrollView(
+                                cacheExtent: 3500,
+                                key: const PageStorageKey<String>('简介'),
+                                slivers: <Widget>[
+                                  videoIntro,
+                                  if (videoDetailController.videoType ==
+                                      SearchType.video) ...[
+                                    divider,
+                                    relatedVideo,
+                                  ]
                                 ],
-                                SliverToBoxAdapter(
-                                  child: Divider(
-                                    indent: 12,
-                                    endIndent: 12,
-                                    color: Theme.of(context)
-                                        .dividerColor
-                                        .withOpacity(0.06),
-                                  ),
-                                ),
-                                relatedVideo,
-                              ],
-                            ),
-                            Obx(
-                              () => VideoReplyPanel(
-                                key: const PageStorageKey<String>('评论'),
-                                bvid: videoDetailController.bvid,
-                                oid: videoDetailController.oid.value,
-                                heroTag: heroTag,
                               ),
-                            )
+                            ),
+                            videoReply
                           ],
                         ),
                       ),
@@ -771,38 +801,19 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 physics: const CustomTabBarViewScrollPhysics(),
                 controller: videoDetailController.tabCtr,
                 children: <Widget>[
-                  CustomScrollView(
+                  pullToFullScreen(CustomScrollView(
                     cacheExtent: 3500,
                     key: const PageStorageKey<String>('简介'),
                     slivers: <Widget>[
+                      videoIntro,
                       if (videoDetailController.videoType ==
                           SearchType.video) ...[
-                        VideoIntroPanel(heroTag: heroTag),
-                      ] else if (videoDetailController.videoType ==
-                          SearchType.media_bangumi) ...[
-                        Obx(() => BangumiIntroPanel(
-                            heroTag: heroTag,
-                            cid: videoDetailController.cid.value)),
+                        divider,
+                        relatedVideo,
                       ],
-                      SliverToBoxAdapter(
-                        child: Divider(
-                          indent: 12,
-                          endIndent: 12,
-                          color:
-                              Theme.of(context).dividerColor.withOpacity(0.06),
-                        ),
-                      ),
-                      relatedVideo,
                     ],
-                  ),
-                  Obx(
-                    () => VideoReplyPanel(
-                      key: const PageStorageKey<String>('评论'),
-                      bvid: videoDetailController.bvid,
-                      oid: videoDetailController.oid.value,
-                      heroTag: heroTag,
-                    ),
-                  )
+                  )),
+                  videoReply
                 ],
               ),
             ),
@@ -825,30 +836,18 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           Expanded(
               child: Row(children: [
             Expanded(
-                child: CustomScrollView(
+                child: pullToFullScreen(CustomScrollView(
               cacheExtent: 3500,
               key: PageStorageKey<String>('简介${videoDetailController.bvid}'),
               slivers: <Widget>[
+                videoIntro,
                 if (videoDetailController.videoType == SearchType.video) ...[
-                  VideoIntroPanel(heroTag: heroTag),
+                  divider,
                   relatedVideo,
-                ] else if (videoDetailController.videoType ==
-                    SearchType.media_bangumi) ...[
-                  Obx(() => BangumiIntroPanel(
-                      heroTag: heroTag, cid: videoDetailController.cid.value)),
                 ]
               ],
-            )),
-            Expanded(
-              child: Obx(
-                () => VideoReplyPanel(
-                  key: const PageStorageKey<String>('评论'),
-                  bvid: videoDetailController.bvid,
-                  oid: videoDetailController.oid.value,
-                  heroTag: heroTag,
-                ),
-              ),
-            )
+            ))),
+            Expanded(child: videoReply)
           ]))
         ]);
       });
@@ -860,35 +859,21 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           final double videoWidth = videoHeight * 9 / 16;
           return Row(children: [
             Expanded(
-                child: CustomScrollView(
+                child: pullToFullScreen(CustomScrollView(
               cacheExtent: 3500,
               key: PageStorageKey<String>('简介${videoDetailController.bvid}'),
               slivers: <Widget>[
-                if (videoDetailController.videoType == SearchType.video) ...[
-                  VideoIntroPanel(heroTag: heroTag),
-                  relatedVideo,
-                ] else if (videoDetailController.videoType ==
-                    SearchType.media_bangumi) ...[
-                  Obx(() => BangumiIntroPanel(
-                      heroTag: heroTag, cid: videoDetailController.cid.value)),
-                ]
+                videoIntro,
+                if (videoDetailController.videoType == SearchType.video)
+                  relatedVideo
               ],
-            )),
+            ))),
             SizedBox(
               height: videoHeight,
               width: isFullScreen.value == true ? context.width : videoWidth,
               child: playerPopScope(videoWidth, videoHeight),
             ),
-            Expanded(
-              child: Obx(
-                () => VideoReplyPanel(
-                  key: const PageStorageKey<String>('评论'),
-                  bvid: videoDetailController.bvid,
-                  oid: videoDetailController.oid.value,
-                  heroTag: heroTag,
-                ),
-              ),
-            ),
+            Expanded(child: videoReply),
           ]);
         }
         final double videoWidth =
@@ -915,22 +900,12 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                         (removeSafeArea
                             ? 0
                             : MediaQuery.of(context).padding.top),
-                    child: CustomScrollView(
+                    child: pullToFullScreen(CustomScrollView(
                       cacheExtent: 3500,
                       key: PageStorageKey<String>(
                           '简介${videoDetailController.bvid}'),
-                      slivers: <Widget>[
-                        if (videoDetailController.videoType ==
-                            SearchType.video) ...[
-                          VideoIntroPanel(heroTag: heroTag),
-                        ] else if (videoDetailController.videoType ==
-                            SearchType.media_bangumi) ...[
-                          Obx(() => BangumiIntroPanel(
-                              heroTag: heroTag,
-                              cid: videoDetailController.cid.value)),
-                        ]
-                      ],
-                    ),
+                      slivers: <Widget>[videoIntro],
+                    )),
                   ),
                 ),
               ],
@@ -946,14 +921,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     cacheExtent: 3500,
                     slivers: [relatedVideo],
                   ),
-                Obx(
-                  () => VideoReplyPanel(
-                    key: const PageStorageKey<String>('评论'),
-                    bvid: videoDetailController.bvid,
-                    oid: videoDetailController.oid.value,
-                    heroTag: heroTag,
-                  ),
-                )
+                videoReply
               ],
             ),
           )
