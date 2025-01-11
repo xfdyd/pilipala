@@ -9,7 +9,6 @@ class ZoneController extends GetxController {
   RxList<HotVideoItemModel> videoList = <HotVideoItemModel>[].obs;
   bool isLoadingMore = false;
   bool flag = false;
-  List<OverlayEntry?> popupDialog = <OverlayEntry?>[];
   int? rid;
   int? tid;
 

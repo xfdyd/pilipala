@@ -1,10 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../utils/storage.dart';
-import '../../utils/utils.dart';
 
 class ListSheet {
   ListSheet({
@@ -23,18 +25,19 @@ class ListSheet {
   final Function changeFucCall;
   final BuildContext context;
 
-  late PersistentBottomSheetController bottomSheetController;
-
   void buildShowBottomSheet() {
-    bottomSheetController = showBottomSheet(
-        context: context,
-        builder: (context) => ListSheetContent(
+    SmartDialog.show(
+        alignment: MediaQuery.of(context).orientation == Orientation.portrait
+            ? Alignment.bottomRight
+            : Alignment.topRight,
+        useSystem: true,
+        builder: (BuildContext context) => ListSheetContent(
               episodes: episodes,
               bvid: bvid,
               aid: aid,
               currentCid: currentCid,
               changeFucCall: changeFucCall,
-              onClose: bottomSheetController.close,
+              onClose: SmartDialog.dismiss,
             ));
   }
 }
@@ -116,15 +119,16 @@ class _ListSheetContentState extends State<ListSheetContent> {
           widget.changeFucCall(widget.bvid!, episode.cid, widget.aid!);
         }
       },
-      dense: false,
-      leading: isCurrentIndex
-          ? Image.asset(
-              'assets/images/live.png',
-              color: primary,
-              height: 12,
-              semanticLabel: "正在播放：",
-            )
-          : null,
+      selected: isCurrentIndex,
+      // dense: false,
+      // leading: isCurrentIndex
+      //     ? Image.asset(
+      //         'assets/images/live.png',
+      //         color: primary,
+      //         height: 12,
+      //         semanticLabel: "正在播放：",
+      //       )
+      //     : null,
       title: Text(
         title,
         style: TextStyle(
@@ -133,6 +137,7 @@ class _ListSheetContentState extends State<ListSheetContent> {
               ? primary
               : Theme.of(context).colorScheme.onSurface,
         ),
+        semanticsLabel: isCurrentIndex ? "正在播放：$title" : title,
       ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -158,8 +163,15 @@ class _ListSheetContentState extends State<ListSheetContent> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: Utils.getSheetHeight(context),
-      color: Theme.of(context).colorScheme.surface,
+      height: 500,
+      width: min(Get.width, 500),
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.all(Radius.circular(12)),
+      ),
+      margin: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(6),
       child: Column(
         children: [
           Container(
@@ -215,6 +227,7 @@ class _ListSheetContentState extends State<ListSheetContent> {
             height: 1,
             color: Theme.of(context).dividerColor.withOpacity(0.1),
           ),
+          const SizedBox(height: 1),
           Expanded(
             child: Material(
               child: ScrollablePositionedList.separated(

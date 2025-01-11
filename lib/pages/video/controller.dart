@@ -322,6 +322,8 @@ class VideoDetailController extends GetxController
         enableHeart: enableHeart,
         autoplay: autoplay,
       );
+    } else {
+      resumePlay = false;
     }
 
     /// 开启自动全屏时，在player初始化完成后立即传入headerControl

@@ -374,6 +374,7 @@ class Utils {
         Utils.needUpdate("${currentInfo.version}+$buildNumber", remoteVersion);
     if (isUpdate) {
       SmartDialog.show(
+        useSystem: true,
         animationType: SmartAnimationType.centerFade_otherSlide,
         builder: (context) {
           return AlertDialog(

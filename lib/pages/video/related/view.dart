@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/skeleton/video_card_h.dart';
-import 'package:PiliPalaX/common/widgets/animated_dialog.dart';
 import 'package:PiliPalaX/common/widgets/http_error.dart';
-import 'package:PiliPalaX/common/widgets/overlay_pop.dart';
 import 'package:PiliPalaX/common/widgets/video_card_h.dart';
 import '../../../../common/constants.dart';
 import '../../../../utils/grid.dart';
@@ -63,18 +61,6 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel>
                           child: VideoCardH(
                             videoItem: relatedVideoList[index],
                             showPubdate: true,
-                            longPress: () {
-                              try {
-                                _relatedController.popupDialog.add(
-                                    _createPopupDialog(_relatedController
-                                        .relatedVideoList[index]));
-                                Overlay.of(context).insert(
-                                    _relatedController.popupDialog.last!);
-                              } catch (err) {
-                                return {};
-                              }
-                            },
-                            longPressEnd: _removePopupDialog,
                           ),
                         );
                       }
@@ -104,22 +90,5 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel>
             }
           },
         ));
-  }
-
-  void _removePopupDialog() {
-    _relatedController.popupDialog.last?.remove();
-    _relatedController.popupDialog.removeLast();
-  }
-
-  OverlayEntry _createPopupDialog(videoItem) {
-    return OverlayEntry(
-      builder: (BuildContext context) => AnimatedDialog(
-        closeFn: _removePopupDialog,
-        child: OverlayPop(
-          videoItem: videoItem,
-          closeFn: _removePopupDialog,
-        ),
-      ),
-    );
   }
 }

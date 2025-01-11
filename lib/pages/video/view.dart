@@ -76,6 +76,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   bool isShowing = true;
   final GlobalKey relatedVideoPanelKey = GlobalKey();
   final GlobalKey videoPlayerFutureKey = GlobalKey();
+  final GlobalKey videoReplyPanelKey = GlobalKey();
 
   @override
   void initState() {
@@ -83,6 +84,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     if (Get.arguments != null && Get.arguments['heroTag'] != null) {
       heroTag = Get.arguments['heroTag'];
     }
+    // print('heroTagView:$heroTag');
     myRouteName = Get.rawRoute!.settings.name!;
     videoDetailController = Get.put(VideoDetailController(), tag: heroTag);
     if (!videoDetailController.autoPlay.value &&
@@ -430,10 +432,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   }
 
   bool triggerFloatingWindowWhenLeaving() {
-    if (GStorage.setting.get('autoMiniPlayer', defaultValue: false) &&
+    if (GStorage.setting
+            .get(SettingBoxKey.autoMiniPlayer, defaultValue: false) &&
         plPlayerController?.playerStatus.status.value == PlayerStatus.playing) {
-      return plPlayerController!
-          .triggerFloatingWindow(videoIntroController, bangumiIntroController);
+      return plPlayerController!.triggerFloatingWindow(
+          videoIntroController, bangumiIntroController, heroTag);
     }
     return false;
   }
@@ -483,14 +486,14 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       future: _futureBuilderFuture,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (!snapshot.hasData || !snapshot.data['status']) {
-          return const SizedBox();
+          return const ColoredBox(color: Colors.transparent);
         }
         return Obx(() {
           if ((!videoDetailController.autoPlay.value &&
                   videoDetailController.isShowCover.value) ||
               plPlayerController == null ||
               plPlayerController!.videoController == null) {
-            return nil;
+            return const ColoredBox(color: Colors.transparent);
           }
           return PLVideoPlayer(
             key: Key(heroTag),
@@ -559,7 +562,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   Widget playerStack(videoWidth, videoHeight) => Stack(
         children: <Widget>[
-          // if (isShowing) plPlayer,
           plPlayer,
 
           /// 关闭自动播放时 手动播放
@@ -587,21 +589,24 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           ]
         ],
       );
-  Widget playerPopScope(videoWidth, videoHeight) => PopScope(
-        canPop: isFullScreen.value != true,
-        onPopInvokedWithResult: (bool didPop, Object? result) {
-          if (isFullScreen.value == true) {
-            plPlayerController!.triggerFullScreen(status: false);
-          }
-          if (MediaQuery.of(context).orientation == Orientation.landscape &&
-              !horizontalScreen) {
-            verticalScreenForTwoSeconds();
-          }
-          if (didPop) {
-            triggerFloatingWindowWhenLeaving();
-          }
-        },
-        child: playerStack(videoWidth, videoHeight),
+  Widget playerPopScope(videoWidth, videoHeight) => Hero(
+        tag: heroTag,
+        child: PopScope(
+          canPop: isFullScreen.value != true,
+          onPopInvokedWithResult: (bool didPop, Object? result) {
+            if (isFullScreen.value == true) {
+              plPlayerController!.triggerFullScreen(status: false);
+            }
+            if (MediaQuery.of(context).orientation == Orientation.landscape &&
+                !horizontalScreen) {
+              verticalScreenForTwoSeconds();
+            }
+            if (didPop) {
+              triggerFloatingWindowWhenLeaving();
+            }
+          },
+          child: playerStack(videoWidth, videoHeight),
+        ),
       );
 
   Widget get relatedVideo =>
@@ -609,7 +614,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   Widget get videoReply => Obx(
         () => VideoReplyPanel(
-          key: const PageStorageKey<String>('评论'),
+          key: videoReplyPanelKey,
           bvid: videoDetailController.bvid,
           oid: videoDetailController.oid.value,
           heroTag: heroTag,
@@ -629,8 +634,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   Widget pullToFullScreen(Widget child) => CustomMaterialIndicator(
         onRefresh: () => plPlayerController!.triggerFullScreen(status: true),
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        indicatorBuilder: (context, controller) {
+        indicatorBuilder: (
+          BuildContext context,
+          IndicatorController controller,
+        ) {
           double progress = min(controller.value, 1.0);
           Color color = Theme.of(context).primaryColor.withOpacity(progress);
           return Padding(

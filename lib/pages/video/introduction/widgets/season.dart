@@ -113,7 +113,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
                   .buildShowBottomSheet();
             },
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: Row(
                 children: <Widget>[
                   Expanded(

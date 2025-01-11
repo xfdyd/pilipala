@@ -16,6 +16,7 @@ class ShutdownTimerService with WidgetsBindingObserver {
   bool waitForPlayingCompleted = false;
   bool isWaiting = false;
   bool isInBackground = false;
+  bool isTimerRunning = false;
   factory ShutdownTimerService() => _instance;
 
   ShutdownTimerService._internal() {
@@ -44,10 +45,12 @@ class ShutdownTimerService with WidgetsBindingObserver {
     SmartDialog.showToast("设置 $scheduledExitInMinutes 分钟后定时关闭");
     _shutdownTimer = Timer(
         Duration(minutes: scheduledExitInMinutes), () => _shutdownDecider());
+    isTimerRunning = true;
   }
 
   void _showTimeUpButPauseDialog() {
     SmartDialog.show(
+      useSystem: true,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: const Text('定时关闭'),
@@ -73,6 +76,7 @@ class ShutdownTimerService with WidgetsBindingObserver {
       return;
     }
     SmartDialog.show(
+      useSystem: true,
       builder: (BuildContext dialogContext) {
         // Start the 10-second timer to auto close the dialog
         _autoCloseDialogTimer?.cancel();
@@ -160,6 +164,7 @@ class ShutdownTimerService with WidgetsBindingObserver {
   void cancelShutdownTimer() {
     isWaiting = false;
     _shutdownTimer?.cancel();
+    isTimerRunning = false;
   }
 }
 

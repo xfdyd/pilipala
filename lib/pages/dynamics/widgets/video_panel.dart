@@ -1,11 +1,13 @@
 // 视频or合集
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/constants.dart';
 import 'package:PiliPalaX/common/widgets/badge.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 import 'package:PiliPalaX/utils/utils.dart';
 
+import '../../../common/widgets/overlay_pop.dart';
 import 'rich_node_panel.dart';
 
 Widget videoSeasonWidget(item, context, type, source, {floor = 1}) {
@@ -85,14 +87,32 @@ Widget videoSeasonWidget(item, context, type, source, {floor = 1}) {
             double width = box.maxWidth;
             return Stack(
               children: [
-                Hero(
-                  tag: content.bvid,
-                  child: NetworkImgLayer(
-                    type: null,
-                    width: width,
-                    height: width / StyleString.aspectRatio,
-                    src: content.cover,
-                    semanticsLabel: content.title,
+                GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onLongPress: () {
+                    // 弹窗显示封面
+                    SmartDialog.show(
+                      useSystem: true,
+                      alignment: Alignment.center,
+                      builder: (BuildContext context) {
+                        return OverlayPop(
+                          videoItem: content,
+                          closeFn: () {
+                            SmartDialog.dismiss();
+                          },
+                        );
+                      },
+                    );
+                  },
+                  child: Hero(
+                    tag: content.bvid,
+                    child: NetworkImgLayer(
+                      type: null,
+                      width: width,
+                      height: width / StyleString.aspectRatio,
+                      src: content.cover,
+                      semanticsLabel: content.title,
+                    ),
                   ),
                 ),
                 if (content.badge != null && type == 'pgc')

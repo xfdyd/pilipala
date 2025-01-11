@@ -66,13 +66,15 @@ class _PlaySettingState extends State<PlaySetting> {
       ),
       body: ListView(
         children: [
-          const SetSwitchItem(
+          SetSwitchItem(
             title: '弹幕开关',
             subTitle: '是否展示弹幕',
-            leading: Icon(Icons.comment_outlined),
+            leading: const Icon(Icons.comment_outlined),
             setKey: SettingBoxKey.enableShowDanmaku,
             defaultVal: true,
-            callFn: PlPlayerController.updateSettingsIfExist,
+            callFn: (_) {
+              PlPlayerController.updateSettingsIfExist();
+            },
           ),
           ListTile(
             dense: false,
@@ -87,7 +89,9 @@ class _PlaySettingState extends State<PlaySetting> {
             leading: Icon(MdiIcons.playPause),
             setKey: SettingBoxKey.autoPlayEnable,
             defaultVal: true,
-            callFn: PlPlayerController.updateSettingsIfExist,
+            callFn: (_) {
+              PlPlayerController.updateSettingsIfExist();
+            },
           ),
           const SetSwitchItem(
             title: '左右侧双击快退/快进',
@@ -189,7 +193,9 @@ class _PlaySettingState extends State<PlaySetting> {
             leading: Icon(MdiIcons.locationExit),
             setKey: SettingBoxKey.continuePlayInBackground,
             defaultVal: false,
-            callFn: PlPlayerController.updateSettingsIfExist,
+            callFn: (_) {
+              PlPlayerController.updateSettingsIfExist();
+            },
           ),
           const SetSwitchItem(
               title: '应用内小窗',

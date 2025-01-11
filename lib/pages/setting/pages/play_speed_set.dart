@@ -225,8 +225,8 @@ class _PlaySpeedPageState extends State<PlaySpeedPage> {
           children: [
             ListTile(
               dense: false,
-              title:
-                  Text('当前默认倍速', style: Theme.of(context).textTheme.titleMedium),
+              title: Text('当前默认倍速',
+                  style: Theme.of(context).textTheme.titleMedium),
               subtitle: Text(playSpeedDefault.toString()),
             ),
             SetSwitchItem(
@@ -252,16 +252,18 @@ class _PlaySpeedPageState extends State<PlaySpeedPage> {
                     subtitle: Text(longPressSpeedDefault.toString()),
                   )
                 : const SizedBox(),
-            const SetSwitchItem(
+            SetSwitchItem(
               title: '长按倍速递增',
               subTitle: '每长按半秒，倍速*1.15，最大8倍速',
               setKey: SettingBoxKey.enableLongPressSpeedIncrease,
               defaultVal: false,
-              callFn: PlPlayerController.updateSettingsIfExist,
+              callFn: (_) {
+                PlPlayerController.updateSettingsIfExist();
+              },
             ),
             Padding(
               padding:
-              const EdgeInsets.only(left: 14, right: 14, top: 6, bottom: 0),
+                  const EdgeInsets.only(left: 14, right: 14, top: 6, bottom: 0),
               child: Text(
                 '点击下方按钮设置默认倍速、默认长按倍速',
                 style: TextStyle(color: Theme.of(context).colorScheme.outline),

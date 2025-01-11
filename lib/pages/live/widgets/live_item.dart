@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/constants.dart';
 import 'package:PiliPalaX/models/live/item.dart';
 import 'package:PiliPalaX/utils/utils.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
+
+import '../../../common/widgets/overlay_pop.dart';
 
 // 视频卡片 - 垂直布局
 class LiveCardV extends StatelessWidget {
@@ -31,28 +34,44 @@ class LiveCardV extends StatelessWidget {
             longPress!();
           }
         },
+        onTap: () async {
+          Get.toNamed('/liveRoom?roomid=${liveItem.roomId}',
+              arguments: {'liveItem': liveItem, 'heroTag': heroTag});
+        },
         // onLongPressEnd: (details) {
         //   if (longPressEnd != null) {
         //     longPressEnd!();
         //   }
         // },
-        child: InkWell(
-          onTap: () async {
-            Get.toNamed('/liveRoom?roomid=${liveItem.roomId}',
-                arguments: {'liveItem': liveItem, 'heroTag': heroTag});
-          },
-          child: Column(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.all(StyleString.imgRadius),
-                child: AspectRatio(
-                  aspectRatio: StyleString.aspectRatio,
-                  child: LayoutBuilder(builder: (context, boxConstraints) {
-                    double maxWidth = boxConstraints.maxWidth;
-                    double maxHeight = boxConstraints.maxHeight;
-                    return Stack(
-                      children: [
-                        Hero(
+        child: Column(
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.all(StyleString.imgRadius),
+              child: AspectRatio(
+                aspectRatio: StyleString.aspectRatio,
+                child: LayoutBuilder(builder: (context, boxConstraints) {
+                  double maxWidth = boxConstraints.maxWidth;
+                  double maxHeight = boxConstraints.maxHeight;
+                  return Stack(
+                    children: [
+                      GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onLongPress: () {
+                          // 弹窗显示封面
+                          SmartDialog.show(
+                            useSystem: true,
+                            alignment: Alignment.center,
+                            builder: (BuildContext context) {
+                              return OverlayPop(
+                                videoItem: liveItem,
+                                closeFn: () {
+                                  SmartDialog.dismiss();
+                                },
+                              );
+                            },
+                          );
+                        },
+                        child: Hero(
                           tag: heroTag,
                           child: NetworkImgLayer(
                             src: liveItem.cover!,
@@ -60,26 +79,26 @@ class LiveCardV extends StatelessWidget {
                             height: maxHeight,
                           ),
                         ),
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          child: AnimatedOpacity(
-                            opacity: 1,
-                            duration: const Duration(milliseconds: 200),
-                            child: VideoStat(
-                              liveItem: liveItem,
-                            ),
+                      ),
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: AnimatedOpacity(
+                          opacity: 1,
+                          duration: const Duration(milliseconds: 200),
+                          child: VideoStat(
+                            liveItem: liveItem,
                           ),
                         ),
-                      ],
-                    );
-                  }),
-                ),
+                      ),
+                    ],
+                  );
+                }),
               ),
-              LiveContent(liveItem: liveItem)
-            ],
-          ),
+            ),
+            LiveContent(liveItem: liveItem)
+          ],
         ),
       ),
     );

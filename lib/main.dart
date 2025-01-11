@@ -31,6 +31,7 @@ import 'package:PiliPalaX/utils/recommend_filter.dart';
 import 'package:catcher_2/catcher_2.dart';
 import './services/loggeer.dart';
 import 'package:flex_seed_scheme/flex_seed_scheme.dart';
+// import 'package:flutter/scheduler.dart' show timeDilation;
 
 /// mainName must be the same as the method name
 // @pragma('vm:entry-point')
@@ -58,6 +59,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
   await GStorage.init();
+  // timeDilation = 10.0;
   if (GStorage.setting.get(SettingBoxKey.autoClearCache, defaultValue: false)) {
     await CacheManage.clearLibraryCache();
   }
@@ -235,6 +237,7 @@ class MyApp extends StatelessWidget {
           navigatorObservers: [
             VideoDetailPage.routeObserver,
             SearchPage.routeObserver,
+            FlutterSmartDialog.observer,
           ],
         );
       }),

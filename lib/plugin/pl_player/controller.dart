@@ -1229,15 +1229,12 @@ class PlPlayerController {
   // }
 
   set controls(bool visible) {
+    if (_showControls.value == visible) return;
     _showControls.value = visible;
     _timer?.cancel();
     if (visible) {
       _hideTaskControls();
     }
-  }
-
-  void hiddenControls(bool val) {
-    showControls.value = val;
   }
 
   /// 设置长按倍速状态 live模式下禁用
@@ -1282,10 +1279,11 @@ class PlPlayerController {
 
   // 应用内小窗
   bool triggerFloatingWindow(VideoIntroController? videoIntroController,
-      BangumiIntroController? bangumiIntroController) {
+      BangumiIntroController? bangumiIntroController, String heroTag) {
     if (videoController == null) {
       return false;
     }
+
     Widget iconButton(IconData icon, VoidCallback onPressed) {
       return Expanded(
         child: IconButton(
@@ -1340,32 +1338,35 @@ class PlPlayerController {
       height: floatingHeight,
       child: Column(
         children: [
-          SizedBox(
-            width: floatingWidth,
-            height: floatingHeight - extentHeight,
-            child: InkWell(
-              onTap: () {
-                if (videoIntroController != null) {
-                  videoIntroController.openVideoDetail();
-                } else if (bangumiIntroController != null) {
-                  bangumiIntroController.openVideoDetail();
-                } else {
-                  pauseIfExists();
-                }
-                floatingManager.closeFloating(globalId);
-              },
-              child: Video(
-                controller: videoController!,
-                controls: NoVideoControls,
-                pauseUponEnteringBackgroundMode:
-                    !_continuePlayInBackground.value,
-                resumeUponEnteringForegroundMode: true,
-                // 字幕尺寸调节
-                subtitleViewConfiguration: SubtitleViewConfiguration(
-                    style: subtitleStyle.value,
-                    padding:
-                        EdgeInsets.only(bottom: subtitleBottomPadding.value)),
-                fit: BoxFit.contain,
+          Hero(
+            tag: heroTag,
+            child: SizedBox(
+              width: floatingWidth,
+              height: floatingHeight - extentHeight,
+              child: InkWell(
+                onTap: () {
+                  if (videoIntroController != null) {
+                    videoIntroController.openVideoDetail();
+                  } else if (bangumiIntroController != null) {
+                    bangumiIntroController.openVideoDetail();
+                  } else {
+                    pauseIfExists();
+                  }
+                  floatingManager.closeFloating(globalId);
+                },
+                child: Video(
+                  controller: videoController!,
+                  controls: NoVideoControls,
+                  pauseUponEnteringBackgroundMode:
+                      !_continuePlayInBackground.value,
+                  resumeUponEnteringForegroundMode: true,
+                  // 字幕尺寸调节
+                  subtitleViewConfiguration: SubtitleViewConfiguration(
+                      style: subtitleStyle.value,
+                      padding:
+                          EdgeInsets.only(bottom: subtitleBottomPadding.value)),
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ),

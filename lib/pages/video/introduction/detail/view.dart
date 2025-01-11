@@ -283,10 +283,9 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                 ]
               ]),
               // 合集
-              if (!loadingStatus &&
-                  widget.videoDetail?.ugcSeason != null) ...[
+              if (!loadingStatus && widget.videoDetail?.ugcSeason != null) ...[
                 Obx(
-                      () => SeasonPanel(
+                  () => SeasonPanel(
                     heroTag: heroTag,
                     ugcSeason: widget.videoDetail!.ugcSeason!,
                     cid: videoIntroController.lastPlayCid.value != 0
@@ -294,18 +293,20 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                         : widget.videoDetail!.pages!.first.cid,
                     changeFuc: videoIntroController.changeSeasonOrbangu,
                   ),
-                )
+                ),
+                const SizedBox(height: 2),
               ],
               if (!loadingStatus &&
                   widget.videoDetail?.pages != null &&
                   widget.videoDetail!.pages!.length > 1) ...[
                 Obx(() => PagesPanel(
-                  heroTag: heroTag,
-                  pages: widget.videoDetail!.pages!,
-                  cid: videoIntroController.lastPlayCid.value,
-                  bvid: videoIntroController.bvid,
-                  changeFuc: videoIntroController.changeSeasonOrbangu,
-                ))
+                      heroTag: heroTag,
+                      pages: widget.videoDetail!.pages!,
+                      cid: videoIntroController.lastPlayCid.value,
+                      bvid: videoIntroController.bvid,
+                      changeFuc: videoIntroController.changeSeasonOrbangu,
+                    )),
+                const SizedBox(height: 2),
               ],
               ListTileTheme(
                 key: const PageStorageKey<String>('视频信息'),
@@ -319,6 +320,14 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   collapsedShape: const RoundedRectangleBorder(),
                   shape: const RoundedRectangleBorder(),
                   // showTrailingIcon: false,
+                  trailing: Column(children: [
+                    Icon(
+                      isExpanded
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
+                      color: t.colorScheme.outline,
+                    )
+                  ]),
                   onExpansionChanged: (bool expanded) {
                     feedBack();
                     setState(() {
@@ -333,18 +342,21 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       Clipboard.setData(ClipboardData(text: title));
                       SmartDialog.showToast("已复制标题：「$title」到剪贴板");
                     },
-                    child: Text(
-                      widget.videoDetail?.title ?? videoItem['title'] ?? "",
-                      // !loadingStatus
-                      //     ? "${widget.videoDetail?.title}"
-                      //     : videoItem['title'] ?? "",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        height: 1.3,
-                        fontWeight: FontWeight.w500,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                      child: Text(
+                        widget.videoDetail?.title ?? videoItem['title'] ?? "",
+                        // !loadingStatus
+                        //     ? "${widget.videoDetail?.title}"
+                        //     : videoItem['title'] ?? "",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          height: 1.5,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: isExpanded ?? isHorizontal ? 999 : 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: isExpanded ?? isHorizontal ? 999 : 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   subtitle: Row(

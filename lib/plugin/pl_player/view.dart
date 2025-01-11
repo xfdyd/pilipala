@@ -732,8 +732,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 // }
 
                 void floatingWindowTrigger() {
+                  String heroTag = videoIntroController?.heroTag ??
+                      bangumiIntroController?.heroTag ??
+                      '';
                   _.triggerFloatingWindow(
-                      videoIntroController, bangumiIntroController);
+                      videoIntroController, bangumiIntroController, heroTag);
 
                   popRouteStackContinuously = Get.currentRoute;
                   Get.until((route) =>

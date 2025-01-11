@@ -4,6 +4,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import '../../models/home/rcmd/result.dart';
 import '../../models/model_rec_video_item.dart';
+import 'overlay_pop.dart';
 import 'stat/danmu.dart';
 import 'stat/view.dart';
 import '../../http/dynamics.dart';
@@ -19,14 +20,14 @@ import 'video_popup_menu.dart';
 // 视频卡片 - 垂直布局
 class VideoCardV extends StatelessWidget {
   final dynamic videoItem;
-  final Function()? longPress;
-  final Function()? longPressEnd;
+  // final Function()? longPress;
+  // final Function()? longPressEnd;
 
   const VideoCardV({
     super.key,
     required this.videoItem,
-    this.longPress,
-    this.longPressEnd,
+    // this.longPress,
+    // this.longPressEnd,
   });
 
   bool isStringNumeric(String str) {
@@ -151,15 +152,8 @@ class VideoCardV extends StatelessWidget {
             margin: EdgeInsets.zero,
             child: GestureDetector(
               onLongPress: () {
-                if (longPress != null) {
-                  longPress!();
-                }
+                // longPress!();
               },
-              // onLongPressEnd: (details) {
-              //   if (longPressEnd != null) {
-              //     longPressEnd!();
-              //   }
-              // },
               child: InkWell(
                 onTap: () async => onPushDetail(heroTag),
                 child: Column(
@@ -169,14 +163,33 @@ class VideoCardV extends StatelessWidget {
                       child: LayoutBuilder(builder: (context, boxConstraints) {
                         double maxWidth = boxConstraints.maxWidth;
                         double maxHeight = boxConstraints.maxHeight;
+                        // print('heroTagV: $heroTag');
                         return Stack(
                           children: [
-                            Hero(
-                              tag: heroTag,
-                              child: NetworkImgLayer(
-                                src: videoItem.pic,
-                                width: maxWidth,
-                                height: maxHeight,
+                            GestureDetector (
+                              onLongPress: () {
+                                // 弹窗显示封面
+                                SmartDialog.show(
+                                  useSystem: true,
+                                  alignment: Alignment.center,
+                                  builder: (BuildContext context) {
+                                    return OverlayPop(
+                                      videoItem: videoItem,
+                                      closeFn: () {
+                                        SmartDialog.dismiss();
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                              behavior: HitTestBehavior.translucent,
+                              child: Hero(
+                                tag: heroTag,
+                                child: NetworkImgLayer(
+                                  src: videoItem.pic,
+                                  width: maxWidth,
+                                  height: maxHeight,
+                                ),
                               ),
                             ),
                             if (videoItem.duration > 0)
