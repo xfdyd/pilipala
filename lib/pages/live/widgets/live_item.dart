@@ -62,12 +62,7 @@ class LiveCardV extends StatelessWidget {
                             useSystem: true,
                             alignment: Alignment.center,
                             builder: (BuildContext context) {
-                              return OverlayPop(
-                                videoItem: liveItem,
-                                closeFn: () {
-                                  SmartDialog.dismiss();
-                                },
-                              );
+                              return OverlayPop(videoItem: liveItem);
                             },
                           );
                         },

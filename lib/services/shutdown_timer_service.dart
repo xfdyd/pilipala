@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:PiliPalaX/plugin/pl_player/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
 
 class ShutdownTimerService with WidgetsBindingObserver {
   static final ShutdownTimerService _instance =
@@ -60,7 +61,7 @@ class ShutdownTimerService with WidgetsBindingObserver {
               child: const Text('确认'),
               onPressed: () {
                 cancelShutdownTimer();
-                SmartDialog.dismiss();
+                Get.back();
               },
             ),
           ],
@@ -81,7 +82,7 @@ class ShutdownTimerService with WidgetsBindingObserver {
         // Start the 10-second timer to auto close the dialog
         _autoCloseDialogTimer?.cancel();
         _autoCloseDialogTimer = Timer(const Duration(seconds: 10), () {
-          SmartDialog.dismiss(); // Close the dialog
+          Get.back();
           _executeShutdown();
         });
         return AlertDialog(
@@ -91,16 +92,15 @@ class ShutdownTimerService with WidgetsBindingObserver {
             TextButton(
               child: const Text('取消关闭'),
               onPressed: () {
-                _autoCloseDialogTimer?.cancel(); // Cancel the auto-close timer
-                cancelShutdownTimer(); // Cancel the shutdown timer
-                SmartDialog.dismiss(); // Close the dialog
+                Get.back();
+                _autoCloseDialogTimer?.cancel();
+                cancelShutdownTimer();
               },
             ),
           ],
         );
       },
     ).then((_) {
-      // Cleanup when the dialog is dismissed
       _autoCloseDialogTimer?.cancel();
     });
   }

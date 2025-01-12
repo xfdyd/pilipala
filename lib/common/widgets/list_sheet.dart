@@ -37,7 +37,7 @@ class ListSheet {
               aid: aid,
               currentCid: currentCid,
               changeFucCall: changeFucCall,
-              onClose: SmartDialog.dismiss,
+              // onClose: SmartDialog.dismiss,
             ));
   }
 }
@@ -50,7 +50,7 @@ class ListSheetContent extends StatefulWidget {
     this.aid,
     required this.currentCid,
     required this.changeFucCall,
-    required this.onClose,
+    // required this.onClose,
   });
 
   final dynamic episodes;
@@ -58,7 +58,7 @@ class ListSheetContent extends StatefulWidget {
   final int? aid;
   final int currentCid;
   final Function changeFucCall;
-  final Function() onClose;
+  // final Function() onClose;
 
   @override
   State<ListSheetContent> createState() => _ListSheetContentState();
@@ -112,7 +112,8 @@ class _ListSheetContentState extends State<ListSheetContent> {
           }
         }
         SmartDialog.showToast('切换到：$title');
-        widget.onClose();
+        // widget.onClose();
+        Get.back();
         if (episode.runtimeType.toString() == "EpisodeItem") {
           widget.changeFucCall(episode.bvid, episode.cid, episode.aid);
         } else {
@@ -218,7 +219,7 @@ class _ListSheetContentState extends State<ListSheetContent> {
                 IconButton(
                   tooltip: '关闭',
                   icon: const Icon(Icons.close),
-                  onPressed: widget.onClose,
+                  onPressed: Get.back,
                 ),
               ],
             ),

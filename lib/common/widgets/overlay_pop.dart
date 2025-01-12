@@ -10,10 +10,9 @@ import '../constants.dart';
 import 'network_img_layer.dart';
 
 class OverlayPop extends StatelessWidget {
-  const OverlayPop({super.key, this.videoItem, this.closeFn});
+  const OverlayPop({super.key, this.videoItem});
 
   final dynamic videoItem;
-  final Function? closeFn;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +54,7 @@ class OverlayPop extends StatelessWidget {
                     style: ButtonStyle(
                       padding: WidgetStateProperty.all(EdgeInsets.zero),
                     ),
-                    onPressed: () => closeFn!(),
+                    onPressed: Get.back,
                     icon: const Icon(
                       Icons.close,
                       size: 18,

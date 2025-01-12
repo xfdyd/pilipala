@@ -174,12 +174,7 @@ class VideoCardV extends StatelessWidget {
                                 useSystem: true,
                                 alignment: Alignment.center,
                                 builder: (BuildContext context) {
-                                  return OverlayPop(
-                                    videoItem: videoItem,
-                                    closeFn: () {
-                                      SmartDialog.dismiss();
-                                    },
-                                  );
+                                  return OverlayPop(videoItem: videoItem);
                                 },
                               );
                             },

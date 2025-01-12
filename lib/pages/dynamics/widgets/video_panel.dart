@@ -95,12 +95,7 @@ Widget videoSeasonWidget(item, context, type, source, {floor = 1}) {
                       useSystem: true,
                       alignment: Alignment.center,
                       builder: (BuildContext context) {
-                        return OverlayPop(
-                          videoItem: content,
-                          closeFn: () {
-                            SmartDialog.dismiss();
-                          },
-                        );
+                        return OverlayPop(videoItem: content);
                       },
                     );
                   },

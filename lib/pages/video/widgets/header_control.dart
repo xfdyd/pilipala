@@ -161,7 +161,7 @@ class _HeaderControlState extends State<HeaderControl> {
                       key: const Key('onlyPlayAudio'),
                       icon: Icons.hourglass_top_outlined,
                       onTap: () {
-                        SmartDialog.dismiss();
+                        Get.back();
                         scheduleExit();
                       },
                       text: "定时关闭",
@@ -171,10 +171,10 @@ class _HeaderControlState extends State<HeaderControl> {
                     ActionRowLineItem(
                       icon: Icons.watch_later_outlined,
                       onTap: () async {
+                        Get.back();
                         final res = await UserHttp.toViewLater(
                             bvid: widget.videoDetailCtr!.bvid);
                         SmartDialog.showToast(res['msg']);
-                        SmartDialog.dismiss();
                       },
                       text: "稍后看",
                       selectStatus: false,
@@ -184,9 +184,10 @@ class _HeaderControlState extends State<HeaderControl> {
                       key: const Key('continuePlayInBackground'),
                       icon: Icons.refresh_outlined,
                       onTap: () {
-                        widget.controller!.setContinuePlayInBackground(null);
+                        Get.back();
+                        widget.videoDetailCtr!.queryVideoUrl();
                       },
-                      text: "重载视频",
+                      text: "刷新",
                       selectStatus: false,
                     ),
                   ]),
@@ -198,14 +199,15 @@ class _HeaderControlState extends State<HeaderControl> {
                     children: [
                       Obx(
                         () => ActionRowLineItem(
-                          key: const Key('flipX'),
-                          icon: Icons.flip,
+                          key: const Key('continuePlayInBackground'),
+                          icon: MdiIcons.locationExit,
                           onTap: () {
-                            widget.controller!.flipX.value =
-                                !widget.controller!.flipX.value;
+                            widget.controller!
+                                .setContinuePlayInBackground(null);
                           },
-                          text: "镜像翻转",
-                          selectStatus: widget.controller!.flipX.value,
+                          text: "后台续播",
+                          selectStatus:
+                              widget.controller!.continuePlayInBackground.value,
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -221,20 +223,19 @@ class _HeaderControlState extends State<HeaderControl> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      // const SizedBox(width: 10),
                       Obx(
                         () => ActionRowLineItem(
-                          key: const Key('continuePlayInBackground'),
-                          icon: MdiIcons.locationExit,
+                          key: const Key('flipX'),
+                          icon: Icons.flip,
                           onTap: () {
-                            widget.controller!
-                                .setContinuePlayInBackground(null);
+                            widget.controller!.flipX.value =
+                                !widget.controller!.flipX.value;
                           },
-                          text: "后台续播",
-                          selectStatus:
-                              widget.controller!.continuePlayInBackground.value,
+                          text: "镜像",
+                          selectStatus: widget.controller!.flipX.value,
                         ),
                       ),
+                      // const SizedBox(width: 10),
                     ],
                   ),
                 ),
@@ -516,7 +517,7 @@ class _HeaderControlState extends State<HeaderControl> {
                     style: subTitleStyle,
                   ),
                   onTap: () async {
-                    SmartDialog.dismiss();
+                    Get.back();
                     String? result = await showDialog(
                       context: context,
                       builder: (context) {
@@ -601,7 +602,7 @@ class _HeaderControlState extends State<HeaderControl> {
                           isSending = false; // 发送结束，更新状态
                         });
                         if (res['status']) {
-                          SmartDialog.dismiss();
+                          Get.back();
                           SmartDialog.showToast('发送成功');
                           // 发送成功，自动预览该弹幕，避免重新请求
                           // TODO: 暂停状态下预览弹幕仍会移动与计时，可考虑添加到dmSegList或其他方式实现
@@ -666,7 +667,7 @@ class _HeaderControlState extends State<HeaderControl> {
                             shutdownTimerService.scheduledExitInMinutes =
                                 choice;
                             shutdownTimerService.startShutdownTimer();
-                            SmartDialog.dismiss();
+                            Get.back();
                           },
                           contentPadding: const EdgeInsets.only(),
                           dense: true,
@@ -841,7 +842,7 @@ class _HeaderControlState extends State<HeaderControl> {
                                   .description;
                               setting.put(
                                   SettingBoxKey.defaultVideoQa, quality);
-                              SmartDialog.dismiss();
+                              Get.back();
                               SmartDialog.showToast(
                                   "默认画质由：$oldQualityDesc 变为：${VideoQualityCode.fromCode(quality)!.description}");
                               widget.videoDetailCtr!.updatePlayer();
@@ -920,7 +921,7 @@ class _HeaderControlState extends State<HeaderControl> {
                                             AudioQuality.values.last.code))!
                                 .description;
                             setting.put(SettingBoxKey.defaultAudioQa, quality);
-                            SmartDialog.dismiss();
+                            Get.back();
                             SmartDialog.showToast(
                                 "默认音质由：$oldQualityDesc 变为：${AudioQualityCode.fromCode(quality)!.description}");
                             widget.videoDetailCtr!.updatePlayer();
@@ -999,7 +1000,7 @@ class _HeaderControlState extends State<HeaderControl> {
                             widget.videoDetailCtr!.currentDecodeFormats =
                                 VideoDecodeFormatsCode.fromString(i)!;
                             widget.videoDetailCtr!.updatePlayer();
-                            SmartDialog.dismiss();
+                            Get.back();
                           },
                           dense: true,
                           contentPadding:
@@ -1115,7 +1116,7 @@ class _HeaderControlState extends State<HeaderControl> {
                             ),
                             onPressed: () {
                               // 弹出对话框
-                              SmartDialog.dismiss();
+                              Get.back();
                               showDialog(
                                 context: context,
                                 useSafeArea: true,
@@ -1454,7 +1455,7 @@ class _HeaderControlState extends State<HeaderControl> {
                         ListTile(
                           onTap: () {
                             widget.controller!.setPlayRepeat(i);
-                            SmartDialog.dismiss();
+                            Get.back();
                           },
                           dense: true,
                           contentPadding:
