@@ -147,70 +147,72 @@ class VideoCardV extends StatelessWidget {
             CustomSemanticsAction(label: item.title): item.onTap!,
         },
         child: Card(
-            elevation: 0,
-            clipBehavior: Clip.hardEdge,
-            margin: EdgeInsets.zero,
-            child: GestureDetector(
-              onLongPress: () {
-                // longPress!();
-              },
-              child: InkWell(
-                onTap: () async => onPushDetail(heroTag),
-                child: Column(
-                  children: [
-                    AspectRatio(
-                      aspectRatio: StyleString.aspectRatio,
-                      child: LayoutBuilder(builder: (context, boxConstraints) {
-                        double maxWidth = boxConstraints.maxWidth;
-                        double maxHeight = boxConstraints.maxHeight;
-                        // print('heroTagV: $heroTag');
-                        return Stack(
-                          children: [
-                            GestureDetector (
-                              onLongPress: () {
-                                // 弹窗显示封面
-                                SmartDialog.show(
-                                  useSystem: true,
-                                  alignment: Alignment.center,
-                                  builder: (BuildContext context) {
-                                    return OverlayPop(
-                                      videoItem: videoItem,
-                                      closeFn: () {
-                                        SmartDialog.dismiss();
-                                      },
-                                    );
-                                  },
-                                );
-                              },
-                              behavior: HitTestBehavior.translucent,
-                              child: Hero(
-                                tag: heroTag,
-                                child: NetworkImgLayer(
-                                  src: videoItem.pic,
-                                  width: maxWidth,
-                                  height: maxHeight,
-                                ),
+          color: Theme.of(context).colorScheme.surface.withOpacity(0.4),
+          elevation: 0,
+          clipBehavior: Clip.hardEdge,
+          margin: EdgeInsets.zero,
+          child: GestureDetector(
+            onLongPress: () {
+              // longPress!();
+            },
+            child: InkWell(
+              onTap: () async => onPushDetail(heroTag),
+              child: Column(
+                children: [
+                  AspectRatio(
+                    aspectRatio: StyleString.aspectRatio,
+                    child: LayoutBuilder(builder: (context, boxConstraints) {
+                      double maxWidth = boxConstraints.maxWidth;
+                      double maxHeight = boxConstraints.maxHeight;
+                      // print('heroTagV: $heroTag');
+                      return Stack(
+                        children: [
+                          GestureDetector(
+                            onLongPress: () {
+                              // 弹窗显示封面
+                              SmartDialog.show(
+                                useSystem: true,
+                                alignment: Alignment.center,
+                                builder: (BuildContext context) {
+                                  return OverlayPop(
+                                    videoItem: videoItem,
+                                    closeFn: () {
+                                      SmartDialog.dismiss();
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                            behavior: HitTestBehavior.translucent,
+                            child: Hero(
+                              tag: heroTag,
+                              child: NetworkImgLayer(
+                                src: videoItem.pic,
+                                width: maxWidth,
+                                height: maxHeight,
                               ),
                             ),
-                            if (videoItem.duration > 0)
-                              PBadge(
-                                bottom: 6,
-                                right: 7,
-                                size: 'small',
-                                type: 'gray',
-                                text: Utils.timeFormat(videoItem.duration),
-                                // semanticsLabel:
-                                //     '时长${Utils.durationReadFormat(Utils.timeFormat(videoItem.duration))}',
-                              )
-                          ],
-                        );
-                      }),
-                    ),
-                    VideoContent(videoItem: videoItem)
-                  ],
-                ),
+                          ),
+                          if (videoItem.duration > 0)
+                            PBadge(
+                              bottom: 6,
+                              right: 7,
+                              size: 'small',
+                              type: 'gray',
+                              text: Utils.timeFormat(videoItem.duration),
+                              // semanticsLabel:
+                              //     '时长${Utils.durationReadFormat(Utils.timeFormat(videoItem.duration))}',
+                            )
+                        ],
+                      );
+                    }),
+                  ),
+                  VideoContent(videoItem: videoItem)
+                ],
               ),
-            )),
+            ),
+          ),
+        ),
       ),
       if (videoItem.goto == 'av')
         Positioned(

@@ -682,10 +682,14 @@ class VideoIntroController extends GetxController {
 
   // 设置关注分组
   void setFollowGroup() {
-    Get.bottomSheet(
-      GroupPanel(mid: videoDetail.value.owner!.mid!),
-      isScrollControlled: true,
-    );
+    SmartDialog.show(
+        alignment: Get.context?.orientation != Orientation.landscape
+            ? Alignment.bottomRight
+            : Alignment.topRight,
+        useSystem: true,
+        builder: (BuildContext context) {
+          return GroupPanel(mid: videoDetail.value.owner!.mid!);
+        });
   }
 
   // ai总结

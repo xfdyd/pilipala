@@ -102,11 +102,20 @@ class _PlDanmakuState extends State<PlDanmaku> {
       Color? defaultColor = playerController.blockTypes.contains(6)
           ? Colors.white //DmUtils.decimalToColor(16777215)
           : null;
+      DanmakuItemType convertType(int type) {
+        if (PlDanmakuController.convertToScrollDanmaku &&
+            playerController.blockTypes.contains(type)) {
+          return DanmakuItemType.scroll;
+        } else {
+          return DmUtils.getPosition(type);
+        }
+      }
+
       currentDanmakuList
           .map((e) => _controller!.addDanmaku(DanmakuContentItem(
                 e.content,
                 color: defaultColor ?? DmUtils.decimalToColor(e.color),
-                type: DmUtils.getPosition(e.mode),
+                type: convertType(e.mode),
               )))
           .toList();
     }

@@ -167,9 +167,11 @@ class _BangumiInfoState extends State<BangumiInfo> {
   // 视频介绍
   showIntroDetail() {
     feedBack();
-    showBottomSheet(
-      context: context,
-      enableDrag: true,
+    SmartDialog.show(
+      alignment: MediaQuery.of(context).orientation == Orientation.portrait
+          ? Alignment.bottomRight
+          : Alignment.topRight,
+      useSystem: true,
       builder: (BuildContext context) {
         return BangumiIntroDetail(bangumiDetail: widget.bangumiDetail!);
       },
@@ -382,8 +384,8 @@ class _BangumiInfoState extends State<BangumiInfo> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
                 Obx(() => ActionItem(
-                  icon: const Icon(Icons.thumb_up_outlined),
-                  selectIcon: const Icon(Icons.thumb_up),
+                      icon: const Icon(Icons.thumb_up_outlined),
+                      selectIcon: const Icon(Icons.thumb_up),
                       onTap:
                           handleState(bangumiIntroController.actionLikeVideo),
                       selectStatus: bangumiIntroController.hasLike.value,

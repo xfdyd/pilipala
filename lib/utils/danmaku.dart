@@ -4,11 +4,12 @@ import 'package:canvas_danmaku/canvas_danmaku.dart';
 class DmUtils {
   static Color decimalToColor(int decimalColor) {
     // 16777215 表示白色
-    int red = (decimalColor >> 16) & 0xFF;
-    int green = (decimalColor >> 8) & 0xFF;
-    int blue = decimalColor & 0xFF;
-
-    return Color.fromARGB(255, red, green, blue);
+    // int red = (decimalColor >> 16) & 0xFF;
+    // int green = (decimalColor >> 8) & 0xFF;
+    // int blue = decimalColor & 0xFF;
+    //
+    // return Color.fromARGB(255, red, green, blue);
+    return Color(decimalColor);
   }
 
   static DanmakuItemType getPosition(int mode) {

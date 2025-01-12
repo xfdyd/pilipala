@@ -1,8 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:PiliPalaX/common/widgets/stat/danmu.dart';
 import 'package:PiliPalaX/common/widgets/stat/view.dart';
-
-import 'package:PiliPalaX/utils/utils.dart';
+import 'package:get/get.dart';
 
 class BangumiIntroDetail extends StatelessWidget {
   final dynamic bangumiDetail;
@@ -21,7 +22,8 @@ class BangumiIntroDetail extends StatelessWidget {
     return Container(
       color: Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.only(left: 14, right: 14),
-      height: Utils.getSheetHeight(context),
+      height: 500,
+      width: min(Get.width, 400),
       child: Column(
         children: [
           Container(

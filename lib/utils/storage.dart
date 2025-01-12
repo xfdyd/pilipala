@@ -201,6 +201,7 @@ class SettingBoxKey {
       strokeWidth = 'strokeWidth',
       fontWeight = 'fontWeight',
       danmakuMassiveMode = 'danmakuMassiveMode',
+      convertToScrollDanmaku = 'convertToScrollDanmaku',
 
       // 代理host port
       systemProxyHost = 'systemProxyHost',

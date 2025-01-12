@@ -8,6 +8,8 @@ class PlDanmakuController {
   final int cid;
   static int danmakuWeight = 0;
   static List<Map<String, dynamic>> danmakuFilter = [];
+  // 按类型屏蔽弹幕转为滚动弹幕
+  static bool convertToScrollDanmaku = true;
   PlDanmakuController(this.cid) {
     refresh();
   }
@@ -27,6 +29,8 @@ class PlDanmakuController {
         defaultValue: []).map<Map<String, dynamic>>((e) {
       return Map<String, dynamic>.from(e);
     }).toList();
+    convertToScrollDanmaku = GStorage.setting
+        .get(SettingBoxKey.convertToScrollDanmaku, defaultValue: true);
   }
 
   void initiate(int videoDuration, int progress) {
@@ -61,10 +65,9 @@ class PlDanmakuController {
     if (result.elems.isNotEmpty) {
       for (var element in result.elems) {
         int pos = element.progress ~/ 100; //每0.1秒存储一次
-        if (dmSegMap[pos] == null) {
-          dmSegMap[pos] = [];
-        }
-        dmSegMap[pos]!.add(element);
+        dmSegMap[pos] ??= [];
+        int i = dmSegMap[pos]!.indexWhere((e) => element.weight > e.weight);
+        (i > 0 ? dmSegMap[pos]!.insert : dmSegMap[pos]!.add)(i, element);
       }
     }
   }

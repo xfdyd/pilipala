@@ -27,6 +27,7 @@ class IntroDetail extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
+        const SizedBox(height: 4),
         Row(children: [
           if (videoDetail!.tname != null && videoDetail.tid != null)
             TextButton(
@@ -47,12 +48,12 @@ class IntroDetail extends StatelessWidget {
               // 移除按钮外边距
               style: ButtonStyle(
                 padding: WidgetStateProperty.all(
-                    const EdgeInsets.symmetric(vertical: 6, horizontal: 10)),
+                    const EdgeInsets.symmetric(vertical: 5, horizontal: 10)),
                 minimumSize: WidgetStateProperty.all(Size.zero),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 shape: WidgetStateProperty.all(
                   RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(10),
                     side: BorderSide(
                         width: 1, color: Theme.of(context).colorScheme.primary),
                   ),
@@ -187,9 +188,15 @@ class IntroDetail extends StatelessWidget {
 
   // ai总结
   showAiBottomSheet(context, modelResult) {
-    showBottomSheet(
-      context: context,
-      enableDrag: true,
+    // showBottomSheet(
+    //   context: context,
+    //   enableDrag: true,
+    //   builder: (BuildContext context) {
+    SmartDialog.show(
+      alignment: MediaQuery.of(context).orientation == Orientation.portrait
+          ? Alignment.bottomRight
+          : Alignment.topRight,
+      useSystem: true,
       builder: (BuildContext context) {
         return AiDetail(modelResult: modelResult);
       },

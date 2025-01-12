@@ -1583,6 +1583,8 @@ class PlPlayerController {
     setting.put(SettingBoxKey.strokeWidth, strokeWidth);
     setting.put(SettingBoxKey.fontWeight, fontWeight);
     setting.put(SettingBoxKey.danmakuMassiveMode, massiveMode);
+    setting.put(SettingBoxKey.convertToScrollDanmaku,
+        PlDanmakuController.convertToScrollDanmaku);
   }
 
   Future<void> dispose() async {

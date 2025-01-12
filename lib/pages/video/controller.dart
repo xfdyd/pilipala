@@ -66,9 +66,9 @@ class VideoDetailController extends GetxController
 
   RxInt oid = 0.obs;
   // 评论id 请求楼中楼评论使用
-  int fRpid = 0;
+  // int fRpid = 0;
 
-  ReplyItemModel? firstFloor;
+  // ReplyItemModel? firstFloor;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   RxString bgCover = ''.obs;
   PlPlayerController? plPlayerController;
@@ -170,27 +170,27 @@ class VideoDetailController extends GetxController
     }
   }
 
-  showReplyReplyPanel() {
-    replyReplyBottomSheetCtr =
-        scaffoldKey.currentState?.showBottomSheet((BuildContext context) {
-      // SmartDialog.show(
-      //     alignment: Alignment.bottomRight,
-      //     builder: (context) {
-      return VideoReplyReplyPanel(
-        oid: oid.value,
-        rpid: fRpid,
-        closePanel: () => {
-          fRpid = 0,
-        },
-        firstFloor: firstFloor,
-        replyType: ReplyType.video,
-        source: 'videoDetail',
-      );
-    });
-    replyReplyBottomSheetCtr?.closed.then((value) {
-      fRpid = 0;
-    });
-  }
+  // showReplyReplyPanel(BuildContext context) {
+  //   // replyReplyBottomSheetCtr =
+  //   //     scaffoldKey.currentState?.showBottomSheet((BuildContext context) {
+  //   SmartDialog.showAttach(
+  //       targetContext: context,
+  //       builder: (context) {
+  //         return VideoReplyReplyPanel(
+  //           oid: oid.value,
+  //           rpid: fRpid,
+  //           closePanel: () => {
+  //             fRpid = 0,
+  //           },
+  //           firstFloor: firstFloor,
+  //           replyType: ReplyType.video,
+  //           source: 'videoDetail',
+  //         );
+  //       });
+  //   // replyReplyBottomSheetCtr?.closed.then((value) {
+  //   //   fRpid = 0;
+  //   // });
+  // }
 
   /// 更新画质、音质
   /// TODO 继续进度播放

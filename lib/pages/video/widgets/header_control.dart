@@ -161,7 +161,7 @@ class _HeaderControlState extends State<HeaderControl> {
                       key: const Key('onlyPlayAudio'),
                       icon: Icons.hourglass_top_outlined,
                       onTap: () {
-                        Get.back();
+                        SmartDialog.dismiss();
                         scheduleExit();
                       },
                       text: "定时关闭",
@@ -174,7 +174,7 @@ class _HeaderControlState extends State<HeaderControl> {
                         final res = await UserHttp.toViewLater(
                             bvid: widget.videoDetailCtr!.bvid);
                         SmartDialog.showToast(res['msg']);
-                        Get.back();
+                        SmartDialog.dismiss();
                       },
                       text: "稍后看",
                       selectStatus: false,
@@ -516,7 +516,7 @@ class _HeaderControlState extends State<HeaderControl> {
                     style: subTitleStyle,
                   ),
                   onTap: () async {
-                    Get.back();
+                    SmartDialog.dismiss();
                     String? result = await showDialog(
                       context: context,
                       builder: (context) {
@@ -601,6 +601,7 @@ class _HeaderControlState extends State<HeaderControl> {
                           isSending = false; // 发送结束，更新状态
                         });
                         if (res['status']) {
+                          SmartDialog.dismiss();
                           SmartDialog.showToast('发送成功');
                           // 发送成功，自动预览该弹幕，避免重新请求
                           // TODO: 暂停状态下预览弹幕仍会移动与计时，可考虑添加到dmSegList或其他方式实现
@@ -609,7 +610,6 @@ class _HeaderControlState extends State<HeaderControl> {
                                   color: Colors.white,
                                   type: DanmakuItemType.scroll,
                                   selfSend: true));
-                          Get.back();
                         } else {
                           SmartDialog.showToast('发送失败，错误信息为${res['msg']}');
                         }
@@ -666,7 +666,7 @@ class _HeaderControlState extends State<HeaderControl> {
                             shutdownTimerService.scheduledExitInMinutes =
                                 choice;
                             shutdownTimerService.startShutdownTimer();
-                            Get.back();
+                            SmartDialog.dismiss();
                           },
                           contentPadding: const EdgeInsets.only(),
                           dense: true,
@@ -841,10 +841,10 @@ class _HeaderControlState extends State<HeaderControl> {
                                   .description;
                               setting.put(
                                   SettingBoxKey.defaultVideoQa, quality);
+                              SmartDialog.dismiss();
                               SmartDialog.showToast(
                                   "默认画质由：$oldQualityDesc 变为：${VideoQualityCode.fromCode(quality)!.description}");
                               widget.videoDetailCtr!.updatePlayer();
-                              Get.back();
                             },
                             dense: true,
                             // 可能包含会员解锁画质
@@ -920,10 +920,10 @@ class _HeaderControlState extends State<HeaderControl> {
                                             AudioQuality.values.last.code))!
                                 .description;
                             setting.put(SettingBoxKey.defaultAudioQa, quality);
+                            SmartDialog.dismiss();
                             SmartDialog.showToast(
                                 "默认音质由：$oldQualityDesc 变为：${AudioQualityCode.fromCode(quality)!.description}");
                             widget.videoDetailCtr!.updatePlayer();
-                            Get.back();
                           },
                           dense: true,
                           contentPadding:
@@ -999,7 +999,7 @@ class _HeaderControlState extends State<HeaderControl> {
                             widget.videoDetailCtr!.currentDecodeFormats =
                                 VideoDecodeFormatsCode.fromString(i)!;
                             widget.videoDetailCtr!.updatePlayer();
-                            Get.back();
+                            SmartDialog.dismiss();
                           },
                           dense: true,
                           contentPadding:
@@ -1062,6 +1062,8 @@ class _HeaderControlState extends State<HeaderControl> {
     int fontWeight = widget.controller!.fontWeight;
     // 海量模式
     bool massiveMode = widget.controller!.massiveMode;
+    // 按类型屏蔽弹幕转为滚动弹幕
+    bool convertToScrollDanmaku = PlDanmakuController.convertToScrollDanmaku;
 
     final DanmakuController danmakuController =
         widget.controller!.danmakuController!;
@@ -1113,7 +1115,7 @@ class _HeaderControlState extends State<HeaderControl> {
                             ),
                             onPressed: () {
                               // 弹出对话框
-                              Get.back();
+                              SmartDialog.dismiss();
                               showDialog(
                                 context: context,
                                 useSafeArea: true,
@@ -1155,7 +1157,23 @@ class _HeaderControlState extends State<HeaderControl> {
                         },
                       ),
                     ),
-                    const Text('按类型屏蔽'),
+                    Row(children: [
+                      const Text('按类型屏蔽'),
+                      const Spacer(),
+                      ActionRowLineItem(
+                        key: const Key('convertToScrollDanmaku'),
+                        onTap: () {
+                          convertToScrollDanmaku = !convertToScrollDanmaku;
+                          PlDanmakuController.convertToScrollDanmaku =
+                              convertToScrollDanmaku;
+                          widget.controller?.putDanmakuSettings();
+                          setState(() {});
+                        },
+                        icon: MdiIcons.formatClear,
+                        text: "屏蔽转滚动",
+                        selectStatus: convertToScrollDanmaku,
+                      ),
+                    ]),
                     Padding(
                       padding: const EdgeInsets.only(top: 12, bottom: 18),
                       child: Row(
@@ -1436,7 +1454,7 @@ class _HeaderControlState extends State<HeaderControl> {
                         ListTile(
                           onTap: () {
                             widget.controller!.setPlayRepeat(i);
-                            Get.back();
+                            SmartDialog.dismiss();
                           },
                           dense: true,
                           contentPadding:

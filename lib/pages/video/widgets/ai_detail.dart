@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -19,7 +21,8 @@ class AiDetail extends StatelessWidget {
     return Container(
       color: Theme.of(context).colorScheme.background,
       padding: const EdgeInsets.only(left: 14, right: 14),
-      height: Utils.getSheetHeight(context),
+      height: 500,
+      width: min(Get.width, 400),
       child: Column(
         children: [
           InkWell(

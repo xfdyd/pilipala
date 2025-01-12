@@ -73,9 +73,9 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height:
-          widget.source == 'videoDetail' ? Utils.getSheetHeight(context) : null,
-      color: Theme.of(context).colorScheme.background,
+      // height:
+      // widget.source == 'videoDetail' ? Utils.getSheetHeight(context) : null,
+      color: Theme.of(context).colorScheme.surface,
       child: Column(
         children: [
           if (widget.source == 'videoDetail')
@@ -90,9 +90,8 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                     tooltip: '关闭',
                     icon: const Icon(Icons.close, size: 20),
                     onPressed: () {
-                      _videoReplyReplyController.currentPage = 0;
                       widget.closePanel!();
-                      Navigator.pop(context);
+                      // Navigator.pop(context);
                     },
                   ),
                 ],
@@ -108,8 +107,8 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
               edgeOffset: 10.0,
               onRefresh: () async {
                 setState(() {});
-                _videoReplyReplyController.currentPage = 0;
-                return await _videoReplyReplyController.queryReplyList();
+                return await _videoReplyReplyController.queryReplyList(
+                    type: 'init');
               },
               child: CustomScrollView(
                 cacheExtent: 3500,

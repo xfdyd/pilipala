@@ -478,23 +478,23 @@ class Utils {
     return '$formattedHours:$formattedMinutes';
   }
 
-  static double getSheetHeight(BuildContext context) {
-    double height = context.height.abs();
-    double width = context.width.abs();
-    if (height > width) {
-      //return height * 0.7;
-      double paddingTop = MediaQueryData.fromView(
-              WidgetsBinding.instance.platformDispatcher.views.single)
-          .padding
-          .top;
-      print("paddingTop");
-      print(paddingTop);
-      paddingTop += width * 9 / 16;
-      return height - paddingTop;
-    }
-    //横屏状态
-    return height;
-  }
+  // static double getSheetHeight(BuildContext context) {
+  //   double height = context.height.abs();
+  //   double width = context.width.abs();
+  //   if (height > width) {
+  //     //return height * 0.7;
+  //     double paddingTop = MediaQueryData.fromView(
+  //             WidgetsBinding.instance.platformDispatcher.views.single)
+  //         .padding
+  //         .top;
+  //     print("paddingTop");
+  //     print(paddingTop);
+  //     paddingTop += width * 9 / 16;
+  //     return height - paddingTop;
+  //   }
+  //   //横屏状态
+  //   return height;
+  // }
 
   static String appSign(
       Map<String, dynamic> params, String appkey, String appsec) {

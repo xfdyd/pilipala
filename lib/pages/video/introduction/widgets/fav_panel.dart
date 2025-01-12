@@ -25,7 +25,7 @@ class _FavPanelState extends State<FavPanel> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: Utils.getSheetHeight(context),
+      height: 500,
       color: Theme.of(context).colorScheme.background,
       child: Column(
         children: [
