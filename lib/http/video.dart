@@ -668,10 +668,10 @@ class VideoHttp {
     }
   }
 
-  static Future subtitlesJson(
+  static Future videoMetaInfo(
       {String? aid, String? bvid, required int cid}) async {
     assert(aid != null || bvid != null);
-    var res = await Request().get(Api.subtitleUrl, data: {
+    var res = await Request().get(Api.videoMetaInfo, data: {
       if (aid != null) 'aid': aid,
       if (bvid != null) 'bvid': bvid,
       'cid': cid,

@@ -306,6 +306,7 @@ class _PlaySettingState extends State<PlaySetting> {
             leading: Icon(Icons.brightness_6_outlined),
             setKey: SettingBoxKey.setSystemBrightness,
             defaultVal: false,
+            needReboot: true,
           ),
           const SetSwitchItem(
             title: '后台音频服务',

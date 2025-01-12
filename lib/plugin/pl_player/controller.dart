@@ -565,7 +565,7 @@ class PlPlayerController {
       }
       await _initializePlayer(seekTo: seekTo);
       if (videoType.value != 'live' && _cid != 0) {
-        refreshSubtitles().then((_) {
+        refreshVideoMetaInfo().then((_) {
           chooseSubtitle();
         });
       }
@@ -1633,11 +1633,11 @@ class PlPlayerController {
     }
   }
 
-  Future refreshSubtitles() async {
+  Future refreshVideoMetaInfo() async {
     _vttSubtitles.clear();
-    Map res = await VideoHttp.subtitlesJson(bvid: _bvid, cid: _cid);
+    Map res = await VideoHttp.videoMetaInfo(bvid: _bvid, cid: _cid);
     if (!res["status"]) {
-      SmartDialog.showToast('查询字幕错误，${res["msg"]}');
+      SmartDialog.showToast('查询视频元信息（字幕、防挡、章节等）错误，${res["msg"]}');
     }
     if (res["data"].length == 0) {
       return;
