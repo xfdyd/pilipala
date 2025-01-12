@@ -67,7 +67,11 @@ class PlDanmakuController {
         int pos = element.progress ~/ 100; //每0.1秒存储一次
         dmSegMap[pos] ??= [];
         int i = dmSegMap[pos]!.indexWhere((e) => element.weight > e.weight);
-        (i > 0 ? dmSegMap[pos]!.insert : dmSegMap[pos]!.add)(i, element);
+        if (i > 0) {
+          dmSegMap[pos]!.insert(i, element);
+        } else {
+          dmSegMap[pos]!.add(element);
+        }
       }
     }
   }
