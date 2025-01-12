@@ -271,7 +271,7 @@ class ChatItem extends StatelessWidget {
                   bottomRight: Radius.circular(16),
                 ),
               ),
-              margin: const EdgeInsets.all(12),
+              margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 30),
               padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

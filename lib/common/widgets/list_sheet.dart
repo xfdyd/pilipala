@@ -171,7 +171,7 @@ class _ListSheetContentState extends State<ListSheetContent> {
         color: Theme.of(context).colorScheme.surface,
         borderRadius: const BorderRadius.all(Radius.circular(12)),
       ),
-      margin: const EdgeInsets.all(12),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 30),
       padding: const EdgeInsets.all(6),
       child: Column(
         children: [

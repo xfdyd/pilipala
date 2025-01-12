@@ -125,7 +125,7 @@ class _HeaderControlState extends State<HeaderControl> {
             color: Theme.of(context).colorScheme.surface,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
-          margin: const EdgeInsets.all(12),
+          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 30),
           padding: const EdgeInsets.all(12),
           child: SingleChildScrollView(
             child: Column(
@@ -643,13 +643,13 @@ class _HeaderControlState extends State<HeaderControl> {
             builder: (BuildContext context, StateSetter setState) {
           return Container(
             width: min(Get.width, 350),
-            height: 500,
+            height: 450,
             clipBehavior: Clip.hardEdge,
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.background,
               borderRadius: const BorderRadius.all(Radius.circular(12)),
             ),
-            margin: const EdgeInsets.all(12),
+            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 30),
             padding: const EdgeInsets.only(left: 14, right: 14),
             child: SingleChildScrollView(
               child: Padding(
@@ -793,7 +793,7 @@ class _HeaderControlState extends State<HeaderControl> {
             color: Theme.of(context).colorScheme.background,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
-          margin: const EdgeInsets.all(12),
+          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 30),
           child: Column(
             children: <Widget>[
               SizedBox(
@@ -896,7 +896,7 @@ class _HeaderControlState extends State<HeaderControl> {
             color: Theme.of(context).colorScheme.background,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
-          margin: const EdgeInsets.all(12),
+          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 30),
           child: Column(
             children: <Widget>[
               const SizedBox(
@@ -983,7 +983,7 @@ class _HeaderControlState extends State<HeaderControl> {
             color: Theme.of(context).colorScheme.background,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
-          margin: const EdgeInsets.all(12),
+          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 30),
           child: Column(
             children: [
               const SizedBox(
@@ -1084,7 +1084,7 @@ class _HeaderControlState extends State<HeaderControl> {
               color: Theme.of(context).colorScheme.background,
               borderRadius: const BorderRadius.all(Radius.circular(12)),
             ),
-            margin: const EdgeInsets.all(12),
+            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 30),
             padding: const EdgeInsets.only(left: 14, right: 14),
             child: SingleChildScrollView(
               child: SliderTheme(
@@ -1210,7 +1210,7 @@ class _HeaderControlState extends State<HeaderControl> {
                               text: i['label'],
                               selectStatus: blockTypes.contains(i['value']),
                             ),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 3),
                           ],
                         ],
                       ),
@@ -1441,7 +1441,7 @@ class _HeaderControlState extends State<HeaderControl> {
             color: Theme.of(context).colorScheme.background,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
-          margin: const EdgeInsets.all(12),
+          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 30),
           child: Column(
             children: [
               const SizedBox(
