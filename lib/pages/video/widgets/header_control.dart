@@ -118,7 +118,7 @@ class _HeaderControlState extends State<HeaderControl> {
       useSystem: true,
       builder: (BuildContext context) {
         return Container(
-          width: min(Get.width, 400),
+          width: min(Get.width, 350),
           height: 500,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
@@ -642,7 +642,7 @@ class _HeaderControlState extends State<HeaderControl> {
         return StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
           return Container(
-            width: min(Get.width, 400),
+            width: min(Get.width, 350),
             height: 500,
             clipBehavior: Clip.hardEdge,
             decoration: BoxDecoration(
@@ -786,7 +786,7 @@ class _HeaderControlState extends State<HeaderControl> {
       useSystem: true,
       builder: (BuildContext context) {
         return Container(
-          width: min(Get.width, 400),
+          width: min(Get.width, 350),
           height: min(totalQaSam * 50.0 + 45, 500),
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
@@ -889,7 +889,7 @@ class _HeaderControlState extends State<HeaderControl> {
       useSystem: true,
       builder: (BuildContext context) {
         return Container(
-          width: min(Get.width, 400),
+          width: min(Get.width, 350),
           height: 250,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
@@ -903,8 +903,8 @@ class _HeaderControlState extends State<HeaderControl> {
                   height: 45,
                   child: Center(child: Text('选择音质', style: titleStyle))),
               Expanded(
-                child: Material(
-                  child: ListView(
+                child: SingleChildScrollView(
+                  child: Column(
                     children: <Widget>[
                       for (final AudioItem i in audio) ...<Widget>[
                         ListTile(
@@ -976,7 +976,7 @@ class _HeaderControlState extends State<HeaderControl> {
       useSystem: true,
       builder: (BuildContext context) {
         return Container(
-          width: min(Get.width, 400),
+          width: min(Get.width, 350),
           height: 250,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
@@ -990,8 +990,8 @@ class _HeaderControlState extends State<HeaderControl> {
                   height: 45,
                   child: Center(child: Text('选择解码格式', style: titleStyle))),
               Expanded(
-                child: Material(
-                  child: ListView(
+                child: SingleChildScrollView(
+                  child: Column(
                     children: [
                       for (var i in list) ...[
                         ListTile(
@@ -1077,7 +1077,7 @@ class _HeaderControlState extends State<HeaderControl> {
         return StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
           return Container(
-            width: min(Get.width, 400),
+            width: min(Get.width, 350),
             height: 500,
             clipBehavior: Clip.hardEdge,
             decoration: BoxDecoration(
@@ -1434,7 +1434,7 @@ class _HeaderControlState extends State<HeaderControl> {
       useSystem: true,
       builder: (BuildContext context) {
         return Container(
-          width: min(Get.width, 400),
+          width: min(Get.width, 350),
           height: 300,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
@@ -1448,8 +1448,8 @@ class _HeaderControlState extends State<HeaderControl> {
                   height: 45,
                   child: Center(child: Text('选择播放顺序', style: titleStyle))),
               Expanded(
-                child: Material(
-                  child: ListView(
+                child: SingleChildScrollView(
+                  child: Column(
                     children: <Widget>[
                       for (final PlayRepeat i in PlayRepeat.values) ...[
                         ListTile(

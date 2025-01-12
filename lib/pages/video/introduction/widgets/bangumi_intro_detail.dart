@@ -23,7 +23,7 @@ class BangumiIntroDetail extends StatelessWidget {
       color: Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.only(left: 14, right: 14),
       height: 500,
-      width: min(Get.width, 400),
+      width: min(Get.width, 350),
       child: Column(
         children: [
           Container(

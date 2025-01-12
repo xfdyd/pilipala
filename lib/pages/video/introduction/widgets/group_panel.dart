@@ -55,7 +55,7 @@ class _GroupPanelState extends State<GroupPanel> {
   Widget build(BuildContext context) {
     return Container(
       height: 500,
-      width: min(Get.width, 400),
+      width: min(Get.width, 350),
       color: Theme.of(context).colorScheme.background,
       child: Column(
         children: <Widget>[
