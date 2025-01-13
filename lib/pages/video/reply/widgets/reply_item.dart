@@ -81,76 +81,149 @@ class ReplyItem extends StatelessWidget {
     );
   }
 
-  Widget lfAvtar(BuildContext context, String heroTag) {
-    return Stack(
-      children: [
-        Hero(
-          tag: heroTag,
-          child: NetworkImgLayer(
+  Widget lfAvatar(BuildContext context, String heroTag) {
+    List<Widget> stackChildren = [
+      Hero(
+        tag: heroTag,
+        child: NetworkImgLayer(
             src: replyItem!.member!.avatar,
             width: 34,
             height: 34,
-            type: 'avatar',
+            type: 'avatar'),
+      )
+    ];
+    if (replyItem!.member!.vip!['vipStatus'] > 0) {
+      stackChildren.add(Positioned(
+        bottom: 0,
+        right: 0,
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Theme.of(context).colorScheme.surface),
+            //color: Theme.of(context).colorScheme.surface,
+          ),
+          child: Image.asset(
+            'assets/images/big-vip.png',
+            height: 12,
+            semanticLabel: "大会员",
           ),
         ),
-        if (replyItem!.member!.vip!['vipStatus'] > 0)
-          Positioned(
-            right: 0,
-            bottom: 0,
-            child: Container(
-              decoration: BoxDecoration(
-                //borderRadius: BorderRadius.circular(7),
-                shape: BoxShape.circle,
-                color: Theme.of(context).colorScheme.background,
-              ),
-              child: Image.asset(
-                'assets/images/big-vip.png',
-                height: 14,
-                semanticLabel: "大会员",
-              ),
-            ),
+      ));
+    }
+    if (replyItem!.member!.officialVerify != null &&
+        replyItem!.member!.officialVerify!['type'] == 0) {
+      stackChildren.add(Positioned(
+        right: stackChildren.length == 1 ? 0 : null,
+        left: stackChildren.length == 2 ? 0 : null,
+        bottom: 0,
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Theme.of(context).colorScheme.surface,
           ),
-        //https://www.bilibili.com/blackboard/activity-whPrHsYJ2.html
-        if (replyItem!.member!.officialVerify != null &&
-            replyItem!.member!.officialVerify!['type'] == 0)
-          Positioned(
-            left: 0,
-            bottom: 0,
-            child: Container(
-              decoration: BoxDecoration(
-                // borderRadius: BorderRadius.circular(8),
-                shape: BoxShape.circle,
-                color: Theme.of(context).colorScheme.surface,
-              ),
-              child: const Icon(
-                Icons.offline_bolt,
-                color: Colors.yellow,
-                size: 14,
-                semanticLabel: "认证个人",
-              ),
-            ),
+          child: const Icon(
+            Icons.offline_bolt,
+            color: Colors.yellow,
+            size: 14,
+            semanticLabel: "认证个人",
           ),
-        if (replyItem!.member!.officialVerify != null &&
-            replyItem!.member!.officialVerify!['type'] == 1)
-          Positioned(
-            left: 0,
-            bottom: 0,
-            child: Container(
-              decoration: BoxDecoration(
-                // borderRadius: BorderRadius.circular(8),
-                shape: BoxShape.circle,
-                color: Theme.of(context).colorScheme.surface,
-              ),
-              child: const Icon(
-                Icons.offline_bolt,
-                color: Colors.lightBlueAccent,
-                size: 14,
-                semanticLabel: "认证机构",
-              ),
-            ),
+        ),
+      ));
+    }
+    if (replyItem!.member!.officialVerify != null &&
+        replyItem!.member!.officialVerify!['type'] == 1) {
+      stackChildren.add(Positioned(
+        right: stackChildren.length == 1 ? 0 : null,
+        left: stackChildren.length == 2 ? 0 : null,
+        bottom: 0,
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Theme.of(context).colorScheme.surface,
           ),
-      ],
+          child: const Icon(
+            Icons.offline_bolt,
+            color: Colors.lightBlueAccent,
+            size: 14,
+            semanticLabel: "认证个人",
+          ),
+        ),
+      ));
+    }
+
+    return Stack(
+      children: stackChildren,
     );
+    // return Stack(
+    //   children: [
+    //     Hero(
+    //       tag: heroTag,
+    //       child: NetworkImgLayer(
+    //         src: replyItem!.member!.avatar,
+    //         width: 34,
+    //         height: 34,
+    //         type: 'avatar',
+    //       ),
+    //     ),
+    //     if (replyItem!.member!.vip!['vipStatus'] > 0)
+    //       Positioned(
+    //         right: 0,
+    //         bottom: 0,
+    //         child: Container(
+    //           decoration: BoxDecoration(
+    //             shape: BoxShape.circle,
+    //             border:
+    //                 Border.all(color: Theme.of(context).colorScheme.surface),
+    //             //color: Theme.of(context).colorScheme.surface,
+    //           ),
+    //           child: Image.asset(
+    //             'assets/images/big-vip.png',
+    //             height: 12,
+    //             semanticLabel: "大会员",
+    //           ),
+    //         ),
+    //       ),
+    //     //https://www.bilibili.com/blackboard/activity-whPrHsYJ2.html
+    //     if (replyItem!.member!.officialVerify != null &&
+    //         replyItem!.member!.officialVerify!['type'] == 0)
+    //       Positioned(
+    //         left: 0,
+    //         bottom: 0,
+    //         child: Container(
+    //           decoration: BoxDecoration(
+    //             // borderRadius: BorderRadius.circular(8),
+    //             shape: BoxShape.circle,
+    //             color: Theme.of(context).colorScheme.surface,
+    //           ),
+    //           child: const Icon(
+    //             Icons.offline_bolt,
+    //             color: Colors.yellow,
+    //             size: 14,
+    //             semanticLabel: "认证个人",
+    //           ),
+    //         ),
+    //       ),
+    //     if (replyItem!.member!.officialVerify != null &&
+    //         replyItem!.member!.officialVerify!['type'] == 1)
+    //       Positioned(
+    //         left: 0,
+    //         bottom: 0,
+    //         child: Container(
+    //           decoration: BoxDecoration(
+    //             // borderRadius: BorderRadius.circular(8),
+    //             shape: BoxShape.circle,
+    //             color: Theme.of(context).colorScheme.surface,
+    //           ),
+    //           child: const Icon(
+    //             Icons.offline_bolt,
+    //             color: Colors.lightBlueAccent,
+    //             size: 14,
+    //             semanticLabel: "认证机构",
+    //           ),
+    //         ),
+    //       ),
+    //   ],
+    // );
   }
 
   Widget content(BuildContext context) {
@@ -173,7 +246,7 @@ class ReplyItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              lfAvtar(context, heroTag),
+              lfAvatar(context, heroTag),
               const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
