@@ -48,6 +48,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # TODO: 获取上一个workflow run运行状态以等待其artifact
+          # TODO: 包括上次失败workflow run中的提交
           workflow_runs=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
             "https://api.github.com/repos/${{ github.repository }}/actions/workflows/build-alpha.yml/runs?status=completed&per_page=2")
           previous_run_id=$(echo $workflow_runs | jq -r '.workflow_runs[0].id')
@@ -248,5 +249,5 @@ jobs:
           large_file: true
           method: sendFile
           path: PiliPalaX-*/*
-          parse_mode: Markdown
-          context: "*v${{ needs.prepare_publish_info.outputs.new_version }}:*\n${{ fromJson(needs.prepare_publish_info.outputs.included_commits) }}"      
+          parse_mode: HTML
+          context: "<b>v${{ needs.prepare_publish_info.outputs.new_version }}:</b>\n${{ fromJson(needs.prepare_publish_info.outputs.included_commits) }}"      
