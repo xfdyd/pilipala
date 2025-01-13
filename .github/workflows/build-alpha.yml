@@ -120,7 +120,7 @@ jobs:
     runs-on: ${{ matrix.build_os }}
     strategy:
       matrix:
-        target_platform: [android-arm, android-arm64, android-x64, android-universal, iOS]
+        target_platform: [android-split-per-abi, android-universal, iOS]
         include:
           - build_os: ubuntu-latest
           - target_platform: iOS
@@ -180,7 +180,7 @@ jobs:
 
       - name: flutter build apk (${{ matrix.target_platform }})
         if: startsWith(matrix.target_platform, 'android') && matrix.target_platform != 'android-universal'
-        run: flutter build apk --release --split-per-abi --target-platform=${{ matrix.target_platform }}
+        run: flutter build apk --release --split-per-abi 
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
