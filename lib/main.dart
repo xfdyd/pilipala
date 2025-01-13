@@ -237,7 +237,6 @@ class MyApp extends StatelessWidget {
           navigatorObservers: [
             VideoDetailPage.routeObserver,
             SearchPage.routeObserver,
-            FlutterSmartDialog.observer,
           ],
         );
       }),

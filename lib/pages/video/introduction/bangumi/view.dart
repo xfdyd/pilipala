@@ -17,6 +17,7 @@ import 'package:PiliPalaX/utils/feed_back.dart';
 
 import 'package:PiliPalaX/utils/utils.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import '../../../../common/widgets/my_dialog.dart';
 import 'controller.dart';
 import '../widgets/bangumi_intro_detail.dart';
 
@@ -167,15 +168,8 @@ class _BangumiInfoState extends State<BangumiInfo> {
   // 视频介绍
   showIntroDetail() {
     feedBack();
-    SmartDialog.show(
-      alignment: MediaQuery.of(context).orientation == Orientation.portrait
-          ? Alignment.bottomRight
-          : Alignment.topRight,
-      useSystem: true,
-      builder: (BuildContext context) {
-        return BangumiIntroDetail(bangumiDetail: widget.bangumiDetail!);
-      },
-    );
+    MyDialog.showCorner(
+        context, BangumiIntroDetail(bangumiDetail: widget.bangumiDetail!));
   }
 
   @override

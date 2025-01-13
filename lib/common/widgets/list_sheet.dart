@@ -7,6 +7,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../utils/storage.dart';
+import 'my_dialog.dart';
 
 class ListSheet {
   ListSheet({
@@ -26,19 +27,16 @@ class ListSheet {
   final BuildContext context;
 
   void buildShowBottomSheet() {
-    SmartDialog.show(
-        alignment: MediaQuery.of(context).orientation == Orientation.portrait
-            ? Alignment.bottomRight
-            : Alignment.topRight,
-        useSystem: true,
-        builder: (BuildContext context) => ListSheetContent(
-              episodes: episodes,
-              bvid: bvid,
-              aid: aid,
-              currentCid: currentCid,
-              changeFucCall: changeFucCall,
-              // onClose: SmartDialog.dismiss,
-            ));
+    MyDialog.showCorner(
+        context,
+        ListSheetContent(
+          episodes: episodes,
+          bvid: bvid,
+          aid: aid,
+          currentCid: currentCid,
+          changeFucCall: changeFucCall,
+          // onClose: SmartDialog.dismiss,
+        ));
   }
 }
 
@@ -130,20 +128,22 @@ class _ListSheetContentState extends State<ListSheetContent> {
       //         semanticLabel: "正在播放：",
       //       )
       //     : null,
-      title: Text(
-        title,
-        style: TextStyle(
-          fontSize: 14,
-          color: isCurrentIndex
-              ? primary
-              : Theme.of(context).colorScheme.onSurface,
-        ),
-        semanticsLabel: isCurrentIndex ? "正在播放：$title" : title,
-      ),
-      trailing: Row(
+      title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Expanded(
+              child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 14,
+              color: isCurrentIndex
+                  ? primary
+                  : Theme.of(context).colorScheme.onSurface,
+            ),
+            semanticsLabel: isCurrentIndex ? "正在播放：$title" : title,
+          )),
           if (episode.badge != null) ...[
+            const SizedBox(width: 10),
             if (episode.badge == '会员')
               Image.asset(
                 'assets/images/big-vip.png',
@@ -154,8 +154,13 @@ class _ListSheetContentState extends State<ListSheetContent> {
             const SizedBox(width: 10),
           ],
           if (!(episode.runtimeType.toString() == 'EpisodeItem' &&
-              (episode.longTitle != null && episode.longTitle != '')))
-            Text('${index + 1}/${widget.episodes!.length}'),
+              (episode.longTitle != null && episode.longTitle != ''))) ...[
+            const SizedBox(width: 10),
+            Text(
+              '${index + 1}/${widget.episodes!.length}',
+              style: const TextStyle(fontSize: 13),
+            ),
+          ]
         ],
       ),
     );
@@ -171,8 +176,8 @@ class _ListSheetContentState extends State<ListSheetContent> {
         color: Theme.of(context).colorScheme.surface,
         borderRadius: const BorderRadius.all(Radius.circular(12)),
       ),
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 30),
-      padding: const EdgeInsets.all(6),
+      // margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 30),
+      padding: const EdgeInsets.only(left: 6, top: 3, bottom: 10),
       child: Column(
         children: [
           Container(
@@ -226,6 +231,8 @@ class _ListSheetContentState extends State<ListSheetContent> {
           ),
           Divider(
             height: 1,
+            indent: 10,
+            endIndent: 20,
             color: Theme.of(context).dividerColor.withOpacity(0.1),
           ),
           const SizedBox(height: 1),
@@ -245,6 +252,8 @@ class _ListSheetContentState extends State<ListSheetContent> {
                 },
                 itemScrollController: itemScrollController,
                 separatorBuilder: (_, index) => Divider(
+                  indent: 18,
+                  endIndent: 25,
                   height: 1,
                   color: Theme.of(context).dividerColor.withOpacity(0.1),
                 ),

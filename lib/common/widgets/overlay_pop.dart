@@ -29,6 +29,7 @@ class OverlayPop extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 8),
           Stack(
             children: [
               NetworkImgLayer(
@@ -69,7 +70,7 @@ class OverlayPop extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
             child: Row(
               children: [
-                if (videoItem.title is String) ...[
+                if (videoItem.title is String)
                   Expanded(
                     child: SelectableText(
                       videoItem.title ?? '',
@@ -82,8 +83,8 @@ class OverlayPop extends StatelessWidget {
                       ),
                       // overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ] else ...[
+                  )
+                else
                   Expanded(
                     child: RichText(
                       overflow: TextOverflow.ellipsis,
@@ -110,29 +111,33 @@ class OverlayPop extends StatelessWidget {
                       ),
                     ),
                   ),
-                ],
                 if (videoItem.runtimeType.toString() != 'LiveItemModel')
-                  IconButton(
-                    tooltip: '稍后再看',
-                    icon: Icon(MdiIcons.clockTimeEightOutline, size: 20),
-                    onPressed: () async {
-                      var res = await UserHttp.toViewLater(
-                          bvid: videoItem.bvid as String);
-                      SmartDialog.showToast(res['msg']);
-                    },
+                  SizedBox(
+                    width: 30,
+                    child: IconButton(
+                      tooltip: '稍后再看',
+                      icon: Icon(MdiIcons.clockTimeEightOutline, size: 20),
+                      onPressed: () async {
+                        var res = await UserHttp.toViewLater(
+                            bvid: videoItem.bvid as String);
+                        SmartDialog.showToast(res['msg']);
+                      },
+                    ),
                   ),
                 const SizedBox(width: 4),
-                IconButton(
-                  tooltip: '保存封面图',
-                  onPressed: () async {
-                    await DownloadUtils.downloadImg(
-                      context,
-                      videoItem.pic ?? videoItem.cover ?? '',
-                    );
-                    // closeFn!();
-                  },
-                  icon: const Icon(Icons.download_outlined, size: 20),
-                )
+                SizedBox(
+                    width: 30,
+                    child: IconButton(
+                      tooltip: '保存封面图',
+                      onPressed: () async {
+                        await DownloadUtils.downloadImg(
+                          context,
+                          videoItem.pic ?? videoItem.cover ?? '',
+                        );
+                        // closeFn!();
+                      },
+                      icon: const Icon(Icons.download_outlined, size: 20),
+                    ))
               ],
             ),
           ),

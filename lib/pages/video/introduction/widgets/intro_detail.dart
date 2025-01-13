@@ -9,6 +9,7 @@ import 'package:PiliPalaX/pages/rank/zone/view.dart';
 
 import '../../../../http/video.dart';
 import '../../widgets/ai_detail.dart';
+import 'package:PiliPalaX/common/widgets/my_dialog.dart';
 
 class IntroDetail extends StatelessWidget {
   const IntroDetail({
@@ -192,14 +193,6 @@ class IntroDetail extends StatelessWidget {
     //   context: context,
     //   enableDrag: true,
     //   builder: (BuildContext context) {
-    SmartDialog.show(
-      alignment: MediaQuery.of(context).orientation == Orientation.portrait
-          ? Alignment.bottomRight
-          : Alignment.topRight,
-      useSystem: true,
-      builder: (BuildContext context) {
-        return AiDetail(modelResult: modelResult);
-      },
-    );
+    MyDialog.showCorner(context, AiDetail(modelResult: modelResult));
   }
 }

@@ -18,6 +18,8 @@ import 'package:html/parser.dart' as html_parser;
 
 import 'package:PiliPalaX/pages/video/introduction/widgets/group_panel.dart';
 
+import '../../common/widgets/my_dialog.dart';
+
 class MemberController extends GetxController with GetTickerProviderStateMixin {
   int? mid;
   MemberController({this.mid});
@@ -67,10 +69,10 @@ class MemberController extends GetxController with GetTickerProviderStateMixin {
   Future getWwebid() async {
     try {
       dynamic response =
-      await Request().get('${HttpString.spaceBaseUrl}/$mid/dynamic');
+          await Request().get('${HttpString.spaceBaseUrl}/$mid/dynamic');
       dom.Document document = html_parser.parse(response.data);
       dom.Element? scriptElement =
-      document.querySelector('script#__RENDER_DATA__');
+          document.querySelector('script#__RENDER_DATA__');
       wwebid = jsonDecode(
           Uri.decodeComponent(scriptElement?.text ?? ''))['access_id'];
     } catch (e) {
@@ -134,16 +136,15 @@ class MemberController extends GetxController with GetTickerProviderStateMixin {
                     specialFollowed = !specialFollowed;
                   }
                   Get.back();
+                  await delayedUpdateRelation();
                 },
                 child: Text(specialFollowed ? '移除特别关注' : '加入特别关注'),
               ),
               TextButton(
                 onPressed: () async {
-                  await Get.bottomSheet(
-                    GroupPanel(mid: mid),
-                    isScrollControlled: true,
-                  );
                   Get.back();
+                  await MyDialog.show(context, GroupPanel(mid: mid));
+                  await delayedUpdateRelation();
                 },
                 child: const Text('设置分组'),
               ),
@@ -160,6 +161,7 @@ class MemberController extends GetxController with GetTickerProviderStateMixin {
                   memberInfo.value.isFollowed = !memberInfo.value.isFollowed!;
                 }
                 Get.back();
+                await delayedUpdateRelation();
               },
               child: Text(memberInfo.value.isFollowed! ? '取消关注' : '关注'),
             ),
@@ -174,7 +176,6 @@ class MemberController extends GetxController with GetTickerProviderStateMixin {
         );
       },
     );
-    await delayedUpdateRelation();
   }
 
   // 关系查询
@@ -207,7 +208,11 @@ class MemberController extends GetxController with GetTickerProviderStateMixin {
       }
       if (res['data']['special'] == 1) {
         specialFollowed = true;
-        attributeText.value += ' 🔔';
+        if (attributeText.value == '已关注') {
+          attributeText.value = '已特关';
+        } else {
+          attributeText.value += ' 🔔';
+        }
       } else {
         specialFollowed = false;
       }

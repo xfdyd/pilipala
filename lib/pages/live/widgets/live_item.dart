@@ -6,6 +6,7 @@ import 'package:PiliPalaX/models/live/item.dart';
 import 'package:PiliPalaX/utils/utils.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 
+import '../../../common/widgets/my_dialog.dart';
 import '../../../common/widgets/overlay_pop.dart';
 
 // 视频卡片 - 垂直布局
@@ -58,13 +59,8 @@ class LiveCardV extends StatelessWidget {
                         behavior: HitTestBehavior.translucent,
                         onLongPress: () {
                           // 弹窗显示封面
-                          SmartDialog.show(
-                            useSystem: true,
-                            alignment: Alignment.center,
-                            builder: (BuildContext context) {
-                              return OverlayPop(videoItem: liveItem);
-                            },
-                          );
+                          MyDialog.show(
+                              context, OverlayPop(videoItem: liveItem));
                         },
                         child: Hero(
                           tag: heroTag,

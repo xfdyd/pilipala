@@ -177,23 +177,7 @@ dependency_overrides:
 #      ref: main
   fading_edge_scrollview: ^4.1.1
   rxdart: ^0.28.0
-  screen_brightness:
-    git:
-      url: https://github.com/aaassseee/screen_brightness.git
-      ref: develop
-      path: screen_brightness
-
-  screen_brightness_android:
-    git:
-      url: https://github.com/aaassseee/screen_brightness.git
-      ref: develop
-      path: screen_brightness_android
-
-  screen_brightness_ios:
-    git:
-      url: https://github.com/aaassseee/screen_brightness.git
-      ref: develop
-      path: screen_brightness_ios
+  screen_brightness: ^2.1.1
 #  media_kit:
 #    git:
 #      url: https://github.com/media-kit/media-kit.git

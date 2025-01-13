@@ -4,6 +4,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import '../../models/home/rcmd/result.dart';
 import '../../models/model_rec_video_item.dart';
+import 'my_dialog.dart';
 import 'overlay_pop.dart';
 import 'stat/danmu.dart';
 import 'stat/view.dart';
@@ -170,13 +171,8 @@ class VideoCardV extends StatelessWidget {
                           GestureDetector(
                             onLongPress: () {
                               // 弹窗显示封面
-                              SmartDialog.show(
-                                useSystem: true,
-                                alignment: Alignment.center,
-                                builder: (BuildContext context) {
-                                  return OverlayPop(videoItem: videoItem);
-                                },
-                              );
+                              MyDialog.show(
+                                  context, OverlayPop(videoItem: videoItem));
                             },
                             behavior: HitTestBehavior.translucent,
                             child: Hero(

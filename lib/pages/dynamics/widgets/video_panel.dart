@@ -7,6 +7,7 @@ import 'package:PiliPalaX/common/widgets/badge.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 import 'package:PiliPalaX/utils/utils.dart';
 
+import '../../../common/widgets/my_dialog.dart';
 import '../../../common/widgets/overlay_pop.dart';
 import 'rich_node_panel.dart';
 
@@ -91,13 +92,8 @@ Widget videoSeasonWidget(item, context, type, source, {floor = 1}) {
                   behavior: HitTestBehavior.translucent,
                   onLongPress: () {
                     // 弹窗显示封面
-                    SmartDialog.show(
-                      useSystem: true,
-                      alignment: Alignment.center,
-                      builder: (BuildContext context) {
-                        return OverlayPop(videoItem: content);
-                      },
-                    );
+                    MyDialog.show(
+                        context, OverlayPop(videoItem: content));
                   },
                   child: Hero(
                     tag: content.bvid,
