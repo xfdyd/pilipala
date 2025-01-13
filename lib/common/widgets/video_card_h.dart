@@ -56,6 +56,7 @@ class VideoCardH extends StatelessWidget {
               CustomSemanticsAction(label: item.title): item.onTap!,
           },
           child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onLongPress: longPress,
             onTap: () async {
               if (type == 'ketang') {
@@ -95,7 +96,8 @@ class VideoCardH extends StatelessWidget {
                               GestureDetector(
                                 onLongPress: () {
                                   // 弹窗显示封面
-                                  MyDialog.show(context, OverlayPop(videoItem: videoItem));
+                                  MyDialog.show(context,
+                                      OverlayPop(videoItem: videoItem));
                                 },
                                 behavior: HitTestBehavior.translucent,
                                 child: Hero(
