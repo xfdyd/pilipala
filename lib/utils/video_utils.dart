@@ -19,11 +19,15 @@ class VideoUtils {
     if (item is AudioItem) {
       if (GStorage.setting
           .get(SettingBoxKey.disableAudioCDN, defaultValue: true)) {
-        return item.backupUrl ?? item.baseUrl ?? "";
+        return item.backupUrl?.isNotEmpty == true
+            ? item.backupUrl!
+            : item.baseUrl ?? "";
       }
     }
     if (defaultCDNService == CDNService.baseUrl.code) {
-      return item.baseUrl ?? "";
+      return item.baseUrl?.isNotEmpty == true
+          ? item.baseUrl
+          : item.backupUrl ?? "";
     }
     if (item is CodecItem) {
       backupUrl = (item.urlInfo?.first.host)! +
@@ -33,20 +37,20 @@ class VideoUtils {
       backupUrl = item.backupUrl;
     }
     if (defaultCDNService == CDNService.backupUrl.code) {
-      return backupUrl ?? item.baseUrl ?? "";
+      return backupUrl?.isNotEmpty == true ? backupUrl : item.baseUrl ?? "";
     }
-    videoUrl = (backupUrl == null || isMCDNorPCDN(backupUrl))
+    videoUrl = (backupUrl?.isEmpty != false || isMCDNorPCDN(backupUrl!))
         ? item.baseUrl
         : backupUrl;
 
-    if (videoUrl == null) {
+    if (videoUrl?.isEmpty != false) {
       return "";
     }
     print("videoUrl:$videoUrl");
 
     String defaultCDNHost = CDNServiceCode.fromCode(defaultCDNService)!.host;
     print("defaultCDNHost:$defaultCDNHost");
-    if (videoUrl.contains("szbdyd.com")) {
+    if (videoUrl!.contains("szbdyd.com")) {
       String hostname =
           Uri.parse(videoUrl).queryParameters['xy_usource'] ?? defaultCDNHost;
       videoUrl =

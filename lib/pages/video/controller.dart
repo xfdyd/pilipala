@@ -420,6 +420,10 @@ class VideoDetailController extends GetxController
       firstVideo = videosList.firstWhere(
           (e) => e.codecs!.startsWith(currentDecodeFormats.code),
           orElse: () => videosList.first);
+      // List<Video> selectedVideos = videosList.where(
+      //       (e) => e.codecs!.startsWith(currentDecodeFormats.code),
+      // ).toList();
+
 
       // videoUrl = enableCDN
       //     ? VideoUtils.getCdnUrl(firstVideo)

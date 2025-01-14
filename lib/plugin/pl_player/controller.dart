@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 // import 'android_window.dart';
 import 'package:flutter_floating/floating/assist/floating_slide_type.dart';
 import 'package:flutter_floating/floating/floating.dart';
+import 'package:flutter_floating/floating/listener/event_listener.dart';
 import 'package:flutter_floating/floating/manager/floating_manager.dart';
 import 'package:flutter_floating/floating_increment.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -552,7 +553,7 @@ class PlPlayerController {
       // }
       // 配置Player 音轨、字幕等等
       _videoPlayerController = await _createVideoController(
-          dataSource, _looping, enableHA, hwdec, width, height);
+          dataSource, _looping, enableHA, hwdec, width, height, seekTo);
       // 获取视频时长 00:00
       _duration.value = duration ?? _videoPlayerController!.state.duration;
       updateDurationSecond();
@@ -563,7 +564,7 @@ class PlPlayerController {
       if (!_listenersInitialized) {
         startListeners();
       }
-      await _initializePlayer(seekTo: seekTo);
+      await _initializePlayer();
       if (videoType.value != 'live' && _cid != 0) {
         refreshVideoMetaInfo().then((_) {
           chooseSubtitle();
@@ -584,6 +585,7 @@ class PlPlayerController {
     String? hwdec,
     double? width,
     double? height,
+    Duration? seekTo,
   ) async {
     // 每次配置时先移除监听
     removeListeners();
@@ -669,12 +671,13 @@ class PlPlayerController {
           ? dataSource.videoSource!
           : "asset://${dataSource.videoSource!}";
       await player.open(
-        Media(assetUrl, httpHeaders: dataSource.httpHeaders),
+        Media(assetUrl, httpHeaders: dataSource.httpHeaders, start: seekTo),
         play: false,
       );
     } else {
       await player.open(
-        Media(dataSource.videoSource!, httpHeaders: dataSource.httpHeaders),
+        Media(dataSource.videoSource!,
+            httpHeaders: dataSource.httpHeaders, start: seekTo),
         play: false,
       );
     }
@@ -686,15 +689,15 @@ class PlPlayerController {
     return player;
   }
 
-  Future refreshPlayer() async {
+  Future<bool> refreshPlayer() async {
     Duration currentPos = _position.value;
     if (_videoPlayerController == null) {
       SmartDialog.showToast('视频播放器为空，请重新进入本页面');
-      return;
+      return false;
     }
     if (dataSource.videoSource?.isEmpty ?? true) {
       SmartDialog.showToast('视频源为空，请重新进入本页面');
-      return;
+      return false;
     }
     if (dataSource.audioSource?.isEmpty ?? true) {
       SmartDialog.showToast('音频源为空');
@@ -710,14 +713,16 @@ class PlPlayerController {
       Media(
         dataSource.videoSource!,
         httpHeaders: dataSource.httpHeaders,
+        start: currentPos,
       ),
       play: true,
     );
-    seekTo(currentPos);
+    return true;
+    // seekTo(currentPos);
   }
 
   // 开始播放
-  Future _initializePlayer({Duration seekTo = Duration.zero}) async {
+  Future _initializePlayer() async {
     if (_instance == null) return;
     // 设置倍速
     if (videoType.value == 'live') {
@@ -735,9 +740,9 @@ class PlPlayerController {
     // }
 
     // 跳转播放
-    if (seekTo != Duration.zero) {
-      await this.seekTo(seekTo);
-    }
+    // if (seekTo != Duration.zero) {
+    //   await this.seekTo(seekTo);
+    // }
 
     // 自动播放
     if (_autoPlay) {
@@ -838,6 +843,10 @@ class PlPlayerController {
         videoPlayerController!.stream.error.listen((String event) {
           // 直播的错误提示没有参考价值，均不予显示
           if (videoType.value == 'live') return;
+          if (event.startsWith("Failed to open .") ||
+              event.startsWith("Cannot open file ''")) {
+            SmartDialog.showToast('视频源为空');
+          }
           if (event.startsWith("Failed to open https://") ||
               event.startsWith("Can not open external file https://") ||
               //tcp: ffurl_read returned 0xdfb9b0bb
@@ -845,13 +854,15 @@ class PlPlayerController {
               event.startsWith('tcp: ffurl_read returned ')) {
             EasyThrottle.throttle('videoPlayerController!.stream.error.listen',
                 const Duration(milliseconds: 10000), () {
-              Future.delayed(const Duration(milliseconds: 3000), () {
+              Future.delayed(const Duration(milliseconds: 3000), () async {
                 print("isBuffering.value: ${isBuffering.value}");
                 print("_buffered.value: ${_buffered.value}");
                 if (isBuffering.value && _buffered.value == Duration.zero) {
-                  refreshPlayer();
                   SmartDialog.showToast('视频链接打开失败，重试中',
                       displayTime: const Duration(milliseconds: 500));
+                  if (!await refreshPlayer()) {
+                    print("failed");
+                  }
                 }
               });
             });
@@ -1457,6 +1468,18 @@ class PlPlayerController {
       ),
     );
     floatingWindow!.open(Get.context!);
+    var listener = FloatingEventListener()
+      ..closeListener = () {
+        VideoDetailController? videoDetailCtr;
+        try {
+          videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
+        } catch (_) {}
+        print("videoDetailCtr: $videoDetailCtr");
+        if (videoDetailCtr != null) {
+          videoDetailCtr.resumePlay = true;
+        }
+      };
+    floatingWindow!.addFloatingListener(listener);
     return true;
   }
 
