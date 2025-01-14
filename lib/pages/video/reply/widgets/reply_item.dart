@@ -145,7 +145,7 @@ class ReplyItem extends StatelessWidget {
             Icons.offline_bolt,
             color: Colors.lightBlueAccent,
             size: 14,
-            semanticLabel: "认证个人",
+            semanticLabel: "认证机构",
           ),
         ),
       ));
