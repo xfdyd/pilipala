@@ -1338,35 +1338,32 @@ class PlPlayerController {
       height: floatingHeight,
       child: Column(
         children: [
-          Hero(
-            tag: heroTag,
-            child: SizedBox(
-              width: floatingWidth,
-              height: floatingHeight - extentHeight,
-              child: InkWell(
-                onTap: () {
-                  if (videoIntroController != null) {
-                    videoIntroController.openVideoDetail();
-                  } else if (bangumiIntroController != null) {
-                    bangumiIntroController.openVideoDetail();
-                  } else {
-                    pauseIfExists();
-                  }
-                  floatingManager.closeFloating(globalId);
-                },
-                child: Video(
-                  controller: videoController!,
-                  controls: NoVideoControls,
-                  pauseUponEnteringBackgroundMode:
-                      !_continuePlayInBackground.value,
-                  resumeUponEnteringForegroundMode: true,
-                  // 字幕尺寸调节
-                  subtitleViewConfiguration: SubtitleViewConfiguration(
-                      style: subtitleStyle.value,
-                      padding:
-                          EdgeInsets.only(bottom: subtitleBottomPadding.value)),
-                  fit: BoxFit.contain,
-                ),
+          SizedBox(
+            width: floatingWidth,
+            height: floatingHeight - extentHeight,
+            child: InkWell(
+              onTap: () {
+                if (videoIntroController != null) {
+                  videoIntroController.openVideoDetail();
+                } else if (bangumiIntroController != null) {
+                  bangumiIntroController.openVideoDetail();
+                } else {
+                  pauseIfExists();
+                }
+                floatingManager.closeFloating(globalId);
+              },
+              child: Video(
+                controller: videoController!,
+                controls: NoVideoControls,
+                pauseUponEnteringBackgroundMode:
+                    !_continuePlayInBackground.value,
+                resumeUponEnteringForegroundMode: true,
+                // 字幕尺寸调节
+                subtitleViewConfiguration: SubtitleViewConfiguration(
+                    style: subtitleStyle.value,
+                    padding:
+                        EdgeInsets.only(bottom: subtitleBottomPadding.value)),
+                fit: BoxFit.contain,
               ),
             ),
           ),

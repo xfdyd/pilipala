@@ -350,9 +350,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // 离开当前页面时
   void didPushNext() async {
     // _bufferedListener?.cancel();
+    videoDetailController.defaultST = plPlayerController!.position.value;
     if (!triggerFloatingWindowWhenLeaving() &&
         !floatingManager.containsFloating(globalId)) {
-      videoDetailController.defaultST = plPlayerController!.position.value;
       videoIntroController.isPaused = true;
       plPlayerController!.pause();
       plPlayerController!.removeStatusLister(playerListener);
