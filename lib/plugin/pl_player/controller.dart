@@ -1476,7 +1476,7 @@ class PlPlayerController {
         } catch (_) {}
         print("videoDetailCtr: $videoDetailCtr");
         if (videoDetailCtr != null) {
-          videoDetailCtr.resumePlay = true;
+          videoDetailCtr.defaultST = position.value;
         }
       };
     floatingWindow!.addFloatingListener(listener);
