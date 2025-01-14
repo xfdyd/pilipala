@@ -532,6 +532,17 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             elevation: 0,
             scrolledUnderElevation: 0,
             backgroundColor: Colors.transparent,
+            title: IconButton(
+              tooltip: '回到主页',
+              icon: const Icon(Icons.home),
+              onPressed: () async {
+                if (mounted) {
+                  popRouteStackContinuously = Get.currentRoute;
+                  Get.until((route) => route.isFirst);
+                  popRouteStackContinuously = "";
+                }
+              },
+            ),
             actions: [
               IconButton(
                 tooltip: '稍后再看',
