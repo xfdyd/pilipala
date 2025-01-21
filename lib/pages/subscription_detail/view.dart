@@ -62,6 +62,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
+        cacheExtent: 3500,
         controller: _controller,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [

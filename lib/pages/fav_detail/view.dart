@@ -62,6 +62,7 @@ class _FavDetailPageState extends State<FavDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
+        cacheExtent: 3500,
         physics: const AlwaysScrollableScrollPhysics(),
         controller: _controller,
         slivers: [

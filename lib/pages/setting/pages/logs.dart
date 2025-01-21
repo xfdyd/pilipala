@@ -41,7 +41,8 @@ class _LogsPageState extends State<LogsPage> {
           .replaceAll('DEVICE INFO', '设备信息')
           .replaceAll('APP INFO', '应用信息')
           .replaceAll('ERROR', '错误信息')
-          .replaceAll('STACK TRACE', '错误堆栈');
+          .replaceAll('STACK TRACE', '错误堆栈')
+          .replaceAll('#', '＃');
     }).toList();
     List<Map<String, dynamic>> result = [];
     for (String i in contentList) {

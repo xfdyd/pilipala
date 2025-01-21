@@ -66,12 +66,15 @@ class _PlaySettingState extends State<PlaySetting> {
       ),
       body: ListView(
         children: [
-          const SetSwitchItem(
+          SetSwitchItem(
             title: '弹幕开关',
             subTitle: '是否展示弹幕',
-            leading: Icon(Icons.comment_outlined),
+            leading: const Icon(Icons.comment_outlined),
             setKey: SettingBoxKey.enableShowDanmaku,
             defaultVal: true,
+            callFn: (_) {
+              PlPlayerController.updateSettingsIfExist();
+            },
           ),
           ListTile(
             dense: false,
@@ -86,6 +89,9 @@ class _PlaySettingState extends State<PlaySetting> {
             leading: Icon(MdiIcons.playPause),
             setKey: SettingBoxKey.autoPlayEnable,
             defaultVal: true,
+            callFn: (_) {
+              PlPlayerController.updateSettingsIfExist();
+            },
           ),
           const SetSwitchItem(
             title: '左右侧双击快退/快进',
@@ -141,6 +147,7 @@ class _PlaySettingState extends State<PlaySetting> {
               );
               if (result != null) {
                 setting.put(SettingBoxKey.subtitlePreference, result);
+                PlPlayerController.updateSettingsIfExist();
                 defaultSubtitlePreference = result;
                 setState(() {});
               }
@@ -186,8 +193,8 @@ class _PlaySettingState extends State<PlaySetting> {
             leading: Icon(MdiIcons.locationExit),
             setKey: SettingBoxKey.continuePlayInBackground,
             defaultVal: false,
-            callFn: (val) {
-              SmartDialog.showToast('如果该设置未生效，请重启');
+            callFn: (_) {
+              PlPlayerController.updateSettingsIfExist();
             },
           ),
           const SetSwitchItem(
@@ -299,6 +306,7 @@ class _PlaySettingState extends State<PlaySetting> {
             leading: Icon(Icons.brightness_6_outlined),
             setKey: SettingBoxKey.setSystemBrightness,
             defaultVal: false,
+            needReboot: true,
           ),
           const SetSwitchItem(
             title: '后台音频服务',

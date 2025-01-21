@@ -6,7 +6,9 @@ import '../../http/search.dart';
 import '../../utils/utils.dart';
 import '../constants.dart';
 import 'badge.dart';
+import 'my_dialog.dart';
 import 'network_img_layer.dart';
+import 'overlay_pop.dart';
 import 'stat/danmu.dart';
 import 'stat/view.dart';
 import 'video_popup_menu.dart';
@@ -17,7 +19,7 @@ class VideoCardH extends StatelessWidget {
     super.key,
     required this.videoItem,
     this.longPress,
-    this.longPressEnd,
+    // this.longPressEnd,
     this.source = 'normal',
     this.showOwner = true,
     this.showView = true,
@@ -27,7 +29,7 @@ class VideoCardH extends StatelessWidget {
   // ignore: prefer_typing_uninitialized_variables
   final videoItem;
   final Function()? longPress;
-  final Function()? longPressEnd;
+  // final Function()? longPressEnd;
   final String source;
   final bool showOwner;
   final bool showView;
@@ -54,9 +56,20 @@ class VideoCardH extends StatelessWidget {
               CustomSemanticsAction(label: item.title): item.onTap!,
           },
           child: GestureDetector(
-            onLongPress: () {
-              if (longPress != null) {
-                longPress!();
+            behavior: HitTestBehavior.opaque,
+            onLongPress: longPress,
+            onTap: () async {
+              if (type == 'ketang') {
+                SmartDialog.showToast('课堂视频暂不支持播放');
+                return;
+              }
+              try {
+                final int cid = videoItem.cid ??
+                    await SearchHttp.ab2c(aid: aid, bvid: bvid);
+                Get.toNamed('/video?bvid=$bvid&cid=$cid',
+                    arguments: {'videoItem': videoItem, 'heroTag': heroTag});
+              } catch (err) {
+                SmartDialog.showToast(err.toString());
               }
             },
             // onLongPressEnd: (details) {
@@ -64,37 +77,30 @@ class VideoCardH extends StatelessWidget {
             //     longPressEnd!();
             //   }
             // },
-            child: InkWell(
-              onTap: () async {
-                if (type == 'ketang') {
-                  SmartDialog.showToast('课堂视频暂不支持播放');
-                  return;
-                }
-                try {
-                  final int cid = videoItem.cid ??
-                      await SearchHttp.ab2c(aid: aid, bvid: bvid);
-                  Get.toNamed('/video?bvid=$bvid&cid=$cid',
-                      arguments: {'videoItem': videoItem, 'heroTag': heroTag});
-                } catch (err) {
-                  SmartDialog.showToast(err.toString());
-                }
-              },
-              child: LayoutBuilder(
-                builder: (BuildContext context, BoxConstraints boxConstraints) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      AspectRatio(
-                        aspectRatio: StyleString.aspectRatio,
-                        child: LayoutBuilder(
-                          builder: (BuildContext context,
-                              BoxConstraints boxConstraints) {
-                            final double maxWidth = boxConstraints.maxWidth;
-                            final double maxHeight = boxConstraints.maxHeight;
-                            return Stack(
-                              children: [
-                                Hero(
+            child: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints boxConstraints) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    AspectRatio(
+                      aspectRatio: StyleString.aspectRatio,
+                      child: LayoutBuilder(
+                        builder: (BuildContext context,
+                            BoxConstraints boxConstraints) {
+                          final double maxWidth = boxConstraints.maxWidth;
+                          final double maxHeight = boxConstraints.maxHeight;
+                          // print('heroTagH: $heroTag');
+                          return Stack(
+                            children: [
+                              GestureDetector(
+                                onLongPress: () {
+                                  // 弹窗显示封面
+                                  MyDialog.show(context,
+                                      OverlayPop(videoItem: videoItem));
+                                },
+                                behavior: HitTestBehavior.translucent,
+                                child: Hero(
                                   tag: heroTag,
                                   child: NetworkImgLayer(
                                     src: videoItem.pic as String,
@@ -102,41 +108,41 @@ class VideoCardH extends StatelessWidget {
                                     height: maxHeight,
                                   ),
                                 ),
-                                if (videoItem.duration != 0)
-                                  PBadge(
-                                    text: Utils.timeFormat(videoItem.duration!),
-                                    right: 6.0,
-                                    bottom: 6.0,
-                                    type: 'gray',
-                                  ),
-                                if (type != 'video')
-                                  PBadge(
-                                    text: type,
-                                    left: 6.0,
-                                    bottom: 6.0,
-                                    type: 'primary',
-                                  ),
-                                // if (videoItem.rcmdReason != null &&
-                                //     videoItem.rcmdReason.content != '')
-                                //   pBadge(videoItem.rcmdReason.content, context,
-                                //       6.0, 6.0, null, null),
-                              ],
-                            );
-                          },
-                        ),
+                              ),
+                              if (videoItem.duration != 0)
+                                PBadge(
+                                  text: Utils.timeFormat(videoItem.duration!),
+                                  right: 6.0,
+                                  bottom: 6.0,
+                                  type: 'gray',
+                                ),
+                              if (type != 'video')
+                                PBadge(
+                                  text: type,
+                                  left: 6.0,
+                                  bottom: 6.0,
+                                  type: 'primary',
+                                ),
+                              // if (videoItem.rcmdReason != null &&
+                              //     videoItem.rcmdReason.content != '')
+                              //   pBadge(videoItem.rcmdReason.content, context,
+                              //       6.0, 6.0, null, null),
+                            ],
+                          );
+                        },
                       ),
-                      VideoContent(
-                        videoItem: videoItem,
-                        source: source,
-                        showOwner: showOwner,
-                        showView: showView,
-                        showDanmaku: showDanmaku,
-                        showPubdate: showPubdate,
-                      )
-                    ],
-                  );
-                },
-              ),
+                    ),
+                    VideoContent(
+                      videoItem: videoItem,
+                      source: source,
+                      showOwner: showOwner,
+                      showView: showView,
+                      showDanmaku: showDanmaku,
+                      showPubdate: showPubdate,
+                    )
+                  ],
+                );
+              },
             ),
           )),
       if (source == 'normal')

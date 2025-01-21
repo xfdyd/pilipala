@@ -65,6 +65,7 @@ class _FavPageState extends State<FavPage> {
             Map data = snapshot.data as Map;
             if (data['status']) {
               return Obx(() => CustomScrollView(
+                  cacheExtent: 3500,
                       controller: scrollController,
                       physics: const AlwaysScrollableScrollPhysics(),
                       slivers: [

@@ -95,6 +95,7 @@ class _DynamicsTabPageState extends State<DynamicsTabPage>
           ]);
         },
         child: CustomScrollView(
+          cacheExtent: 3500,
           physics: const AlwaysScrollableScrollPhysics(),
           controller: _dynamicsTabController.scrollController,
           slivers: [

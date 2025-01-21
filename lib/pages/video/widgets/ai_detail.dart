@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -5,6 +7,8 @@ import 'package:get/get.dart';
 import 'package:PiliPalaX/models/video/ai.dart';
 import 'package:PiliPalaX/pages/video/index.dart';
 import 'package:PiliPalaX/utils/utils.dart';
+
+import '../../../plugin/pl_player/controller.dart';
 
 class AiDetail extends StatelessWidget {
   final ModelResult? modelResult;
@@ -17,139 +21,107 @@ class AiDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.only(left: 14, right: 14),
-      height: Utils.getSheetHeight(context),
-      child: Column(
-        children: [
-          InkWell(
-            onTap: () => Get.back(),
-            child: Container(
-              height: 35,
-              padding: const EdgeInsets.only(bottom: 2),
-              child: Center(
-                child: Container(
-                  width: 32,
-                  height: 3,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary,
-                    borderRadius: const BorderRadius.all(Radius.circular(3)),
-                  ),
-                ),
+      height: 500,
+      width: min(Get.width, 500),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Text(
+              modelResult!.summary!,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                height: 1.5,
               ),
             ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Text(
-                    modelResult!.summary!,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      height: 1.5,
+            const SizedBox(height: 20),
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: modelResult!.outline!.length,
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                return Column(
+                  children: [
+                    Text(
+                      modelResult!.outline![index].title!,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        height: 1.5,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: modelResult!.outline!.length,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return Column(
-                        children: [
-                          Text(
-                            modelResult!.outline![index].title!,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              height: 1.5,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: modelResult!
-                                .outline![index].partOutline!.length,
-                            itemBuilder: (context, i) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Wrap(
+                    const SizedBox(height: 6),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount:
+                          modelResult!.outline![index].partOutline!.length,
+                      itemBuilder: (context, i) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Wrap(
+                              children: [
+                                RichText(
+                                  text: TextSpan(
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onBackground,
+                                      height: 1.5,
+                                    ),
                                     children: [
-                                      RichText(
-                                        text: TextSpan(
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onBackground,
-                                            height: 1.5,
-                                          ),
-                                          children: [
-                                            TextSpan(
-                                              text: Utils.tampToSeektime(
-                                                  modelResult!
-                                                      .outline![index]
-                                                      .partOutline![i]
-                                                      .timestamp!),
-                                              style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
-                                              ),
-                                              recognizer: TapGestureRecognizer()
-                                                ..onTap = () {
-                                                  // 跳转到指定位置
-                                                  try {
-                                                    Get.find<VideoDetailController>(
-                                                            tag: Get.arguments[
-                                                                'heroTag'])
-                                                        .plPlayerController!
-                                                        .seekTo(
-                                                          Duration(
-                                                            seconds:
-                                                                Utils.duration(
-                                                              Utils.tampToSeektime(modelResult!
-                                                                      .outline![
-                                                                          index]
-                                                                      .partOutline![
-                                                                          i]
-                                                                      .timestamp!)
-                                                                  .toString(),
-                                                            ),
-                                                          ),
-                                                        );
-                                                  } catch (_) {}
-                                                },
-                                            ),
-                                            const TextSpan(text: ' '),
-                                            TextSpan(
-                                                text: modelResult!
-                                                    .outline![index]
-                                                    .partOutline![i]
-                                                    .content!),
-                                          ],
+                                      TextSpan(
+                                        text: Utils.tampToSeektime(modelResult!
+                                            .outline![index]
+                                            .partOutline![i]
+                                            .timestamp!),
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
                                         ),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            // 跳转到指定位置
+                                            PlPlayerController.seekToIfExists(
+                                                Duration(
+                                                  seconds: Utils.duration(
+                                                    Utils.tampToSeektime(
+                                                            modelResult!
+                                                                .outline![index]
+                                                                .partOutline![i]
+                                                                .timestamp!)
+                                                        .toString(),
+                                                  ),
+                                                ),
+                                                type: 'slider');
+                                          },
                                       ),
+                                      const TextSpan(text: ' '),
+                                      TextSpan(
+                                          text: modelResult!.outline![index]
+                                              .partOutline![i].content!),
                                     ],
                                   ),
-                                ],
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 20),
-                        ],
-                      );
-                    },
-                  )
-                ],
-              ),
-            ),
-          ),
-        ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                );
+              },
+            )
+          ],
+        ),
       ),
     );
   }

@@ -50,7 +50,7 @@ dependencies:
   # 图片
   cached_network_image: ^3.4.1
   extended_image: ^8.2.0
-  saver_gallery: ^4.0.0
+  saver_gallery: ^4.0.1
 
   # QRCode
   qr_flutter: ^4.1.0
@@ -170,16 +170,20 @@ dependencies:
   flex_seed_scheme: ^3.4.1
 #  android_window: ^0.4.0
 dependency_overrides:
-  mime:
-    git: https://github.com/orz12/mime.git
+#  mime:
+#    git:
+#      url: https://github.com/dart-lang/tools.git
+#      path: pkgs/mime
+#      ref: main
   fading_edge_scrollview: ^4.1.1
   rxdart: ^0.28.0
-  screen_brightness: ^2.0.1
+  screen_brightness: ^2.1.1
 #  media_kit:
 #    git:
 #      url: https://github.com/media-kit/media-kit.git
 #      ref: main
 #      path: media_kit
+  custom_refresh_indicator: ^4.0.1
 
 dev_dependencies:
   flutter_test:

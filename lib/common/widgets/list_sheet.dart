@@ -1,10 +1,13 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../utils/storage.dart';
-import '../../utils/utils.dart';
+import 'my_dialog.dart';
 
 class ListSheet {
   ListSheet({
@@ -23,19 +26,17 @@ class ListSheet {
   final Function changeFucCall;
   final BuildContext context;
 
-  late PersistentBottomSheetController bottomSheetController;
-
   void buildShowBottomSheet() {
-    bottomSheetController = showBottomSheet(
-        context: context,
-        builder: (context) => ListSheetContent(
-              episodes: episodes,
-              bvid: bvid,
-              aid: aid,
-              currentCid: currentCid,
-              changeFucCall: changeFucCall,
-              onClose: bottomSheetController.close,
-            ));
+    MyDialog.showCorner(
+        context,
+        ListSheetContent(
+          episodes: episodes,
+          bvid: bvid,
+          aid: aid,
+          currentCid: currentCid,
+          changeFucCall: changeFucCall,
+          // onClose: SmartDialog.dismiss,
+        ));
   }
 }
 
@@ -47,7 +48,7 @@ class ListSheetContent extends StatefulWidget {
     this.aid,
     required this.currentCid,
     required this.changeFucCall,
-    required this.onClose,
+    // required this.onClose,
   });
 
   final dynamic episodes;
@@ -55,7 +56,7 @@ class ListSheetContent extends StatefulWidget {
   final int? aid;
   final int currentCid;
   final Function changeFucCall;
-  final Function() onClose;
+  // final Function() onClose;
 
   @override
   State<ListSheetContent> createState() => _ListSheetContentState();
@@ -109,35 +110,40 @@ class _ListSheetContentState extends State<ListSheetContent> {
           }
         }
         SmartDialog.showToast('切换到：$title');
-        widget.onClose();
+        // widget.onClose();
+        Get.back();
         if (episode.runtimeType.toString() == "EpisodeItem") {
           widget.changeFucCall(episode.bvid, episode.cid, episode.aid);
         } else {
           widget.changeFucCall(widget.bvid!, episode.cid, widget.aid!);
         }
       },
-      dense: false,
-      leading: isCurrentIndex
-          ? Image.asset(
-              'assets/images/live.png',
-              color: primary,
-              height: 12,
-              semanticLabel: "正在播放：",
-            )
-          : null,
-      title: Text(
-        title,
-        style: TextStyle(
-          fontSize: 14,
-          color: isCurrentIndex
-              ? primary
-              : Theme.of(context).colorScheme.onSurface,
-        ),
-      ),
-      trailing: Row(
+      selected: isCurrentIndex,
+      // dense: false,
+      // leading: isCurrentIndex
+      //     ? Image.asset(
+      //         'assets/images/live.png',
+      //         color: primary,
+      //         height: 12,
+      //         semanticLabel: "正在播放：",
+      //       )
+      //     : null,
+      title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Expanded(
+              child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 14,
+              color: isCurrentIndex
+                  ? primary
+                  : Theme.of(context).colorScheme.onSurface,
+            ),
+            semanticsLabel: isCurrentIndex ? "正在播放：$title" : title,
+          )),
           if (episode.badge != null) ...[
+            const SizedBox(width: 10),
             if (episode.badge == '会员')
               Image.asset(
                 'assets/images/big-vip.png',
@@ -148,8 +154,13 @@ class _ListSheetContentState extends State<ListSheetContent> {
             const SizedBox(width: 10),
           ],
           if (!(episode.runtimeType.toString() == 'EpisodeItem' &&
-              (episode.longTitle != null && episode.longTitle != '')))
-            Text('${index + 1}/${widget.episodes!.length}'),
+              (episode.longTitle != null && episode.longTitle != ''))) ...[
+            const SizedBox(width: 10),
+            Text(
+              '${index + 1}/${widget.episodes!.length}',
+              style: const TextStyle(fontSize: 13),
+            ),
+          ]
         ],
       ),
     );
@@ -158,8 +169,15 @@ class _ListSheetContentState extends State<ListSheetContent> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: Utils.getSheetHeight(context),
-      color: Theme.of(context).colorScheme.surface,
+      height: 500,
+      width: min(Get.width, 500),
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.all(Radius.circular(12)),
+      ),
+      // margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 30),
+      padding: const EdgeInsets.only(left: 6, top: 3, bottom: 10),
       child: Column(
         children: [
           Container(
@@ -206,15 +224,18 @@ class _ListSheetContentState extends State<ListSheetContent> {
                 IconButton(
                   tooltip: '关闭',
                   icon: const Icon(Icons.close),
-                  onPressed: widget.onClose,
+                  onPressed: Get.back,
                 ),
               ],
             ),
           ),
           Divider(
             height: 1,
+            indent: 10,
+            endIndent: 20,
             color: Theme.of(context).dividerColor.withOpacity(0.1),
           ),
+          const SizedBox(height: 1),
           Expanded(
             child: Material(
               child: ScrollablePositionedList.separated(
@@ -231,6 +252,8 @@ class _ListSheetContentState extends State<ListSheetContent> {
                 },
                 itemScrollController: itemScrollController,
                 separatorBuilder: (_, index) => Divider(
+                  indent: 18,
+                  endIndent: 25,
                   height: 1,
                   color: Theme.of(context).dividerColor.withOpacity(0.1),
                 ),

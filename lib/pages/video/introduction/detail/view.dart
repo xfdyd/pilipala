@@ -283,10 +283,9 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                 ]
               ]),
               // 合集
-              if (!loadingStatus &&
-                  widget.videoDetail?.ugcSeason != null) ...[
+              if (!loadingStatus && widget.videoDetail?.ugcSeason != null) ...[
                 Obx(
-                      () => SeasonPanel(
+                  () => SeasonPanel(
                     heroTag: heroTag,
                     ugcSeason: widget.videoDetail!.ugcSeason!,
                     cid: videoIntroController.lastPlayCid.value != 0
@@ -294,18 +293,20 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                         : widget.videoDetail!.pages!.first.cid,
                     changeFuc: videoIntroController.changeSeasonOrbangu,
                   ),
-                )
+                ),
+                const SizedBox(height: 2),
               ],
               if (!loadingStatus &&
                   widget.videoDetail?.pages != null &&
                   widget.videoDetail!.pages!.length > 1) ...[
                 Obx(() => PagesPanel(
-                  heroTag: heroTag,
-                  pages: widget.videoDetail!.pages!,
-                  cid: videoIntroController.lastPlayCid.value,
-                  bvid: videoIntroController.bvid,
-                  changeFuc: videoIntroController.changeSeasonOrbangu,
-                ))
+                      heroTag: heroTag,
+                      pages: widget.videoDetail!.pages!,
+                      cid: videoIntroController.lastPlayCid.value,
+                      bvid: videoIntroController.bvid,
+                      changeFuc: videoIntroController.changeSeasonOrbangu,
+                    )),
+                const SizedBox(height: 2),
               ],
               ListTileTheme(
                 key: const PageStorageKey<String>('视频信息'),
@@ -318,88 +319,118 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   initiallyExpanded: isExpanded,
                   collapsedShape: const RoundedRectangleBorder(),
                   shape: const RoundedRectangleBorder(),
-                  // showTrailingIcon: false,
+                  showTrailingIcon: false,
+                  // trailing: Column(children: [
+                  //   Icon(
+                  //     isExpanded
+                  //         ? Icons.keyboard_arrow_up
+                  //         : Icons.keyboard_arrow_down,
+                  //     color: t.colorScheme.outline,
+                  //   )
+                  // ]),
                   onExpansionChanged: (bool expanded) {
                     feedBack();
                     setState(() {
                       isExpanded = expanded;
                     });
                   },
-                  title: GestureDetector(
-                    onLongPress: () {
-                      feedBack();
-                      String title =
-                          widget.videoDetail?.title ?? videoItem['title'] ?? "";
-                      Clipboard.setData(ClipboardData(text: title));
-                      SmartDialog.showToast("已复制标题：「$title」到剪贴板");
-                    },
-                    child: Text(
-                      widget.videoDetail?.title ?? videoItem['title'] ?? "",
-                      // !loadingStatus
-                      //     ? "${widget.videoDetail?.title}"
-                      //     : videoItem['title'] ?? "",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        height: 1.3,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: isExpanded ?? isHorizontal ? 999 : 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  subtitle: Row(
-                    children: <Widget>[
-                      StatView(
-                        theme: 'gray',
-                        view: !loadingStatus
-                            ? widget.videoDetail?.stat?.view ?? '-'
-                            : videoItem['stat']?.view ?? '-',
-                        size: 'medium',
-                      ),
-                      const SizedBox(width: 10),
-                      StatDanMu(
-                        theme: 'gray',
-                        danmu: !loadingStatus
-                            ? widget.videoDetail?.stat?.danmu ?? '-'
-                            : videoItem['stat']?.danmu ?? '-',
-                        size: 'medium',
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        Utils.dateFormat(
-                            !loadingStatus
-                                ? widget.videoDetail?.pubdate
-                                : videoItem['pubdate'],
-                            formatType: 'detail'),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: t.colorScheme.outline,
-                        ),
-                      ),
-                      if (MineController.anonymity) ...<Widget>[
-                        const SizedBox(width: 10),
-                        Icon(
-                          MdiIcons.incognito,
-                          size: 15,
-                          color: t.colorScheme.outline,
-                          semanticLabel: '无痕',
-                        ),
-                      ],
-                      const SizedBox(width: 10),
-                      if (videoIntroController.isShowOnlineTotal)
-                        Obx(
-                          () => Text(
-                            '${videoIntroController.total.value}人在看',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: t.colorScheme.outline,
-                            ),
+                  title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        GestureDetector(
+                          onLongPress: () {
+                            feedBack();
+                            String title = widget.videoDetail?.title ??
+                                videoItem['title'] ??
+                                "";
+                            Clipboard.setData(ClipboardData(text: title));
+                            SmartDialog.showToast("已复制标题：「$title」到剪贴板");
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                      child: Text(
+                                    widget.videoDetail?.title ??
+                                        videoItem['title'] ??
+                                        "",
+                                    // !loadingStatus
+                                    //     ? "${widget.videoDetail?.title}"
+                                    //     : videoItem['title'] ?? "",
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      height: 1.5,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    maxLines: isExpanded ? 999 : 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  )),
+                                  Icon(
+                                    isExpanded
+                                        ? Icons.keyboard_arrow_up
+                                        : Icons.keyboard_arrow_down,
+                                    size: 20,
+                                    color: t.colorScheme.outline,
+                                  )
+                                ]),
                           ),
                         ),
-                      const Spacer(),
-                      const SizedBox(width: 10),
-                    ],
-                  ),
+                        Row(
+                          children: <Widget>[
+                            StatView(
+                              theme: 'gray',
+                              view: !loadingStatus
+                                  ? widget.videoDetail?.stat?.view ?? '-'
+                                  : videoItem['stat']?.view ?? '-',
+                              size: 'medium',
+                            ),
+                            const SizedBox(width: 10),
+                            StatDanMu(
+                              theme: 'gray',
+                              danmu: !loadingStatus
+                                  ? widget.videoDetail?.stat?.danmu ?? '-'
+                                  : videoItem['stat']?.danmu ?? '-',
+                              size: 'medium',
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              Utils.dateFormat(
+                                  !loadingStatus
+                                      ? widget.videoDetail?.pubdate
+                                      : videoItem['pubdate'],
+                                  formatType: 'detail'),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: t.colorScheme.outline,
+                              ),
+                            ),
+                            if (MineController.anonymity) ...<Widget>[
+                              const SizedBox(width: 10),
+                              Icon(
+                                MdiIcons.incognito,
+                                size: 15,
+                                color: t.colorScheme.outline,
+                                semanticLabel: '无痕',
+                              ),
+                            ],
+                            const SizedBox(width: 10),
+                            if (videoIntroController.isShowOnlineTotal)
+                              Obx(
+                                () => Text(
+                                  '${videoIntroController.total.value}人在看',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: t.colorScheme.outline,
+                                  ),
+                                ),
+                              ),
+                            const Spacer(),
+                            const SizedBox(width: 10),
+                          ],
+                        ),
+                      ]),
                   children: [
                     Row(children: [
                       if (widget.videoDetail != null)

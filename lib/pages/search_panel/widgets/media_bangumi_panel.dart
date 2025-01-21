@@ -15,6 +15,7 @@ Widget searchBangumiPanel(BuildContext context, ctr, list) {
   TextStyle style =
       TextStyle(fontSize: Theme.of(context).textTheme.labelMedium!.fontSize);
   return CustomScrollView(
+    cacheExtent: 3500,
     controller: ctr.scrollController,
     slivers: [
       SliverGrid(

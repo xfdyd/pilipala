@@ -24,7 +24,7 @@ class Api {
 
   // 字幕
   // aid, cid
-  static const String subtitleUrl = '/x/player/wbi/v2';
+  static const String videoMetaInfo = '/x/player/wbi/v2';
 
   // 视频详情
   // 竖屏 https://api.bilibili.com/x/web-interface/view?aid=527403921

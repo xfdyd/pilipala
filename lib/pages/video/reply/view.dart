@@ -8,6 +8,8 @@ import 'package:PiliPalaX/pages/video/index.dart';
 import 'package:PiliPalaX/pages/video/reply_new/index.dart';
 import 'package:PiliPalaX/utils/feed_back.dart';
 import 'package:PiliPalaX/utils/id_utils.dart';
+import '../../../models/video/reply/item.dart';
+import '../reply_reply/view.dart';
 import 'controller.dart';
 import 'widgets/reply_item.dart';
 
@@ -40,6 +42,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   bool _isFabVisible = true;
   String replyLevel = '1';
   late String heroTag;
+  Rx<ReplyItemModel?> firstFloor = Rx(null);
 
   // 添加页面缓存
   @override
@@ -54,11 +57,11 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
     replyLevel = widget.replyLevel ?? '1';
     if (replyLevel == '2') {
       _videoReplyController = Get.put(
-          VideoReplyController(widget.oid, widget.rpid.toString(), replyLevel),
+          VideoReplyController(widget.oid, widget.rpid, replyLevel),
           tag: widget.rpid.toString());
     } else {
       _videoReplyController = Get.put(
-          VideoReplyController(widget.oid, '', replyLevel),
+          VideoReplyController(widget.oid, 0, replyLevel),
           tag: heroTag);
     }
 
@@ -116,29 +119,31 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   }
 
   // 展示二级回复
-  void replyReply(replyItem) {
-    final VideoDetailController videoDetailCtr =
-        Get.find<VideoDetailController>(tag: heroTag);
-    if (replyItem != null) {
-      videoDetailCtr.oid.value = replyItem.oid;
-      videoDetailCtr.fRpid = replyItem.rpid!;
-      videoDetailCtr.firstFloor = replyItem;
-      videoDetailCtr.showReplyReplyPanel();
-    }
-  }
+  // void replyReply(replyItem) {
+  //   // final VideoDetailController videoDetailCtr =
+  //   //     Get.find<VideoDetailController>(tag: heroTag);
+  //   // if (replyItem != null) {
+  //   //   videoDetailCtr.oid.value = replyItem.oid;
+  //   //   videoDetailCtr.fRpid = replyItem.rpid!;
+  //   //   videoDetailCtr.firstFloor = replyItem;
+  //   //   // videoDetailCtr.showReplyReplyPanel();
+  //   // }
+  //
+  // }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return RefreshIndicator(
-      displacement: 10.0,
-      edgeOffset: 10.0,
-      onRefresh: () async {
-        await _videoReplyController.queryReplyList(type: 'init');
-      },
-      child: Stack(
-        children: [
-          CustomScrollView(
+    return Stack(
+      children: [
+        RefreshIndicator(
+          displacement: 10.0,
+          edgeOffset: 10.0,
+          onRefresh: () async {
+            await _videoReplyController.queryReplyList(type: 'init');
+          },
+          child: CustomScrollView(
+            cacheExtent: 3500,
             controller: scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
             key: const PageStorageKey<String>('评论'),
@@ -161,11 +166,21 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                       ),
                     ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        SizedBox(
+                          width: 45,
+                          child:
+                        IconButton(
+                          iconSize: 20,
+                            onPressed: () {
+                              final VideoDetailController videoDetailCtr =
+                                  Get.find<VideoDetailController>(tag: heroTag);
+                              videoDetailCtr.tabCtr.animateTo(0);
+                            },
+                            icon: const Icon(Icons.arrow_back))),
                         Obx(
                           () => AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 400),
+                            duration: const Duration(milliseconds: 300),
                             transitionBuilder:
                                 (Widget child, Animation<double> animation) {
                               return ScaleTransition(
@@ -178,6 +193,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                             ),
                           ),
                         ),
+                        const Spacer(),
                         SizedBox(
                           height: 35,
                           child: TextButton.icon(
@@ -236,8 +252,9 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                                     _videoReplyController.replyList[index],
                                 showReplyRow: true,
                                 replyLevel: replyLevel,
-                                replyReply: (replyItem) =>
-                                    replyReply(replyItem),
+                                replyReply: (replyItem) {
+                                  firstFloor.value = replyItem;
+                                },
                                 replyType: ReplyType.video,
                               );
                             }
@@ -249,52 +266,78 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
               ),
             ],
           ),
-          Positioned(
-            bottom: MediaQuery.of(context).padding.bottom + 14,
-            right: 14,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0, 2),
-                end: const Offset(0, 0),
-              ).animate(CurvedAnimation(
-                parent: fabAnimationCtr,
-                curve: Curves.easeInOut,
-              )),
-              child: FloatingActionButton(
-                heroTag: null,
-                onPressed: () {
-                  feedBack();
-                  showModalBottomSheet(
-                    context: context,
-                    isDismissible: false,
-                    isScrollControlled: true,
-                    builder: (BuildContext context) {
-                      return VideoReplyNewDialog(
-                        oid: _videoReplyController.aid ??
-                            IdUtils.bv2av(Get.parameters['bvid']!),
-                        root: 0,
-                        parent: 0,
-                        replyType: ReplyType.video,
-                      );
-                    },
-                  ).then(
-                    (value) => {
-                      // 完成评论，数据添加
-                      if (value != null && value['data'] != null)
-                        {
-                          _videoReplyController.replyList
-                              .insert(0, value['data'])
-                        }
-                    },
-                  );
-                },
-                tooltip: '发表评论',
-                child: const Icon(Icons.reply),
-              ),
+        ),
+        Positioned(
+          bottom: MediaQuery.of(context).padding.bottom + 14,
+          right: 14,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 2),
+              end: const Offset(0, 0),
+            ).animate(CurvedAnimation(
+              parent: fabAnimationCtr,
+              curve: Curves.easeInOut,
+            )),
+            child: FloatingActionButton(
+              heroTag: null,
+              onPressed: () {
+                feedBack();
+                showModalBottomSheet(
+                  context: context,
+                  isDismissible: false,
+                  isScrollControlled: true,
+                  builder: (BuildContext context) {
+                    return VideoReplyNewDialog(
+                      oid: _videoReplyController.aid ??
+                          IdUtils.bv2av(Get.parameters['bvid']!),
+                      root: 0,
+                      parent: 0,
+                      replyType: ReplyType.video,
+                    );
+                  },
+                ).then(
+                  (value) => {
+                    // 完成评论，数据添加
+                    if (value != null && value['data'] != null)
+                      {_videoReplyController.replyList.insert(0, value['data'])}
+                  },
+                );
+              },
+              tooltip: '发表评论',
+              child: const Icon(Icons.reply),
             ),
           ),
-        ],
-      ),
+        ),
+        Obx(() {
+          if (firstFloor.value == null) return const SizedBox();
+          return Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {}, // 阻止事件穿透
+              child: PopScope(
+                canPop: firstFloor.value == null,
+                onPopInvokedWithResult: (bool didPop, Object? result) async {
+                  firstFloor.value = null;
+                },
+                child: VideoReplyReplyPanel(
+                  oid: widget.oid,
+                  rpid: firstFloor.value!.rpid!,
+                  closePanel: () => {
+                    firstFloor.value = null,
+                  },
+                  firstFloor: firstFloor.value,
+                  replyType: ReplyType.video,
+                  source: 'videoDetail',
+                ),
+              ),
+            ),
+          );
+        }),
+      ],
     );
   }
 }

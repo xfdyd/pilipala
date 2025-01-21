@@ -83,6 +83,7 @@ class SearchVideoPanel extends StatelessWidget {
         ),
         Expanded(
             child: CustomScrollView(
+          cacheExtent: 3500,
           controller: ctr.scrollController,
           slivers: [
             SliverPadding(

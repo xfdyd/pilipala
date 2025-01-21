@@ -13,7 +13,6 @@ class RcmdController extends GetxController {
   int _currentPage = 0;
   // RxList<RecVideoItemAppModel> appVideoList = <RecVideoItemAppModel>[].obs;
   // RxList<RecVideoItemModel> webVideoList = <RecVideoItemModel>[].obs;
-  List<OverlayEntry?> popupDialog = <OverlayEntry?>[];
   Box setting = GStorage.setting;
   RxInt crossAxisCount = 2.obs;
   late bool enableSaveLastData;

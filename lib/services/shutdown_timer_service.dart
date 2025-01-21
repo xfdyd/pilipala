@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:PiliPalaX/plugin/pl_player/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
 
 class ShutdownTimerService with WidgetsBindingObserver {
   static final ShutdownTimerService _instance =
@@ -16,6 +17,7 @@ class ShutdownTimerService with WidgetsBindingObserver {
   bool waitForPlayingCompleted = false;
   bool isWaiting = false;
   bool isInBackground = false;
+  bool isTimerRunning = false;
   factory ShutdownTimerService() => _instance;
 
   ShutdownTimerService._internal() {
@@ -44,10 +46,12 @@ class ShutdownTimerService with WidgetsBindingObserver {
     SmartDialog.showToast("设置 $scheduledExitInMinutes 分钟后定时关闭");
     _shutdownTimer = Timer(
         Duration(minutes: scheduledExitInMinutes), () => _shutdownDecider());
+    isTimerRunning = true;
   }
 
   void _showTimeUpButPauseDialog() {
     SmartDialog.show(
+      useSystem: true,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: const Text('定时关闭'),
@@ -57,7 +61,7 @@ class ShutdownTimerService with WidgetsBindingObserver {
               child: const Text('确认'),
               onPressed: () {
                 cancelShutdownTimer();
-                SmartDialog.dismiss();
+                Get.back();
               },
             ),
           ],
@@ -73,11 +77,12 @@ class ShutdownTimerService with WidgetsBindingObserver {
       return;
     }
     SmartDialog.show(
+      useSystem: true,
       builder: (BuildContext dialogContext) {
         // Start the 10-second timer to auto close the dialog
         _autoCloseDialogTimer?.cancel();
         _autoCloseDialogTimer = Timer(const Duration(seconds: 10), () {
-          SmartDialog.dismiss(); // Close the dialog
+          Get.back();
           _executeShutdown();
         });
         return AlertDialog(
@@ -87,16 +92,15 @@ class ShutdownTimerService with WidgetsBindingObserver {
             TextButton(
               child: const Text('取消关闭'),
               onPressed: () {
-                _autoCloseDialogTimer?.cancel(); // Cancel the auto-close timer
-                cancelShutdownTimer(); // Cancel the shutdown timer
-                SmartDialog.dismiss(); // Close the dialog
+                Get.back();
+                _autoCloseDialogTimer?.cancel();
+                cancelShutdownTimer();
               },
             ),
           ],
         );
       },
     ).then((_) {
-      // Cleanup when the dialog is dismissed
       _autoCloseDialogTimer?.cancel();
     });
   }
@@ -160,6 +164,7 @@ class ShutdownTimerService with WidgetsBindingObserver {
   void cancelShutdownTimer() {
     isWaiting = false;
     _shutdownTimer?.cancel();
+    isTimerRunning = false;
   }
 }
 

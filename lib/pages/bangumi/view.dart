@@ -81,6 +81,7 @@ class _BangumiPageState extends State<BangumiPage>
         return _bangumiController.queryBangumiFollow();
       },
       child: CustomScrollView(
+        cacheExtent: 3500,
         controller: _bangumiController.scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [

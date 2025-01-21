@@ -6,9 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/constants.dart';
 import 'package:PiliPalaX/common/skeleton/video_card_v.dart';
-import 'package:PiliPalaX/common/widgets/animated_dialog.dart';
 import 'package:PiliPalaX/common/widgets/http_error.dart';
-import 'package:PiliPalaX/common/widgets/overlay_pop.dart';
 import 'package:PiliPalaX/pages/home/index.dart';
 import 'package:PiliPalaX/pages/main/index.dart';
 
@@ -87,6 +85,7 @@ class _LivePageState extends State<LivePage>
           return await _liveController.onRefresh();
         },
         child: CustomScrollView(
+          cacheExtent: 3500,
           physics: const AlwaysScrollableScrollPhysics(),
           controller: _liveController.scrollController,
           slivers: [
@@ -131,23 +130,6 @@ class _LivePageState extends State<LivePage>
     );
   }
 
-  void _removePopupDialog() {
-    _liveController.popupDialog.last?.remove();
-    _liveController.popupDialog.removeLast();
-  }
-
-  OverlayEntry _createPopupDialog(liveItem) {
-    return OverlayEntry(
-      builder: (context) => AnimatedDialog(
-        closeFn: _removePopupDialog,
-        child: OverlayPop(
-          videoItem: liveItem,
-          closeFn: _removePopupDialog,
-        ),
-      ),
-    );
-  }
-
   Widget contentGrid(ctr, liveList) {
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithExtentAndRatio(
@@ -160,16 +142,7 @@ class _LivePageState extends State<LivePage>
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
           return liveList!.isNotEmpty
-              ? LiveCardV(
-                  liveItem: liveList[index],
-                  longPress: () {
-                    _liveController.popupDialog
-                        .add(_createPopupDialog(liveList[index]));
-                    Overlay.of(context)
-                        .insert(_liveController.popupDialog.last!);
-                  },
-                  longPressEnd: _removePopupDialog,
-                )
+              ? LiveCardV(liveItem: liveList[index])
               : const VideoCardVSkeleton();
         },
         childCount: liveList!.isNotEmpty ? liveList!.length : 10,

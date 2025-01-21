@@ -6,8 +6,7 @@ import 'package:get/get.dart';
 import 'package:nil/nil.dart';
 import 'package:PiliPalaX/plugin/pl_player/index.dart';
 import 'package:PiliPalaX/utils/feed_back.dart';
-//dart-math
-import 'dart:math' as math;
+import 'dart:math';
 
 import '../../../common/widgets/audio_video_progress_bar.dart';
 
@@ -32,9 +31,9 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
     double lastAnnouncedValue = -1;
     return Obx(() {
       final int value = _.sliderPositionSeconds.value;
-      final int max = _.durationSeconds.value;
+      final int durationSec = _.durationSeconds.value;
       final int buffer = _.bufferedSeconds.value;
-      if (value > max || max <= 0) {
+      if (value > durationSec || durationSec <= 0) {
         return nil;
       }
       bool isEquivalentFullScreen = _.isFullScreen.value ||
@@ -54,12 +53,12 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
                   bottom: 3 + (isEquivalentFullScreen ? Get.height * 0.01 : 0)),
               child: Semantics(
                   // label: '${(value / max * 100).round()}%',
-                  value: '${(value / max * 100).round()}%',
+                  value: '${(value / durationSec * 100).round()}%',
                   // enabled: false,
                   child: ProgressBar(
                     progress: Duration(seconds: value),
                     buffered: Duration(seconds: buffer),
-                    total: Duration(seconds: max),
+                    total: Duration(seconds: durationSec),
                     progressBarColor: colorTheme,
                     baseBarColor: Colors.white.withOpacity(0.2),
                     bufferedBarColor: colorTheme.withOpacity(0.4),
@@ -74,7 +73,7 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
                       _.onChangedSliderStart();
                     },
                     onDragUpdate: (duration) {
-                      double newProgress = duration.timeStamp.inSeconds / max;
+                      double newProgress = duration.timeStamp.inSeconds / durationSec;
                       if ((newProgress - lastAnnouncedValue).abs() > 0.02) {
                         accessibilityDebounce?.cancel();
                         accessibilityDebounce =
@@ -93,7 +92,7 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
                       _.seekTo(Duration(seconds: duration.inSeconds),
                           type: 'slider');
                       SemanticsService.announce(
-                          "${(duration.inSeconds / max * 100).round()}%",
+                          "${(duration.inSeconds / durationSec * 100).round()}%",
                           TextDirection.ltr);
                     },
                   )),
@@ -104,7 +103,7 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
             ),
             const SizedBox(height: 6),
             if (isEquivalentFullScreen)
-              SizedBox(height: math.max(Get.height * 0.08 - 15, 0)),
+              SizedBox(height: max(Get.height * 0.08 - 15, 0)),
           ],
         ),
       );

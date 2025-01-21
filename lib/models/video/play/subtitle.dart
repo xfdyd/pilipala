@@ -3,8 +3,8 @@ enum SubtitlePreference { off, on, withoutAi }
 extension SubtitlePreferenceDesc on SubtitlePreference {
   static final List<String> _descList = [
     '默认不显示字幕',
-    '选择第一个可用字幕',
-    '跳过自动生成(ai)字幕，选择第一个可用字幕'
+    '默认显示，优先选择非自动生成(ai)字幕',
+    '默认仅显示非自动生成(ai)字幕',
   ];
   get description => _descList[index];
 }

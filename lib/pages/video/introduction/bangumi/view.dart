@@ -17,6 +17,7 @@ import 'package:PiliPalaX/utils/feed_back.dart';
 
 import 'package:PiliPalaX/utils/utils.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import '../../../../common/widgets/my_dialog.dart';
 import 'controller.dart';
 import '../widgets/bangumi_intro_detail.dart';
 
@@ -167,13 +168,8 @@ class _BangumiInfoState extends State<BangumiInfo> {
   // 视频介绍
   showIntroDetail() {
     feedBack();
-    showBottomSheet(
-      context: context,
-      enableDrag: true,
-      builder: (BuildContext context) {
-        return BangumiIntroDetail(bangumiDetail: widget.bangumiDetail!);
-      },
-    );
+    MyDialog.showCorner(
+        context, BangumiIntroDetail(bangumiDetail: widget.bangumiDetail!));
   }
 
   @override
@@ -382,8 +378,8 @@ class _BangumiInfoState extends State<BangumiInfo> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
                 Obx(() => ActionItem(
-                  icon: const Icon(Icons.thumb_up_outlined),
-                  selectIcon: const Icon(Icons.thumb_up),
+                      icon: const Icon(Icons.thumb_up_outlined),
+                      selectIcon: const Icon(Icons.thumb_up),
                       onTap:
                           handleState(bangumiIntroController.actionLikeVideo),
                       selectStatus: bangumiIntroController.hasLike.value,

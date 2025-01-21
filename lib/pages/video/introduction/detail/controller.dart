@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:PiliPalaX/plugin/pl_player/controller.dart';
 import 'package:flutter/material.dart';
@@ -138,8 +139,46 @@ class VideoIntroController extends GetxController {
   }
 
   void openVideoDetail() {
-    Get.toNamed('/video?bvid=$bvid&cid=${lastPlayCid.value}&resume=true',
-        arguments: {'heroTag': heroTag});
+    // if (Get.previousRoute == '/video?bvid=$bvid&cid=${lastPlayCid.value}') {
+    //   Get.back();
+    //   return;
+    // }
+
+    VideoDetailController? videoDetailCtr;
+    try {
+      videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
+    } catch (_) {}
+    print("videoDetailCtr: $videoDetailCtr");
+    if (videoDetailCtr == null) {
+      Get.toNamed('/video?bvid=$bvid&cid=${lastPlayCid.value}&resume=true',
+          arguments: {'heroTag': heroTag});
+      return;
+    }
+    videoDetailCtr.resumePlay = true;
+    popRouteStackContinuously = '/video?bvid=$bvid&cid=${lastPlayCid.value}';
+    Get.until((Route<dynamic> route) {
+      print(route.settings.name);
+      print(route.settings.arguments);
+      print(route.settings.arguments.runtimeType);
+      if (route.settings.arguments is Map) {
+        String? heroTagCurr =
+            (route.settings.arguments as Map<String, dynamic>)['heroTag'];
+        if (heroTagCurr != null && heroTagCurr.isNotEmpty) {
+          return heroTag == heroTagCurr;
+        }
+      }
+      // String? args = route.settings.arguments?.toString();
+      // if (args != null && args.isNotEmpty) {
+      //   String? heroTagCurr =jsonDecode(args)['heroTag'];
+      //   if (heroTagCurr != null && heroTagCurr.isNotEmpty) {
+      //     return heroTag == heroTagCurr;
+      //   }
+      // }
+      // return route.settings.arguments!.heroTag == heroTag || route.isFirst;
+      return route.settings.name?.startsWith('/video?bvid=$bvid') == true ||
+          route.isFirst;
+    });
+    popRouteStackContinuously = "";
   }
 
   // 获取视频简介&分p
@@ -681,12 +720,10 @@ class VideoIntroController extends GetxController {
   }
 
   // 设置关注分组
-  void setFollowGroup() {
-    Get.bottomSheet(
-      GroupPanel(mid: videoDetail.value.owner!.mid!),
-      isScrollControlled: true,
-    );
-  }
+  // void setFollowGroup() {
+  //   MyDialog.showCorner(
+  //       context, GroupPanel(mid: videoDetail.value.owner!.mid!));
+  // }
 
   // ai总结
   Future aiConclusion() async {

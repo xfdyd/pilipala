@@ -74,6 +74,7 @@ class _MemberSeasonsAndSeriesPageState
         edgeOffset: 10.0,
         onRefresh: _ctr.onRefresh,
         child: CustomScrollView(
+          cacheExtent: 3500,
           physics: const ClampingScrollPhysics(),
           slivers: [
             FutureBuilder(

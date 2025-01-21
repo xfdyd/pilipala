@@ -146,6 +146,7 @@ class SettingBoxKey {
       autoPiP = 'autoPiP',
       pipNoDanmaku = 'pipNoDanmaku',
       enableAutoLongPressSpeed = 'enableAutoLongPressSpeed',
+      enableLongPressSpeedIncrease = 'enableLongPressSpeedIncrease',
       subtitlePreference = 'subtitlePreference',
       playerGestureActionMap = 'playerGestureActionMap',
       // youtube 双击快进快退
@@ -200,6 +201,7 @@ class SettingBoxKey {
       strokeWidth = 'strokeWidth',
       fontWeight = 'fontWeight',
       danmakuMassiveMode = 'danmakuMassiveMode',
+      convertToScrollDanmaku = 'convertToScrollDanmaku',
 
       // 代理host port
       systemProxyHost = 'systemProxyHost',
@@ -259,7 +261,11 @@ class VideoBoxKey {
       // 自定义倍速集合
       customSpeedsList = 'customSpeedsList',
       // 画面填充比例
-      cacheVideoFit = 'cacheVideoFit';
+      cacheVideoFit = 'cacheVideoFit',
+      // 字幕字体大小
+      subtitleFontSize = 'subtitleFontSize',
+      // 字幕距底边距
+      subtitleBottomPadding = 'subtitleBottomPadding';
 }
 
 class OnlineCacheKey {

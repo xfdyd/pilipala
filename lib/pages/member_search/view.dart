@@ -92,6 +92,7 @@ class _MemberSearchPageState extends State<MemberSearchPage>
               );
             }
             return CustomScrollView(
+              cacheExtent: 3500,
               physics: const AlwaysScrollableScrollPhysics(),
               controller: scrollController,
               slivers: <Widget>[

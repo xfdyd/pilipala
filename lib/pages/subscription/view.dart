@@ -54,6 +54,7 @@ class _SubPageState extends State<SubPage> {
             Map? data = snapshot.data;
             if (data != null && data['status']) {
               return Obx(() => CustomScrollView(
+                      cacheExtent: 3500,
                       controller: scrollController,
                       physics: const AlwaysScrollableScrollPhysics(),
                       slivers: [

@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/constants.dart';
-import 'package:PiliPalaX/common/widgets/animated_dialog.dart';
-import 'package:PiliPalaX/common/widgets/overlay_pop.dart';
 import 'package:PiliPalaX/common/skeleton/video_card_h.dart';
 import 'package:PiliPalaX/common/widgets/http_error.dart';
 import 'package:PiliPalaX/common/widgets/video_card_h.dart';
@@ -79,6 +77,7 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
         return await _hotController.onRefresh();
       },
       child: CustomScrollView(
+        cacheExtent: 3500,
         physics: const AlwaysScrollableScrollPhysics(),
         controller: _hotController.scrollController,
         slivers: [
@@ -104,13 +103,6 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
                           return VideoCardH(
                             videoItem: _hotController.videoList[index],
                             showPubdate: true,
-                            longPress: () {
-                              _hotController.popupDialog.add(_createPopupDialog(
-                                  _hotController.videoList[index]));
-                              Overlay.of(context)
-                                  .insert(_hotController.popupDialog.last!);
-                            },
-                            longPressEnd: _removePopupDialog,
                           );
                         }, childCount: _hotController.videoList.length),
                       ),
@@ -152,20 +144,4 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
     );
   }
 
-  void _removePopupDialog() {
-    _hotController.popupDialog.last?.remove();
-    _hotController.popupDialog.removeLast();
-  }
-
-  OverlayEntry _createPopupDialog(videoItem) {
-    return OverlayEntry(
-      builder: (context) => AnimatedDialog(
-        closeFn: _removePopupDialog,
-        child: OverlayPop(
-          videoItem: videoItem,
-          closeFn: _removePopupDialog,
-        ),
-      ),
-    );
-  }
 }

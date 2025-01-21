@@ -159,7 +159,7 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
     pics = item.modules.moduleDynamic.major.opus.pics;
   }
   InlineSpan? richNodes = richNode(item, context);
-  print(item.type);
+  // print(item.type);
   switch (item.type) {
     // 图文
     case 'DYNAMIC_TYPE_DRAW':
@@ -358,7 +358,8 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
                 height: 50,
               ),
               const SizedBox(width: 10),
-              Column(
+              Expanded(
+                  child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -373,7 +374,7 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
-              )
+              ))
             ],
           ));
     default:
