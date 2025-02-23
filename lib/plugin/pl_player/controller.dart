@@ -15,7 +15,6 @@ import 'package:flutter_floating/floating/assist/floating_slide_type.dart';
 import 'package:flutter_floating/floating/floating.dart';
 import 'package:flutter_floating/floating/listener/event_listener.dart';
 import 'package:flutter_floating/floating/manager/floating_manager.dart';
-import 'package:flutter_floating/floating_increment.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:get/get.dart';
@@ -1687,7 +1686,7 @@ class PlPlayerController {
     int findSubtitleWithoutAi() {
       return _vttSubtitles.indexWhere((element) {
         return !element['language']!.startsWith('ai');
-      });
+      }, 1);
     }
 
     void setSubtitleFallback(int defaultIndex) {
