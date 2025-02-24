@@ -272,7 +272,7 @@ class Api {
 
   // 用户信息 需要Wbi签名
   // https://api.bilibili.com/x/space/wbi/acc/info?mid=503427686&token=&platform=web&web_location=1550101&w_rid=d709892496ce93e3d94d6d37c95bde91&wts=1689301482
-  static const String memberInfo = '/x/space/wbi/acc/info';
+  static const String memberInfo = '${HttpString.appBaseUrl}/x/v2/space';
 
   // 用户名片信息
   static const String memberCardInfo = '/x/web-interface/card';

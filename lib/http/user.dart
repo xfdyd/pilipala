@@ -8,12 +8,17 @@ import '../models/user/info.dart';
 import '../models/user/stat.dart';
 import '../models/user/sub_detail.dart';
 import '../models/user/sub_folder.dart';
+import '../utils/storage.dart';
 import 'api.dart';
 import 'init.dart';
 
 class UserHttp {
   static Future<dynamic> userStat({required int mid}) async {
-    var res = await Request().get(Api.userStat, data: {'vmid': mid});
+    var res = await Request().get(Api.userStat, data: {
+      'access_key': GStorage.localCache
+          .get(LocalCacheKey.accessKey, defaultValue: {})['value'],
+      'vmid': mid
+    });
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {

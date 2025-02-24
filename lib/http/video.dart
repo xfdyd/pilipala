@@ -563,12 +563,30 @@ class VideoHttp {
   // 操作用户关系
   static Future relationMod(
       {required int mid, required int act, required int reSrc}) async {
-    var res = await Request().post(Api.relationMod, queryParameters: {
-      'fid': mid,
-      'act': act,
-      're_src': reSrc,
-      'csrf': await Request.getCsrf(),
-    });
+    String pcua =
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.2 Safari/605.1.15';
+    var res = await Request().post(Api.relationMod,
+        data: {
+          'fid': mid,
+          'act': act,
+          're_src': reSrc,
+          'gaia_source': 'web_main',
+          'spmid': '333.999.0.0',
+          'extend_content': {
+            "entity": "user",
+            "entity_id": mid,
+            'fp': pcua,
+          },
+          'csrf': await Request.getCsrf(),
+        },
+        options: Options(
+          contentType: Headers.formUrlEncodedContentType,
+          headers: {
+            'origin': 'https://space.bilibili.com',
+            'referer': 'https://space.bilibili.com/$mid/dynamic',
+            'user-agent': pcua,
+          },
+        ));
     print(res);
     if (res.data['code'] == 0) {
       return {'status': true};

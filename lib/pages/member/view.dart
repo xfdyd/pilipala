@@ -72,7 +72,7 @@ class _MemberPageState extends State<MemberPage>
           IconButton(
             tooltip: '搜索',
             onPressed: () => Get.toNamed(
-                '/memberSearch?mid=$mid&uname=${_memberController.memberInfo.value.name!}'),
+                '/memberSearch?mid=$mid&uname=${_memberController.memberInfo.value.card!.name!}'),
             icon: const Icon(Icons.search_outlined),
           ),
           PopupMenuButton(
@@ -178,9 +178,11 @@ class _MemberPageState extends State<MemberPage>
       child: FutureBuilder(
         future: _futureBuilderFuture,
         builder: (context, snapshot) {
+          print("snapshot:${snapshot.connectionState} ${snapshot.hasData}");
           if (snapshot.connectionState == ConnectionState.done &&
               snapshot.hasData) {
             Map data = snapshot.data!;
+            print(data);
             if (data['status']) {
               return Obx(
                 () => Stack(
@@ -200,6 +202,7 @@ class _MemberPageState extends State<MemberPage>
   }
 
   Widget profilePanelAndDetailInfo(bool isHorizontal, bool loadingStatus) {
+    print("loadingStatus:$loadingStatus");
     if (isHorizontal) {
       return Row(
         children: [
@@ -229,7 +232,7 @@ class _MemberPageState extends State<MemberPage>
           children: [
             Flexible(
                 child: Text(
-              _memberController.memberInfo.value.name ?? '',
+              _memberController.memberInfo.value.card?.name ?? '',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context)
@@ -237,60 +240,45 @@ class _MemberPageState extends State<MemberPage>
                   .titleMedium!
                   .copyWith(fontWeight: FontWeight.bold, height: 2),
             )),
-            const SizedBox(width: 2),
-            if (_memberController.memberInfo.value.sex == '女')
-              const Icon(
-                FontAwesomeIcons.venus,
-                size: 14,
-                color: Colors.pink,
-                semanticLabel: '女',
-              ),
-            if (_memberController.memberInfo.value.sex == '男')
-              const Icon(
-                FontAwesomeIcons.mars,
-                size: 14,
-                color: Colors.blue,
-                semanticLabel: '男',
-              ),
             const SizedBox(width: 4),
-            if (_memberController.memberInfo.value.level != null)
+            if (_memberController.memberInfo.value.card?.level != null)
               Image.asset(
-                'assets/images/lv/lv${_memberController.memberInfo.value.level}.png',
+                'assets/images/lv/lv${_memberController.memberInfo.value.card!.level}.png',
                 height: 11,
-                semanticLabel: '等级${_memberController.memberInfo.value.level}',
+                semanticLabel: '等级${_memberController.memberInfo.value.card!.level}',
               ),
             const SizedBox(width: 6),
-            if (_memberController.memberInfo.value.vip?.status == 1) ...[
+            if (_memberController.memberInfo.value.card?.vip?.status == 1) ...[
               if (_memberController
-                      .memberInfo.value.vip?.label?['img_label_uri_hans'] !=
+                      .memberInfo.value.card!.vip?.label?['image'] !=
                   '')
                 Image.network(
                   _memberController
-                      .memberInfo.value.vip!.label!['img_label_uri_hans'],
+                      .memberInfo.value.card!.vip!.label!['image'],
                   height: 20,
                   semanticLabel:
-                      _memberController.memberInfo.value.vip!.label!['text'],
+                      _memberController.memberInfo.value.card!.vip!.label!['text'],
                 )
-              else if (_memberController.memberInfo.value.vip
+              else if (_memberController.memberInfo.value.card!.vip
                       ?.label?['img_label_uri_hans_static'] !=
                   '')
                 Image.network(
-                  _memberController.memberInfo.value.vip!
+                  _memberController.memberInfo.value.card!.vip!
                       .label!['img_label_uri_hans_static'],
                   height: 20,
                   semanticLabel:
-                      _memberController.memberInfo.value.vip!.label!['text'],
+                      _memberController.memberInfo.value.card!.vip!.label!['text'],
                 ),
             ],
           ],
         ),
-        if (_memberController.memberInfo.value.official != null &&
-            _memberController.memberInfo.value.official!['title'] != '') ...[
+        if (_memberController.memberInfo.value.card?.officialVerify != null &&
+            _memberController.memberInfo.value.card?.officialVerify!['title'] != '') ...[
           // const SizedBox(height: 2),
           Text.rich(
             maxLines: 2,
             TextSpan(
-              text: _memberController.memberInfo.value.official!['role'] == 1
+              text: _memberController.memberInfo.value.card!.officialVerify!['role'] == 1
                   ? '个人认证：'
                   : '机构认证：',
               style: TextStyle(
@@ -298,7 +286,7 @@ class _MemberPageState extends State<MemberPage>
               ),
               children: [
                 TextSpan(
-                  text: _memberController.memberInfo.value.official!['title'],
+                  text: _memberController.memberInfo.value.card!.officialVerify!['title'],
                 ),
               ],
             ),
@@ -307,7 +295,7 @@ class _MemberPageState extends State<MemberPage>
         ],
         const SizedBox(height: 6),
         SelectableText(
-          _memberController.memberInfo.value.sign ?? '',
+          _memberController.memberInfo.value.card?.sign ?? '',
         ),
       ],
     );

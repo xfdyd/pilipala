@@ -29,7 +29,8 @@ class ProfilePanel extends StatelessWidget {
                     width: 90,
                     height: 90,
                     type: 'avatar',
-                    src: !loadingStatus ? memberInfo.face : ctr.face.value,
+                    src:
+                        !loadingStatus ? memberInfo.card!.face : ctr.face.value,
                   ),
                   if (!loadingStatus &&
                       memberInfo.liveRoom != null &&
@@ -41,10 +42,9 @@ class ProfilePanel extends StatelessWidget {
                         onTap: () {
                           LiveItemModel liveItem = LiveItemModel.fromJson({
                             'title': memberInfo.liveRoom!.title,
-                            'uname': memberInfo.name,
-                            'face': memberInfo.face,
+                            'uname': memberInfo.card!.name,
+                            'face': memberInfo.card!.face,
                             'roomid': memberInfo.liveRoom!.roomId,
-                            'watched_show': memberInfo.liveRoom!.watchedShow,
                           });
                           Get.toNamed(
                             '/liveRoom?roomid=${memberInfo.liveRoom!.roomId}',
@@ -94,13 +94,13 @@ class ProfilePanel extends StatelessWidget {
                         InkWell(
                           onTap: () {
                             Get.toNamed(
-                                '/follow?mid=${memberInfo.mid}&name=${memberInfo.name}');
+                                '/follow?mid=${memberInfo.card!.mid}&name=${memberInfo.card!.name}');
                           },
                           child: Column(
                             children: [
                               Text(
                                 !loadingStatus
-                                    ? ctr.userStat!['following'].toString()
+                                    ? memberInfo.card!.attention.toString()
                                     : '-',
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold),
@@ -119,15 +119,15 @@ class ProfilePanel extends StatelessWidget {
                         InkWell(
                           onTap: () {
                             Get.toNamed(
-                                '/fan?mid=${memberInfo.mid}&name=${memberInfo.name}');
+                                '/fan?mid=${memberInfo.card!.mid}&name=${memberInfo.card!.name}');
                           },
                           child: Column(
                             children: [
                               Text(
                                   !loadingStatus
-                                      ? ctr.userStat!['follower'] != null
+                                      ? memberInfo.card!.fans != null
                                           ? Utils.numFormat(
-                                              ctr.userStat!['follower'],
+                                              memberInfo.card!.fans,
                                             )
                                           : '-'
                                       : '-',
@@ -150,10 +150,9 @@ class ProfilePanel extends StatelessWidget {
                               children: [
                                 Text(
                                     !loadingStatus
-                                        ? ctr.userStat!['likes'] != null
+                                        ? memberInfo.card!.likes != null
                                             ? Utils.numFormat(
-                                                ctr.userStat!['likes'],
-                                              )
+                                                memberInfo.card!.likes)
                                             : '-'
                                         : '-',
                                     style: const TextStyle(
@@ -207,8 +206,8 @@ class ProfilePanel extends StatelessWidget {
                                 '/whisperDetail',
                                 parameters: {
                                   'talkerId': ctr.mid.toString(),
-                                  'name': memberInfo.name!,
-                                  'face': memberInfo.face!,
+                                  'name': memberInfo.card!.name!,
+                                  'face': memberInfo.card!.face!,
                                   'mid': ctr.mid.toString(),
                                 },
                               );

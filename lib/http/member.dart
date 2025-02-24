@@ -1,5 +1,8 @@
 import 'dart:developer';
 
+import 'package:dio/dio.dart';
+
+import '../common/constants.dart';
 import '../models/dynamics/result.dart';
 import '../models/follow/result.dart';
 import '../models/member/archive.dart';
@@ -15,21 +18,43 @@ import 'index.dart';
 class MemberHttp {
   static Future memberInfo({
     int? mid,
-    String token = '',
-    dynamic wwebid,
   }) async {
-    Map params = await WbiSign().makSign({
-      'mid': mid,
-      'token': token,
-      'platform': 'web',
-      'web_location': 1550101,
-      'w_webid': wwebid,
-    });
-    var res = await Request().get(
-      Api.memberInfo,
-      data: params,
-      extra: {'ua': 'pc'},
+    String? accessKey = GStorage.localCache
+        .get(LocalCacheKey.accessKey, defaultValue: {})['value'];
+    Map<String, String> data = {
+      if (accessKey?.isNotEmpty == true) 'access_key': accessKey!,
+      'appkey': Constants.appKey,
+      'build': '1462100',
+      'c_locale': 'zh_CN',
+      'channel': 'yingyongbao',
+      'mobi_app': 'android_hd',
+      'platform': 'android',
+      's_locale': 'zh_CN',
+      'statistics': Constants.statistics,
+      'ts': (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString(),
+      'vmid': mid.toString(),
+    };
+    String sign = Utils.appSign(
+      data,
+      Constants.appKey,
+      Constants.appSec,
     );
+    data['sign'] = sign;
+    int? _mid = GStorage.userInfo.get('userInfoCache')?.mid;
+    dynamic res = await Request().get(
+      Api.memberInfo,
+      data: data,
+      options: Options(
+        headers: {
+          'env': 'prod',
+          'app-key': 'android_hd',
+          'x-bili-mid': _mid,
+          'bili-http-engine': 'cronet',
+          'user-agent': Constants.userAgent,
+        },
+      ),
+    );
+    print(res);
     if (res.data['code'] == 0) {
       return {
         'status': true,
