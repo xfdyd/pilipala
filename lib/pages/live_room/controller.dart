@@ -56,7 +56,7 @@ class LiveRoomController extends GetxController {
   }
 
   Future queryLiveInfo() async {
-    var res = await LiveHttp.liveRoomInfo(roomId: roomId, qn: 10000);
+    var res = await LiveHttp.liveRoomInfo(roomId: roomId, qn: 80);
     if (res['status']) {
       List<CodecItem> codec =
           res['data'].playurlInfo.playurl.stream.first.format.first.codec;
